@@ -1,308 +1,240 @@
 package com.example.pieteditor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
 import com.example.pieteditor.CodelTableModel.*;
 
-
-
 public class Interpreter {
+    boolean mPaused;
+    int mCountSteps;
 
-	class CodelPoint{
-		public int x;
-		public int y;
-		CodelPoint(int _x, int _y){
-			x = _x;
-			y = _y;
-		}
-	}
+    CodelTableModel mModel;
+    CodelTableModelScaner mModelScaner;
 
-	private enum DirectionPointer{
-		/*
-		 * Determines with Codel Choser scanning direction
-		 * */
-		RIGHT,BOTTOM,TOP,LEFT;
+    Logger mLogger;
+    PietMachine mMachine;
 
-	}
+    Codel mCurrentCodel;
+    Codel mNextCodel;
+    Codel mEdgeCodel;
+    
+    public Interpreter(Logger _logger, PietMachine _machine) {
+        // TODO Auto-generated constructor stub
+        mLogger = _logger;
+        mMachine = _machine;
 
-	private enum CodelChoser{
-		/*
-		 * Determines with Direction Pointer scanning direction
-		 * */
-		LEFT,RIGHT;
-	}
+        mCountSteps = 0;
 
+        mCurrentCodel = new Codel();
+        mNextCodel = new Codel();
+        mEdgeCodel = new Codel();
 
-	private enum OperationCode{
-		IDLE, PUSH, POP, ADD, SUB, MUL, DIV, MOD, NOT, GREATER, POINTER,
-		SWITCH, DUPLICATE, ROLL, IN_NUMBER, IN_CHAR, OUT_NUMBER, OUT_CHAR;
-	}
+        mModelScaner = new CodelTableModelScaner();
+    }
 
-	private enum ExecuteFlowState{
-		PAUSE,CLEAR,RUN;
-	}
+    public void setInput(CodelTableModel _model) {
+        mModel = _model;
+        mModelScaner.setModel(_model);
+    }
 
-	private Stack<Integer> mStack;
+    public boolean isOnPause() {
+        return mPaused;
+    }
 
-	CodelChoser mCodelChoser;
-	DirectionPointer mDirectionPointer;
-	boolean mPaused;
-	CodelTableModel mModel;
-	OperationCode mOperationCode;
-	Logger mLogger;
+    public void pause() {
+        mPaused = true;
+    }
 
-	int countSteps;
-	
-	CodelCursor mCurrentCodel;
-	CodelCursor mNextCodel;
+    private void findNextCodel(Codel codel) {
+        int x = codel.x;
+        int y = codel.y;
 
-	public Interpreter ( Logger _logger ) {
-		// TODO Auto-generated constructor stub
-		mCodelChoser = CodelChoser.LEFT;
-		mDirectionPointer = DirectionPointer.RIGHT;
-		mOperationCode = OperationCode.IDLE;
+        DirectionPointer directionPointer = mMachine.getDirectionPointer();
 
-		mLogger = _logger;
-		countSteps = 0;
-		mCurrentCodel = new CodelCursor(0,0);
-		mNextCodel = new CodelCursor(-1,-1);
-	}
-	
-	public void setInput(CodelTableModel _model){
-		mModel = _model;
-	}
+        if (directionPointer.isRight()) {
+            x += 1;
+        } else if (directionPointer.isBottom()) {
+            y += 1;
+        } else if (directionPointer.isLeft()) {
+            x -= 1;
+        } else if (directionPointer.isTop()) {
+            y -= 1;
+        }
 
-	public boolean getPaused(){
-		return mPaused;
-	}
+        mNextCodel.set(x, y);
+    }
 
-	public void pause(){
-		mPaused = true;
-	}
-	/*  вправо 	влево 	самый верхний
-				вправо 	самый нижний
-		вниз 	влево 	самый правый
-				вправо 	самый левый
-		влево 	влево 	самый нижний
-				вправо 	самый верхний
-		вверх 	влево 	самый левый
-				вправо 	самый правый*/
+    private boolean isValid(Codel codel) {
+        if (mModel.isValid(codel) == false) {
+            return false;
+        }
 
-	/**
-	 * Collections.sort(list, new Comparator<String>() {
-	    public int compare(String a, String b) {
-	        return Integer.signum(fixString(a) - fixString(b));
-	    }
-	    private int fixString(String in) {
-	        return Integer.parseInt(in.substring(0, in.indexOf('_')));
-	    }
-	});
-	 */
+        CodelColor value = mModel.getValue(codel);
+        if (value == CodelColor.BLACK) {
+            return false;
+        }
 
-	public CodelCursor getCodelOnEdge(ArrayList<CodelCursor> _codels){
-		Comparator<CodelCursor> comparator = new Comparator<CodelCursor>(){
-			@Override
-			public int compare(CodelCursor o1, CodelCursor o2) {
-				return o1.y - o2.y;
-			}
-		};;
-		if( mDirectionPointer == DirectionPointer.RIGHT ){
-			if( mCodelChoser == CodelChoser.LEFT ){
-				comparator = new Comparator<CodelCursor>(){
-					@Override
-					public int compare(CodelCursor o1, CodelCursor o2) {
-						return o1.y - o2.y;
-					}
-				};
-			}
-			else if ( mCodelChoser == CodelChoser.RIGHT ){
-				comparator = new Comparator<CodelCursor>(){
-					@Override
-					public int compare(CodelCursor o1, CodelCursor o2) {
-						return o2.y - o1.y;
-					}
-				};
-			}
-		}
-		else if( mDirectionPointer == DirectionPointer.BOTTOM ){
-			if( mCodelChoser == CodelChoser.LEFT ){
-				comparator = new Comparator<CodelCursor>(){
-					@Override
-					public int compare(CodelCursor o1, CodelCursor o2) {
-						return o2.x - o1.x;
-					}
-				};
-			}
-			else if ( mCodelChoser == CodelChoser.RIGHT ){
-				comparator = new Comparator<CodelCursor>(){
-					@Override
-					public int compare(CodelCursor o1, CodelCursor o2) {
-						return o1.x - o2.x;
-					}
-				};
-			}
-		}
-		else if( mDirectionPointer == DirectionPointer.LEFT ){
-			if( mCodelChoser == CodelChoser.LEFT ){
-				comparator = new Comparator<CodelCursor>(){
-					@Override
-					public int compare(CodelCursor o1, CodelCursor o2) {
-						return o2.y - o1.y;
-					}
-				};
-			}
-			else if ( mCodelChoser == CodelChoser.RIGHT ){
-				comparator = new Comparator<CodelCursor>(){
-					@Override
-					public int compare(CodelCursor o1, CodelCursor o2) {
-						return o1.y - o2.y;
-					}
-				};
-			}
-		}
-		else if( mDirectionPointer == DirectionPointer.TOP ){
-			if( mCodelChoser == CodelChoser.LEFT ){
-				comparator = new Comparator<CodelCursor>(){
-					@Override
-					public int compare(CodelCursor o1, CodelCursor o2) {
-						return o1.x - o2.x;
-					}
-				};
-			}
-			else if ( mCodelChoser == CodelChoser.RIGHT ){
-				comparator = new Comparator<CodelCursor>(){
-					@Override
-					public int compare(CodelCursor o1, CodelCursor o2) {
-						return o2.x - o1.x;
-					}
-				};
-			}
-		}
+        return true;
+    }
 
-		Collections.sort(_codels, comparator);
+    private void switchDirection(int attempt) {
+        if ((attempt % 2) == 0) {
+            CodelChoser codelChoser = mMachine.getCodelChoser();
+            codelChoser.switchState();
+        } else {
+            DirectionPointer directionPointer = mMachine.getDirectionPointer();
+            directionPointer.rollClockWise();
+        }
+    }
 
-		CodelCursor chosen = _codels.get(0);
-		return chosen;
-	}
+    private boolean executeCommand(Codel _current, Codel _next, Integer _input) {
+        CodelColor currentColor = mModel.getValue(_current);
+        CodelColor nextColor = mModel.getValue(_next);
 
-	public void run(){
-		mLogger.info("Iterpreter run");
-		mPaused = false;
-		countSteps = 0;
-		while( mPaused == false ){
-			if ( step() == false ){
-				break;
-			}
-		}
-	}
+        int deltaHue = nextColor.hue - currentColor.hue;
+        int deltaDark = nextColor.dark - currentColor.dark;
 
-	public CodelCursor getNextCodel( CodelCursor codel){
-		CodelCursor next = new CodelCursor(codel); 
-		if ( mDirectionPointer == DirectionPointer.RIGHT ){
-			next.x += 1;
-		}
-		else if ( mDirectionPointer == DirectionPointer.BOTTOM ){
-			next.y += 1;
-		}
-		else if ( mDirectionPointer == DirectionPointer.LEFT ){
-			next.x -= 1;
-		}
-		else if ( mDirectionPointer == DirectionPointer.TOP ){
-			next.y -= 1;
-		}
+        try {
+            mMachine.runCommand(deltaDark, deltaHue, _input);
+            return true;
+        }
+        catch (PietMachineExecutionError exception) {
+            mLogger.error("BAD COMMAND EXECUTE delta dark :%d "
+                    + " delta hue %d error: %s", deltaDark, deltaHue, exception.toString());
+            return false;
+        }
+    }
 
-		return next;
-	}
+    /**In Piet Language specifiation chosing between two variants of moving
+     * made by CodelChoser,
+     * but this caught error on common used HelloWorld example.
+     * I don`t know why,
+     * but in iterpreters often used  evenes of DirectionalPointer
+     * So i decide to use the same method.
+     */
+    private void findCodelOnEdge(CodelArea area) {
+        DirectionPointer directionPointer = mMachine.getDirectionPointer();
 
-	public boolean isValid( CodelCursor codel ){
-		if( mModel.isValid(codel) == false ){
-			return false;
-		}
-		
-		CodelColor value = mModel.getValue(codel);
-		if ( value == CodelColor.BLACK ){
-			return false;
-		}
+        int even = directionPointer.getState() % 2;
+       
+        if (directionPointer.isRight()) {
+            if (even != 0) {
+                mEdgeCodel.set(area.minYCodel);
+            } else {
+                mEdgeCodel.set(area.maxYCodel);
+            }
+        } else if (directionPointer.isBottom()) {
+            if (even != 0) {
+                mEdgeCodel.set(area.maxXCodel);
+            } else {
+                mEdgeCodel.set(area.minXCodel);
+            }
 
-		return true;
-	}
+        } else if (directionPointer.isLeft()) {
+            if (even != 0) {
+                mEdgeCodel.set(area.maxYCodel);
+            } else {
+                mEdgeCodel.set(area.minYCodel);
+            }
+        } else if (directionPointer.isTop()) {
+            if (even != 0) {
+                mEdgeCodel.set(area.minXCodel);
+            } else {
+                mEdgeCodel.set(area.maxXCodel);
+            }
+        }
+    }
 
-	public void switchDirection( int attempt ){
-		if ( (attempt % 2) == 0 ){
-			if( mCodelChoser == CodelChoser.LEFT ){
-				mCodelChoser = CodelChoser.RIGHT;
-			}
-			else{
-				mCodelChoser = CodelChoser.LEFT;
-			}
-		}
-		else{
-			if ( mDirectionPointer == DirectionPointer.RIGHT ){
-				mDirectionPointer = DirectionPointer.BOTTOM;
-			}
-			else if ( mDirectionPointer == DirectionPointer.BOTTOM ){
-				mDirectionPointer = DirectionPointer.LEFT;
-			}	
-			else if ( mDirectionPointer == DirectionPointer.LEFT ){
-				mDirectionPointer = DirectionPointer.TOP;
-			}
-			else if ( mDirectionPointer == DirectionPointer.TOP ){
-				mDirectionPointer = DirectionPointer.RIGHT;
-			}
-		}
-	}
-	
-	public boolean executeCommand(){
-//		dH = hex2tuple[self.matrix[ny][nx]]['hue'] - \
-//                hex2tuple[self.matrix[self.y][self.x]]['hue']
-//           dD = hex2tuple[self.matrix[ny][nx]]['dark'] - \
-//                hex2tuple[self.matrix[self.y][self.x]]['dark']
-		
-	}
-	
-	public boolean step(){
-		int attempt = 1;
-		ArrayList<CodelCursor> neighbours = mModel.getNeighbors(mCurrentCodel);
-		CodelCursor codelOnEdge = getCodelOnEdge(neighbours);
+    private CodelArea findCodelArea(Codel codel) {
+        mModelScaner.scanForCodelNeighbors(codel.x, codel.y);
+        CodelArea area = mModelScaner.getCodelArea();
+        return area;
+    }
 
-		boolean seenWhite = false;
+    public void run() {
+        /*mMachine.setCommandRunListener( new PietMachine.CommandRunListener() {
+            public void onRunCommand(final Command command,
+                    final PietMachineStack stack) {
+                System.out.print(command);
+                System.out.println(" Stack : " + stack.toString());
+            }
+        });*/
 
-		mLogger.info("Start");
-		CodelColor value = mModel.getValue(mCurrentCodel);
-		
-		while (attempt <= 8){
-			CodelCursor nextCodel = getNextCodel(codelOnEdge);
-			if (isValid(nextCodel) == false){
-				attempt += 1;
-				
-				switchDirection(attempt);
-						
-				if( value == CodelColor.WHITE ){
-					continue;
-				}
-				
-				mLogger.info("FIX ME");
-			}
-			else if( value == CodelColor.WHITE ){
-				seenWhite = true;
-				attempt = 0;
-				codelOnEdge = nextCodel;
-			}
-			else{
-				if( seenWhite == false ){
-					executeCommand();
-				}
-				
-				mCurrentCodel = nextCodel;
-				countSteps += 1;
-				
-				return true;
-			}
-		}
-		
-		mLogger.info("STEP FAILED");
-		return false;
-	}
+        mLogger.info("Iterpreter run");
+        mPaused = false;
+        mCountSteps = 0;
+        while (mPaused == false) {
+            //System.out.println("count steps" + mCountSteps);
+            if (step() == false) {
+                break;
+            }
+        }
+    }
+
+    public boolean step() {
+        CodelArea area = findCodelArea(mCurrentCodel);
+        findCodelOnEdge(area);
+
+        boolean seenWhite = false;
+
+        CodelColor value = mModel.getValue(mCurrentCodel);
+
+        int attempt = 1;
+        while (attempt <= 8) {         
+            Integer codelData = area.size;
+
+            findNextCodel(mEdgeCodel);
+            /*printf("current %d,%d; edge %d,%d; next %d,%d;pointer %d codel %d"
+            , mCurrentCodel.x,mCurrentCodel.y,codelOnEdge.x,codelOnEdge.y, nextCodel.x, nextCodel .y,
+            mDirectionPointer.ordinal(), mCodelChoser.ordinal());    */
+
+            if (isValid(mNextCodel) == false) {
+                attempt += 1;
+
+                switchDirection(attempt);
+
+                if (value == CodelColor.WHITE) {
+                    continue;
+                }
+
+                //FIX ME
+                mCurrentCodel.set(mEdgeCodel);
+                
+                area = findCodelArea(mCurrentCodel);
+                findCodelOnEdge(area);
+            }
+            else if (value == CodelColor.WHITE) {
+                seenWhite = true;
+                attempt = 0;
+                mEdgeCodel.set(mNextCodel);
+            }
+            else {
+                if (seenWhite == false) {
+                    boolean result = executeCommand(mCurrentCodel, mNextCodel, codelData);
+                    if (result == false) {
+                        //ERROR HANDLING HERE
+                        return false;
+                    }
+                }
+
+                mCurrentCodel.set(mNextCodel);
+                mCountSteps += 1;
+                return true;
+            }
+        }
+
+        mLogger.info("STEP FAILED");
+        return false;
+    }
+
+    public static void main(String[] args) {
+        CodelTableModel model = FakeData.getHelloWorldModel();
+        Logger logger = new LoggerJavaSdkStdOut();
+
+        InOutSystem inOutSystem = new InOutSystemJDK();
+        PietMachine machine = new PietMachine(inOutSystem);
+
+        Interpreter interpreter = new Interpreter(logger, machine);
+        interpreter.setInput(model);
+
+        interpreter.run();
+    }
 }
