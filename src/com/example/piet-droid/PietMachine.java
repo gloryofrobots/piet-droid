@@ -5,171 +5,210 @@ import java.util.Collections;
 import java.io.IOException;
 
 public class PietMachine {
-	Stack<Integer> mStack;
-	Integer mValue;
 
+    public interface CommandRunListener {
+        public void onRunCommand(final Command command, final PietMachineStack stack);
+    }
+
+    PietMachineStack mStack;
+    Integer mValue;
     DirectionPointer mDirectionPointer;
     CodelChoser mCodelChoser;
+    InOutSystem mInOutSystem;
+    CommandRunListener mCommandRunListener;
+    Command[][] mCommands;
 
-	abstract class Command{
-		public boolean exec(Stack<Integer> _stack, Integer _input
-                , DirectionPointer _directionPointer, CodelChoser _codelChoser) throws PietMachineExecutionError {
-			try{
-				this.onExec(_stack, _input, _directionPointer,_codelChoser);
-                //System.out.println(_stack);
-				return true;
-            }
-			catch(NullPointerException e){
-                System.out.println(e.toString());
-				return false;
-			}
-		}
-		
-		abstract void onExec(Stack<Integer> _stack, Integer _input,
-                             DirectionPointer _directionPointer, CodelChoser _codelChoser) throws PietMachineExecutionError;
-	}
+    private final int DARK_COUNT = 6;
+    private final int HUE_COUNT = 3;
 
-	Command[][] mCommands;
-	private final int DARK_COUNT = 6;
-	private final int HUE_COUNT = 3;
-	public PietMachine() {
-		mStack = new Stack<Integer>();
-		mValue = 0;
-		mCommands = new Command[DARK_COUNT][HUE_COUNT];
+    public PietMachine(InOutSystem _inOutSystem) {
+        mInOutSystem = _inOutSystem;
+
+        mStack = new PietMachineStack();
+        mValue = 0;
+
+        mCommands = new Command[DARK_COUNT][HUE_COUNT];
+
+        mCommandRunListener = null;
 
         mDirectionPointer = new DirectionPointer();
         mCodelChoser = new CodelChoser();
 
-		setupCommands();
-	}
+        setupCommands();
+    }
 
-    public final DirectionPointer getDirectionPointer(){
+    public final void setCommandRunListener(CommandRunListener listener) {
+        mCommandRunListener = listener;
+    }
+
+    public final DirectionPointer getDirectionPointer() {
         return mDirectionPointer;
     }
 
-    public final CodelChoser getCodelChoser(){
+    public final CodelChoser getCodelChoser() {
         return mCodelChoser;
     }
 
-	private void setupCommands(){
-		//idle
-		mCommands[0][0] = new Command(){
-			void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				
-			}
-		};
-		//push
-		mCommands[0][1] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				_stack.push(_input);
-			}
-		};
-		//pop
-		mCommands[0][2] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				_stack.pop();
-			}
-		};
-		//add
-		mCommands[1][0] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				Integer next = _stack.pop();
-				_stack.push(top + next);
-			}
-		};
-		//sub
-		mCommands[1][1] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				Integer next = _stack.pop();
-				_stack.push(next - top);
-			}
-		};
-		//mul
-		mCommands[1][2] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				Integer next = _stack.pop();
-				_stack.push(next * top);
-			}
-		};
-		//DIV
-		mCommands[2][0] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				Integer next = _stack.pop();
-				_stack.push(next / top);
-			}
-		};
-	
-		//MOD
-		mCommands[2][1] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				Integer next = _stack.pop();
-				_stack.push(next % top);
-			}
-		};
-		//NOT
-		mCommands[2][2] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				Integer result = 0;
-				
-				if(top == 0){
-					result = 1;
-				}
-				
-				_stack.push(result);
-			}
-		};
-		//GREATER
-		mCommands[3][0] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				Integer next = _stack.pop();
-				if (next > top){
-					_stack.push(1);
-				}
-				else{
-					_stack.push(0);
-				}
-			}
-		};
-		//POINTER
-		mCommands[3][1] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
+    public void setCommand(int dark, int hue, Command command)
+            throws ArrayIndexOutOfBoundsException {
+        mCommands[dark][hue] = command;
+    }
+
+    private void setupCommands() {
+        //idle
+        mCommands[0][0] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+            }
+        };
+        //push
+        mCommands[0][1] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                _stack.push(_input);
+                setRepresentation("PUSH", "%d", _input);
+            }
+        };
+        //pop
+        mCommands[0][2] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer removed = _stack.pop();
+                setRepresentation("POP", "%d", removed);
+            }
+        };
+        //add
+        mCommands[1][0] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+                Integer next = _stack.pop();
+                _stack.push(top + next);
+
+                setRepresentation("ADD", "%d %d", top, next);
+            }
+        };
+        //sub
+        mCommands[1][1] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+                Integer next = _stack.pop();
+                _stack.push(next - top);
+
+                setRepresentation("SUB", "%d %d", next, top);
+            }
+        };
+        //mul
+        mCommands[1][2] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+                Integer next = _stack.pop();
+                _stack.push(next * top);
+
+                setRepresentation("MUL", "%d %d", next, top);
+            }
+        };
+        //DIV
+        mCommands[2][0] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+                Integer next = _stack.pop();
+                _stack.push(next / top);
+
+                setRepresentation("DIV", "%d %d", next, top);
+            }
+        };
+
+        //MOD
+        mCommands[2][1] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+                Integer next = _stack.pop();
+                _stack.push(next % top);
+
+                setRepresentation("MOD", "%d %d", next, top);
+            }
+        };
+        //NOT
+        mCommands[2][2] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+                Integer result = 0;
+
+                if (top == 0) {
+                    result = 1;
+                }
+
+                _stack.push(result);
+
+                setRepresentation("NOT", "%d", result);
+            }
+        };
+        //GREATER
+        mCommands[3][0] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+                Integer next = _stack.pop();
+                Integer result = 0;
+
+                if (next > top) {
+                    result = 1;
+                }
+
+                _stack.push(result);
+
+                setRepresentation("GREATER", "%d %d", next, top);
+            }
+        };
+        //POINTER
+        mCommands[3][1] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
                 Integer top = _stack.pop();
 
                 _direction.roll(top);
-			}
-		};
-		//SWITCH
-		mCommands[3][2] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
+
+                setRepresentation("POINTER", "%d", top);
+            }
+        };
+        //SWITCH
+        mCommands[3][2] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
                 Integer top = _stack.pop();
 
                 _codelChoser.roll(top);
-			}
-		};
-		//DUPLICATE
-		mCommands[4][0] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
+
+                setRepresentation("SWITCH", "%d", top);
+            }
+        };
+        //DUPLICATE
+        mCommands[4][0] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
                 Integer top = _stack.pop();
 
                 _stack.push(top);
                 _stack.push(top);
-			}
-		};
-		//ROLL
-		mCommands[4][1] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
+
+                setRepresentation("DUPLICATE", "%d", top);
+            }
+        };
+        //ROLL
+        mCommands[4][1] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
                 Integer num = _stack.pop();
                 Integer depth = _stack.pop();
                 num %= depth;
 
-                if (depth <= 0 || num == 0){
+                if (depth <= 0 || num == 0) {
                     return;
                 }
 
@@ -181,7 +220,7 @@ public class PietMachine {
 
                 int aboveRange = _stack.size() - secondPosition;
                 ArrayList<Integer> aboveElements = new ArrayList<Integer>();
-                for(int i = 0; i < aboveRange; ++i){
+                for (int i = 0; i < aboveRange; ++i) {
                     Integer value = _stack.pop();
                     aboveElements.add(value);
                 }
@@ -189,142 +228,101 @@ public class PietMachine {
 
                 int belowRange = secondPosition - firstPosition;
                 ArrayList<Integer> belowElements = new ArrayList<Integer>();
-                for(int i = 0; i < belowRange; ++i){
+                for (int i = 0; i < belowRange; ++i) {
                     Integer value = _stack.pop();
                     belowElements.add(value);
                 }
                 Collections.reverse(belowElements);
 
-                for (Integer value : aboveElements){
+                for (Integer value : aboveElements) {
                     _stack.push(value);
                 }
 
-                for (Integer value : belowElements){
+                for (Integer value : belowElements) {
                     _stack.push(value);
                 }
-			}
-		};
-		//IN_NUMBER
-		mCommands[4][2] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser)
-                    throws PietMachineExecutionError{
-                try{
-                    Integer value = System.in.read();
-                    _stack.push(value);
-                }
-                catch (IOException exception){
-                    String msg = exception.getMessage();
-                    throw new PietMachineExecutionError(msg);
-                }
-			}
-		};
-		//IN_CHAR
-		mCommands[5][0] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser)
-                    throws PietMachineExecutionError{
-                try{
-                    Integer value = System.in.read();
-                    _stack.push(value);
-                }
-                catch (IOException exception){
-                    String msg = exception.getMessage();
-                    throw new PietMachineExecutionError(msg);
-                }
-			}
-		};
-		//OUT_NUMBER
-		mCommands[5][1] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				System.out.print(top);
-			}
-		};
-		//OUT_CHAR
-		mCommands[5][2] = new Command(){
-            void onExec(Stack<Integer> _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser){
-				Integer top = _stack.pop();
-				
-				char [] unicode = Character.toChars(top);
-				System.out.print(unicode);
-			}
-		};
-	}
 
-	public void runCommand(int _dark, int _hue, Integer _input) throws PietMachineExecutionError {
+                setRepresentation("ROLL", "%d %d", num, depth);
+            }
+        };
+        //IN_NUMBER
+        mCommands[4][2] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem)
+                    throws PietMachineExecutionError {
+                try {
+                    Integer value = _inOutSystem.read();
+                    _stack.push(value);
+                    setRepresentation("IN_NUMBER", "%d", value);
+                } catch (IOException exception) {
+                    String msg = exception.getMessage();
+                    throw new PietMachineExecutionError(msg);
+                }
+            }
+        };
+        //IN_CHAR
+        mCommands[5][0] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem)
+                    throws PietMachineExecutionError {
+                try {
+                    Integer value = _inOutSystem.read();
+                    _stack.push(value);
+                    setRepresentation("IN_CHAR", "%d", value);
+                } catch (IOException exception) {
+                    String msg = exception.getMessage();
+                    throw new PietMachineExecutionError(msg);
+                }
+            }
+        };
+        //OUT_NUMBER
+        mCommands[5][1] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+                _inOutSystem.write(top);
+
+                setRepresentation("OUT_NUMBER", "%d", top);
+            }
+        };
+        //OUT_CHAR
+        mCommands[5][2] = new Command() {
+
+            public void onExec(PietMachineStack _stack, Integer _input, DirectionPointer _direction, CodelChoser _codelChoser, InOutSystem _inOutSystem) {
+                Integer top = _stack.pop();
+
+                char[] unicode = Character.toChars(top);
+                String repr = new String(unicode);
+                _inOutSystem.write(repr);
+
+                setRepresentation("OUT_CHAR", "%s", repr);
+            }
+        };
+    }
+
+    public void runCommand(int _dark, int _hue, Integer _input) throws PietMachineExecutionError {
         int y = _hue;
         int x = _dark;
-        if(_hue < 0){
+        if (_hue < 0) {
             y = DARK_COUNT - (-1 * _hue);
         }
-        if(_dark < 0){
+        if (_dark < 0) {
             x = HUE_COUNT - (-1 * _dark);
         }
 
         //String format = String.format("%d,%d (%d)", x,y,_input);
         //System.out.println(format);
-		mCommands[y][x].exec(mStack, _input, mDirectionPointer, mCodelChoser);
-	}
-	
-	/*
-	    def NOT(self):
-	        if len(self.stack) < 1:
-	            return
-	        top = self.stack.pop()
-	        self.stack.append(int(not top))
+        Command command = mCommands[y][x];
+        command.exec(mStack, _input, mDirectionPointer, mCodelChoser, mInOutSystem);
 
-	    def GTR(self):
-	        if len(self.stack) < 2:
-	            return
-	        top = self.stack.pop()
-	        next = self.stack.pop()
-	        self.stack.append(int(next > top))
+        onRunCommand(command);
+    }
 
-	    def PNTR(self):
-	        if len(self.stack) < 1:
-	            return
-	        top = self.stack.pop()
-	        self.dp = (self.dp + top) % 4
+    private void onRunCommand(Command command) {
+        if (mCommandRunListener == null) {
+            return;
+        }
 
-	    def SWCH(self):
-	        if len(self.stack) < 1:
-	            return
-	        top = self.stack.pop()
-	        self.cc *= (-1) ** (top % 2)
-
-	    def DUP(self):
-	        if len(self.stack) < 1:
-	            return
-	        self.stack.append(self.stack[-1])
-
-	    def ROLL(self):
-	        if len(self.stack) < 2:
-	            return
-	        num = self.stack.pop()
-	        depth = self.stack.pop()
-	        num %= depth
-	        if depth <= 0 or num == 0:
-	            return
-	        x = -abs(num) + depth * (num < 0)
-	        self.stack[-depth:] = self.stack[x:] + self.stack[-depth:x]
-
-	    def N_IN(self):
-
-	        n = int(raw_input("Enter an integer: "))
-	        self.stack.append(n)
-
-	    def C_IN(self):
-	        c = ord(raw_input("Enter a character: "))
-	        self.stack.append(c)
-
-	    def NOUT(self):
-	        if len(self.stack) < 1:
-	            return
-	        top = self.stack.pop()
-	        sys.stdout.write(str(top))
-
-	    def COUT(self):
-	        if len(self.stack) < 1:
-	            return
-	        top = self.stack.pop()
-	        sys.stdout.write(chr(top))*/
+        mCommandRunListener.onRunCommand(command, mStack);
+    }
 }

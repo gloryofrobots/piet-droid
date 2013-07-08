@@ -1,12 +1,7 @@
 package com.example.pieteditor;
 
 public class FakeData {
-
-	public FakeData() {
-		// TODO Auto-generated constructor stub
-	}
-	
-	public static CodelTableModel getModel(){
+	public static CodelTableModel getHelloWorldModel(){
 		CodelTableModel model = new CodelTableModel( 32, 32 );
 		model.set(0, 0, CodelColor.LIGHT_RED);
 		model.set(1, 0, CodelColor.RED);

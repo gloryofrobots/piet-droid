@@ -1,11 +1,7 @@
 package com.example.pieteditor;
 
 /**
- * Created with IntelliJ IDEA.
- * User: gloryofrobots
- * Date: 05/07/13
- * Time: 13:24
- * To change this template use File | Settings | File Templates.
+ 
  */
 
 import java.util.ArrayList;
