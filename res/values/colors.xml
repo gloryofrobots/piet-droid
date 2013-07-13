@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="codel_field_line_color">#000</color>
+    <color name="marker_color">#AFFF</color>
+    <color name="text_color">#AFFF</color>
+    <color name="codel_field_default_color">#CCC</color>
+    <color name="main_background">#CCC</color>
+    <color name="debug_cell_highlight">#000</color>
+
+</resources>

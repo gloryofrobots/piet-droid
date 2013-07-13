@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">piet-droid</string>
+    <string name="action_settings">Settings</string>
+    
+    <string name="main_button_load">Load</string>
+    
+    <string name="control_panel_button_run">Run</string>
+    <string name="control_panel_button_step">Step</string>
+    <string name="control_panel_button_stop">Stop</string>
+</resources>
