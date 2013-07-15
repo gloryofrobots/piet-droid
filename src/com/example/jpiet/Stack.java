@@ -30,8 +30,7 @@ public class Stack<T> {
 	private Link mHead;
 	
 	public Stack() {
-		mHead = new Link(null, null);
-        mSize = 0;
+		clear();
 	}
 	
 	public T pop() {
@@ -51,7 +50,12 @@ public class Stack<T> {
         ++mSize;
 		mHead = new Link(_item, mHead);
 	}
-
+	
+	public void clear() {
+	    mHead = new Link(null, null);
+        mSize = 0;
+	}
+	
     public int size(){
         return mSize;
     }

@@ -1,26 +1,45 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/main_background"
-    android:orientation="horizontal" >
+    android:shrinkColumns="*"
+    android:stretchColumns="*" >
 
-    <Button
-        android:id="@+id/button_run"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/control_panel_button_run" />
-    
-    
-    <Button
-        android:id="@+id/button_stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/control_panel_button_stop" />
-    
-    <Button
-        android:id="@+id/button_step"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/control_panel_button_step" />
-</LinearLayout>
+    <TableRow>
+
+        <Button
+            android:id="@+id/button_run"
+            android:layout_width="@dimen/control_button_side"
+            android:layout_height="@dimen/control_button_side"
+            android:background="@color/button_run_color"
+            android:text="@string/control_panel_button_run" />
+
+        <Button
+            android:id="@+id/button_step"
+            android:layout_width="@dimen/control_button_side"
+            android:layout_height="@dimen/control_button_side"
+            android:layout_marginLeft="10dip"
+            android:background="@color/button_step_color"
+            android:text="@string/control_panel_button_step" />
+ />
+
+        <Button
+            android:id="@+id/button_pause"
+            android:layout_width="@dimen/control_button_side"
+            android:layout_height="@dimen/control_button_side"
+            android:layout_marginLeft="10dip"
+            android:background="@color/button_pause_color"
+            android:text="@string/control_panel_button_pause" />
+ />
+
+        <Button
+            android:id="@+id/button_stop"
+            android:layout_width="@dimen/control_button_side"
+            android:layout_height="@dimen/control_button_side"
+            android:layout_marginLeft="10dip"
+            android:background="@color/button_stop_color"
+            android:text="@string/control_panel_button_stop" />
+ />
+    </TableRow>
+
+</TableLayout>

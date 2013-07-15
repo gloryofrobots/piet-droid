@@ -4,8 +4,14 @@
     <color name="codel_field_line_color">#000</color>
     <color name="marker_color">#AFFF</color>
     <color name="text_color">#AFFF</color>
-    <color name="codel_field_default_color">#CCC</color>
-    <color name="main_background">#CCC</color>
+    <color name="codel_field_default_color">#fff</color>
+    <color name="main_background">#FFF</color>
     <color name="debug_cell_highlight">#000</color>
+    
+    <color name="button_run_color">#FF0000</color>
+    <color name="button_step_color"> #0000FF</color>
+    <color name="button_pause_color">#FFFF00 </color>
+    <color name="button_stop_color">#FF00FF</color>
+    <color name="default_draw_color">#FF0000</color>
 
 </resources>

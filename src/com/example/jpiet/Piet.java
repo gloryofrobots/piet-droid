@@ -49,6 +49,10 @@ public class Piet {
 		mInterpreter.setExecutionStepListener(listener);
 	}
 	
+	public void calculateCommandOpportunity(int color, PietMachine.CommandOpportunityVisitor visitor) {
+	    mMachine.calculateCommandOpportunity(color, visitor);
+	}
+	
 	public void createModel(int width, int height){
 		mModel = new CodelTableModel(width, height);
 		/*if (mInterpreter.isRun()) {

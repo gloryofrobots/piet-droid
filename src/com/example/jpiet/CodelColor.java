@@ -5,7 +5,7 @@ package com.example.jpiet;
  */
 public enum CodelColor {
 	
-    BLACK("Black", 0x000000, -1, -1),
+    BLACK("Black", 0x000000, -10, -10),
     LIGHT_YELLOW("Light Yellow", 0xffffc0, 1, 0),
     GREEN("Green", 0x00ff00, 2, 1),
     DARK_YELLOW("Dark Yellow", 0xc0c000, 1, 2),
@@ -24,7 +24,7 @@ public enum CodelColor {
     YELLOW("Yellow", 0xffff00, 1, 1),
     LIGHT_CYAN("Light Cyan", 0xc0ffff, 3, 0),
     DARK_CYAN("Dark Cyan", 0x00c0c0, 3, 2),
-    WHITE("White", 0xffffff, -1, -1);
+    WHITE("White", 0xffffff, -100, -100);
     String name;
     
     public int value;
@@ -41,7 +41,16 @@ public enum CodelColor {
 
         return findColor(r, g, b);
     }
-
+    
+    public int getARGB(){
+        int argb = 255;
+        argb = (argb << 8) + R;
+        argb = (argb << 8) + G;
+        argb = (argb << 8) + B;
+        
+        return argb;
+    }
+    
     public static CodelColor findColor(int r, int g, int b) {
         CodelColor result = BLACK;
         for (CodelColor c: CodelColor.values()) {

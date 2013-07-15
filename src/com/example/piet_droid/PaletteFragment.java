@@ -3,6 +3,12 @@ package com.example.piet_droid;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,6 +17,8 @@ import android.view.ViewGroup;
 
 
 public class PaletteFragment extends Fragment {
+    
+    GradientDrawable mDrawable;
     
     public interface  OnChooseColorListener{
         public void onChooseColor(int color);
@@ -24,45 +32,61 @@ public class PaletteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.control_panel_toolbox, container,
+        View view = inflater.inflate(R.layout.palette_fragment, container,
                 false);
         
         Resources resources = getResources();
-        //TODO CHECK CACHED INSTANCE(SEE DEVELOPER TUTORIAL ON ANDROID DOCS)
+        
+        mDrawable = new GradientDrawable();
+        int defaultColor = resources.getColor(R.color.default_draw_color);
+        mDrawable.setColor(defaultColor);
+        
+        View currentColor = view.findViewById(R.id.current_color_view);
+        currentColor.setBackgroundDrawable(mDrawable);
+        
+        
+        //TODO CHECK CACHED INSTANCE(SEE DEVELOPER TUTORIAL ON ANDROID DOCS) OR IT IN ACTIVITY PERHAPS
         
         final ColorFieldView palette = (ColorFieldView) view.findViewById(R.id.colorPalette);
-
-        TypedArray colors = resources.obtainTypedArray(R.array.colors);
-        int size = colors.length();
-        int y = 0;
-        int x = 0;
-        for (int i = 0; i < size; i++) {
-            int color = colors.getColor(i, 0);
-            palette.setCellColor(x, y, color);
-            x++;
-
-            if (((i + 1) % 10) == 0) {
-                y++;
-                x = 0;
-            }
-
-        }
-
-        colors.recycle();
 
         palette.setOnCellClickListener(new ColorFieldView.CellClickListener() {
             @Override
             public void onCellClick(int x, int y) {
-                // Log.e("TEST", String.format("%d-%d", x, y));
                 int color = palette.getCellColor(x, y);
+                chooseColor(color);
+            }
+        });
+        
+        
+        View blackCell = view.findViewById(R.id.black_palette);
+        blackCell.setOnClickListener(new View.OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                chooseColor(Color.BLACK);
                 
-                mOnChooseColorListener.onChooseColor(color);
+            }
+        });
+        
+        View whiteCell = view.findViewById(R.id.white_palette);
+        whiteCell.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                chooseColor(Color.WHITE);
             }
         });
         
         return view;
     }
-
+    
+    public void chooseColor(int color) {
+        GradientDrawable gd = (GradientDrawable) mDrawable.mutate();
+        gd.setColor(color);
+        gd.invalidateSelf();
+        mOnChooseColorListener.onChooseColor(color);
+    }
+    
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

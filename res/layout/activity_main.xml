@@ -14,60 +14,48 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="vertical" >
+
+        <fragment
+            android:id="@+id/control_toolbox_fragment"
+            android:name="com.example.piet_droid.ControlToolBoxFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
-            
-            <fragment android:name="com.example.piet_droid.PaletteFragment"
-              android:id="@+id/palette_fragment"
-              android:layout_weight="1"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content" />
-            
-            
-            <Button
-                android:id="@+id/button_load"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/main_button_load" />
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:orientation="horizontal" >
+
+            <com.example.piet_droid.ColorFieldView
+                android:id="@+id/codelField"
+                android:layout_width="350dp"
+                android:layout_height="350dp"
+                colorField:countX="@integer/field_count_codels_x"
+                colorField:countY="@integer/field_count_codels_y"
+                colorField:defaultColor="@color/codel_field_default_color" />
 
             <fragment
-                android:id="@+id/control_toolbox_fragment"
-                android:name="com.example.piet_droid.ControlToolBoxFragment"
+                android:id="@+id/palette_fragment"
+                android:name="com.example.piet_droid.PaletteFragmentSimple"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_weight="1" />
 
-        <com.example.piet_droid.ColorFieldView
-            android:id="@+id/codelField"
-            android:layout_width="350dp"
-            android:layout_height="350dp"
-            colorField:countX="@integer/field_count_codels_x"
-            colorField:countY="@integer/field_count_codels_y"
-            colorField:defaultColor="@color/codel_field_default_color"
-            colorField:palette="@array/colors" />
+            <fragment
+                android:id="@+id/command_helper_fragment"
+                android:name="com.example.piet_droid.CommandHelperFragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+        </LinearLayout>
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/edit_text_in"
-        android:layout_width="fill_parent"
+    <Button
+        android:id="@+id/button_load"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:lines="1" />
-
-    <TextView
-        android:id="@+id/edit_text_out"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:lines="1" />
-
-    <TextView
-        android:id="@+id/edit_text_info"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:lines="5" />
-
+        android:text="@string/main_button_load" />
 </LinearLayout>

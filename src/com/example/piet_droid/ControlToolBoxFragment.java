@@ -11,10 +11,10 @@ import android.widget.Button;
 public class ControlToolBoxFragment extends Fragment {
     Button mButtonRun ;
     Button mButtonStep;
-    Button mButtonStop ;
+    Button mButtonPause ;
+    Button mButtonStop;
     
     public ControlToolBoxFragment(){
-        
     }
     
     public interface InteractionListener {
@@ -23,6 +23,8 @@ public class ControlToolBoxFragment extends Fragment {
         public void onInteractionStep();
 
         public void onInteractionStop();
+        
+        public void onInteractionReset();
         // /
     }
 
@@ -37,14 +39,18 @@ public class ControlToolBoxFragment extends Fragment {
 
         mButtonRun = (Button) view.findViewById(R.id.button_run);
         mButtonStep = (Button) view.findViewById(R.id.button_step);
+        mButtonPause = (Button) view.findViewById(R.id.button_pause);
         mButtonStop = (Button) view.findViewById(R.id.button_stop);
         
         setControlsToDefaultState();
         
         mButtonRun.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                mButtonStop.setEnabled(true);
+                mButtonPause.setEnabled(true);
+                
+                mButtonStop.setEnabled(false);
                 mButtonStep.setEnabled(false);
+                mButtonRun.setEnabled(false);
                 
                 mInteractionListener.onInteractionRun();
             }
@@ -56,9 +62,22 @@ public class ControlToolBoxFragment extends Fragment {
             }
         });
         
+        mButtonPause.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mButtonPause.setEnabled(false);
+                mButtonStop.setEnabled(true);
+                mButtonStep.setEnabled(true);
+                mButtonRun.setEnabled(true);
+                
+                mInteractionListener.onInteractionStop();
+                
+            }
+        });
+        
         mButtonStop.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                mInteractionListener.onInteractionStop();
+                setControlsToDefaultState();
+                mInteractionListener.onInteractionReset();
                 
             }
         });
@@ -80,6 +99,7 @@ public class ControlToolBoxFragment extends Fragment {
     public void setControlsToDefaultState() {
         mButtonRun.setEnabled(true);
         mButtonStep.setEnabled(true);
+        mButtonPause.setEnabled(false);
         mButtonStop.setEnabled(false);
     }
     

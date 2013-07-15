@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:colorField="http://schemas.android.com/apk/res/com.example.piet_droid"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/main_background"
+    android:orientation="vertical" >
+
+    <com.example.piet_droid.ColorFieldView
+        android:id="@+id/colorPalette"
+        android:layout_width="120dp"
+        android:layout_height="240dp"
+        colorField:countX="@integer/palette_count_codels_x"
+        colorField:countY="@integer/palette_count_codels_y"
+        colorField:defaultColor="@color/codel_field_default_color"
+        colorField:palette="@array/colors" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" 
+        >
+
+        <View
+            android:id="@+id/white_palette"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@color/white"
+            />
+        
+         <View
+            android:id="@+id/black_palette"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@color/black"
+             />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/current_color_view"
+        android:layout_width="@dimen/current_color_view_width"
+        android:layout_height="@dimen/current_color_view_height"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

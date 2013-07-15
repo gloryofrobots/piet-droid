@@ -99,16 +99,14 @@ public class Interpreter {
         CodelColor currentColor = mModel.getValue(_current);
         CodelColor nextColor = mModel.getValue(_next);
 
-        int deltaHue = nextColor.hue - currentColor.hue;
-        int deltaDark = nextColor.dark - currentColor.dark;
-
         try {
-            mMachine.runCommand(deltaDark, deltaHue, _input);
+            mMachine.runCommand(currentColor, nextColor, _input);
             return true;
         }
         catch (PietMachineExecutionError exception) {
-            mLogger.error("BAD COMMAND EXECUTE delta dark :%d "
-                    + " delta hue %d error: %s", deltaDark, deltaHue, exception.toString());
+            //TODO ERROR REPORTING
+            /*mLogger.error("BAD COMMAND EXECUTE delta dark :%d "
+                    + " delta hue %d error: %s", deltaDark, deltaHue, exception.toString());*/
             return false;
         }
     }
@@ -172,6 +170,7 @@ public class Interpreter {
     public void init(){
     	 mStepNumber = 0;
          mCurrentCodel.set(0, 0);
+         mMachine.init();
     }
     
     public void run() {
