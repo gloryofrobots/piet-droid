@@ -11,14 +11,18 @@ public class Piet {
 	CodelTableModel mModel;
 	Interpreter mInterpreter;
 	PietMachine mMachine;
+	Command mLastCommand;
 	
 	public Piet(Logger logger, InOutSystem inOutSystem){
         mMachine = new PietMachine(inOutSystem);
+        
+        
         mInterpreter = new Interpreter(logger, mMachine, inOutSystem);
+        
 	}
 	
-	public void setCommandRunListener(CommandRunListener listener){
-		mMachine.setCommandRunListener(listener);
+	public void addCommandRunListener(CommandRunListener listener){
+		mMachine.addCommandRunListener(listener);
 		
 		/*machine.setCommandRunListener( new PietMachine.CommandRunListener() {
              public void onRunCommand(final Command command,

@@ -6,10 +6,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
-public class FilledCircleDrawable extends Drawable {
+public class DrawableFilledCircle extends Drawable {
 	Paint mPaint;
 	
-	public FilledCircleDrawable() {
+	public DrawableFilledCircle() {
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPaint.setStrokeWidth(1);
 		mPaint.setStyle(Paint.Style.FILL_AND_STROKE);

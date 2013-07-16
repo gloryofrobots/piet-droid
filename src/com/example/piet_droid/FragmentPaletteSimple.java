@@ -8,7 +8,6 @@ import com.example.jpiet.PietMachine;
 import android.app.Activity;
 import android.content.res.Resources;
 
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -25,9 +24,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-public class PaletteFragmentSimple extends Fragment {
+public class FragmentPaletteSimple extends Fragment {
     public class TextDrawable extends Drawable {
 
         private final String mText;
@@ -51,25 +49,21 @@ public class PaletteFragmentSimple extends Fragment {
         public void draw(Canvas canvas) {
             Rect bounds = getBounds();
             
-            int boundsWidth = mTextBounds.width();
-            int boundsHeight = mTextBounds.height();
-            int width = bounds.width();
-            int height = bounds.height();
-            
             int length = mText.length();
             float[] widths = new float[length];
             
-            int textSize = (int) mPaint.getTextSize();
             mPaint.getTextWidths(mText, widths);
             int totalW = 0;
             for(float w : widths){
                 totalW += w;
             }
-            
-            int px = bounds.left + ((bounds.width() - totalW) / 2);
-            int py = bounds.top + ((bounds.height() - textSize) / 2);
+            //FIXME
+            int textSize = (int) mPaint.getTextSize();
 
-            canvas.drawText(mText, px, py + boundsHeight, mPaint);
+            int px = bounds.left + ((bounds.width() - totalW) / 2);
+            int py = bounds.top + ((bounds.height() - textSize) / 2) + mTextBounds.height();
+
+            canvas.drawText(mText, px, py, mPaint);
         }
 
         @Override
@@ -139,7 +133,7 @@ public class PaletteFragmentSimple extends Fragment {
         public void onChooseColor(int color);
     }
 
-    public PaletteFragmentSimple() {
+    public FragmentPaletteSimple() {
     }
 
     private OnChooseColorListener mOnChooseColorListener;
@@ -147,7 +141,7 @@ public class PaletteFragmentSimple extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.palette_fragment_simple, container,
+        View view = inflater.inflate(R.layout.fragment_palette_simple, container,
                 false);
 
         Resources resources = getResources();
@@ -202,7 +196,7 @@ public class PaletteFragmentSimple extends Fragment {
                     "tags and titles for commans has different length");
         }
 
-        mTagsAliasLink = new HashMap<String, PaletteFragmentSimple.TextDrawable>();
+        mTagsAliasLink = new HashMap<String, FragmentPaletteSimple.TextDrawable>();
         int size = command_tags.length;
         for (int i = 0; i < size; i++) {
             String alias = command_alias[i];

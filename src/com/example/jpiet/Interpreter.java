@@ -120,12 +120,12 @@ public class Interpreter {
      */
     private void findCodelOnEdge(CodelArea area) {
         DirectionPointer directionPointer = mMachine.getDirectionPointer();
-        CodelChoser codelChoser = mMachine.getCodelChoser();
+        //CodelChoser codelChoser = mMachine.getCodelChoser();
         int even = 0;
         if (directionPointer.getState() < 2){
            even = 1;
         }
-        //FIX ME FUCK!
+        //FIXME FUCK!
         /*
         if (codelChoser.isRight()) {
             even = 1;

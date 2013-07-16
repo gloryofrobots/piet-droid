@@ -1,7 +1,6 @@
 package com.example.piet_droid;
 
 import java.util.List;
-import java.util.Locale;
 
 import android.os.Bundle;
 
@@ -11,39 +10,38 @@ import android.graphics.BitmapFactory;
 import android.support.v4.app.FragmentActivity;
 
 
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.example.jpiet.Codel;
-import com.example.jpiet.CodelChoser;
-import com.example.jpiet.Command;
-import com.example.jpiet.CommandRunListener;
-import com.example.jpiet.DirectionPointer;
+
+import com.example.jpiet.InOutSystem;
 
 import com.example.jpiet.Piet;
-import com.example.jpiet.PietMachineStack;
 import com.example.piet_droid.AsyncTaskLoadBitmap.Pixel;
 
 public class MainActivity extends FragmentActivity implements
-        ControlToolBoxFragment.InteractionListener, PaletteFragmentSimple.OnChooseColorListener
-        , AsyncTaskRunPiet.ExecutionProcessListener, AsyncTaskLoadBitmap.LoadProcessListener{
+        FragmentControlToolBox.InteractionListener, FragmentPaletteSimple.OnChooseColorListener
+        , AsyncTaskRunPiet.ExecutionProcessListener, AsyncTaskLoadBitmap.LoadProcessListener
+        , PietProvider{
 
     Piet mPiet;
-    InOutSystemEditText mInOutSystem;
+    
     ColorFieldView mColorField;
     private int mActiveColor;
-    private FilledCircleDrawable mDebugDrawable;
-    TextView mInfoText;
+    private DrawableFilledCircle mDebugDrawable;
+    
     long mSleepBetweenStep;
     
     AsyncTaskRunPiet mCurrentRunTask;
     
-    ControlToolBoxFragment mToolBoxFragment;
-    CommandHelperFragment mCommandHelperFragment;
+    FragmentInOutBuffers mFragmentInOutBuffers;
+    FragmentControlToolBox mToolBoxFragment;
+    FragmentCommandHelper mCommandHelperFragment;
+    FragmentStateInfo mFragmentStateInfo;
+    FragmentCommandLog mFragmentCommandLog;
+    FragmentPaletteSimple mFragmentPaletteSimple;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,24 +51,35 @@ public class MainActivity extends FragmentActivity implements
         Resources resources = getResources();
         mSleepBetweenStep = 2L;
         
-        mDebugDrawable = new FilledCircleDrawable();
+        mDebugDrawable = new DrawableFilledCircle();
         int drawableColor = resources.getColor(R.color.debug_cell_highlight);
         mDebugDrawable.setColor(drawableColor);
         
         mActiveColor = 0;
         
-        initPiet(resources);
-        mInfoText = (TextView) findViewById(R.id.edit_text_info);
-        initColorField();
-        
         mActiveColor = resources.getColor(R.color.default_draw_color);
                 
-        mToolBoxFragment = (ControlToolBoxFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.control_toolbox_fragment);
+        mToolBoxFragment = (FragmentControlToolBox) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_control_toolbox);
         
         
-        mCommandHelperFragment = (CommandHelperFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.command_helper_fragment);
+        mCommandHelperFragment = (FragmentCommandHelper) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_command_helper);
+        
+        
+        mFragmentStateInfo = (FragmentStateInfo) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_state_info);
+        
+        mFragmentCommandLog = (FragmentCommandLog) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_command_log);
+        
+        mFragmentInOutBuffers = (FragmentInOutBuffers) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_in_out_buffers);
+        
+        
+        initPiet(resources);
+        
+        initColorField();
         
         final Button buttonLoad = (Button) findViewById(R.id.button_load);
         buttonLoad.setOnClickListener(new View.OnClickListener() {
@@ -79,14 +88,19 @@ public class MainActivity extends FragmentActivity implements
             }
         });
         
-        PaletteFragmentSimple palette =  (PaletteFragmentSimple) getSupportFragmentManager()
-                .findFragmentById(R.id.palette_fragment);
+        mFragmentPaletteSimple =  (FragmentPaletteSimple) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_palette_simple);
         
-        palette.setPiet(mPiet);
-        palette.chooseColor(mActiveColor);
-        
+        mFragmentPaletteSimple.setPiet(mPiet);
+        mFragmentPaletteSimple.chooseColor(mActiveColor);
     }
-
+    
+    @Override
+    public void onStart() {
+        super.onStart();
+        mCommandHelperFragment.invalidate();
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -98,47 +112,25 @@ public class MainActivity extends FragmentActivity implements
         mColorField.setCellColor(x, y, color);
         mPiet.setColor(x, y, color);
     }
-    
+     
     private void updateViewAfterStep(){
-        int stepCounter = mPiet.getStepNumber();
-        DirectionPointer directionPointer = mPiet.getDirectionPointer();
-
-        CodelChoser codelChoser = mPiet.getCodelChoser();
         Codel currentCodel = mPiet.getCurrentCodel();
-
-        String info = String.format(Locale.US,
-                "step : %d cur codel : (%d,%d) \n DP : %s, CC : %s", stepCounter,
-                currentCodel.x, currentCodel.y,
-                directionPointer.toString(), codelChoser.toString());
-        
-        mColorField.setCellDrawable(currentCodel.x, currentCodel.y, mDebugDrawable);
-        mInfoText.setText(info);
-        mInOutSystem.flush();
+        //mColorField.setCellDrawable(currentCodel.x, currentCodel.y, mDebugDrawable);
+        mFragmentStateInfo.update();
+        mFragmentInOutBuffers.update();
+        mFragmentCommandLog.update();
     }
     
     private void initPiet(Resources resources) {
-
-        final EditText inText = (EditText) findViewById(R.id.edit_text_in);
-        final TextView outText = (TextView) findViewById(R.id.edit_text_out);
-
-        mInOutSystem = new InOutSystemEditText(inText, outText);
+        InOutSystem inOutSystem = mFragmentInOutBuffers.getInOutSystem();
         LoggerDroid logger = new LoggerDroid();
 
-        mPiet = new Piet(logger, mInOutSystem);
+        mPiet = new Piet(logger, inOutSystem);
 
         int countX = resources.getInteger(R.integer.field_count_codels_x);
         int countY = resources.getInteger(R.integer.field_count_codels_y);
 
         mPiet.createModel(countX, countY);
-        
-        mPiet.setCommandRunListener(new CommandRunListener() {
-            @Override
-            public void onRunCommand(Command command, PietMachineStack stack) {
-                Log.i("RUN COMMAND",
-                        String.format("%s : %s", command.toString(),
-                                stack.toString()));
-            }
-        });
     }
 
     private void initColorField() {
@@ -157,7 +149,7 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onChooseColor(int color) {
         mActiveColor = color;
-        mCommandHelperFragment.setColor(color, mPiet);
+        mCommandHelperFragment.setColor(color);
     }
     
     @Override
@@ -200,19 +192,17 @@ public class MainActivity extends FragmentActivity implements
     
     @Override
     public void onRunStart() {
-        mInfoText.setText("");
-        mInOutSystem.prepare();
+        mFragmentStateInfo.init();
+        mColorField.clearDrawables();
+        mFragmentInOutBuffers.prepare();
         mPiet.init();
     }
 
     @Override
     public void onRunCancel() {
-        // TODO Auto-generated method stub
         mColorField.clearDrawables();
-        
-        mInfoText.setText("");
-        mInOutSystem.prepare();
-        
+        mFragmentStateInfo.init();
+        mFragmentInOutBuffers.prepare();
         mCurrentRunTask = null;
     }
     
@@ -220,12 +210,12 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onRunUpdate(List<Codel> codelsToUpdate) {
         updateViewAfterStep();
-        
+        /*
         synchronized (codelsToUpdate) {
             for (Codel codel : codelsToUpdate) {
                 mColorField.setCellDrawable(codel.x, codel.y, mDebugDrawable);
             }
-        }
+        }*/
     }
 
     @Override
@@ -234,7 +224,6 @@ public class MainActivity extends FragmentActivity implements
         mCurrentRunTask = null;
     }
     
-
     public void load() {
         //TODO FADE OUT FADE IN
         Bitmap bitmap = BitmapFactory.decodeFile("/data/helloWorld_small.png");
@@ -257,7 +246,7 @@ public class MainActivity extends FragmentActivity implements
         
     }
 
-    @Override
+   /* @Override
     public void onLoadBitmapUpdate(List<Pixel> pixels) {
         
         synchronized (pixels) {
@@ -265,11 +254,20 @@ public class MainActivity extends FragmentActivity implements
                 setCell(pixel.x, pixel.y, pixel.color);
             }
         }
+    }*/
+    
+    public void onLoadBitmapPixel(int x, int y, int color){
+        setCell(x, y, color);
     }
-
+    
     @Override
     public void onLoadBitmapComplete() {
         mColorField.setVisibility(View.VISIBLE);
         mColorField.invalidate();
+    }
+
+    @Override
+    public Piet getPiet() {
+        return mPiet;
     }
 }

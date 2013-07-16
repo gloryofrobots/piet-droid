@@ -8,13 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class ControlToolBoxFragment extends Fragment {
+public class FragmentControlToolBox extends Fragment {
     Button mButtonRun ;
     Button mButtonStep;
     Button mButtonPause ;
     Button mButtonStop;
     
-    public ControlToolBoxFragment(){
+    public FragmentControlToolBox(){
     }
     
     public interface InteractionListener {
@@ -34,7 +34,7 @@ public class ControlToolBoxFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.control_panel_toolbox, container,
+        View view = inflater.inflate(R.layout.fragment_control_toolbox, container,
                 false);
 
         mButtonRun = (Button) view.findViewById(R.id.button_run);

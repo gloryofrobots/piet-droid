@@ -8,6 +8,9 @@
     <color name="main_background">#FFF</color>
     <color name="debug_cell_highlight">#000</color>
     
+    
+    <color name="fragment_background">#ccc</color>
+    
     <color name="button_run_color">#FF0000</color>
     <color name="button_step_color"> #0000FF</color>
     <color name="button_pause_color">#FFFF00 </color>

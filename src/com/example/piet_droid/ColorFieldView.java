@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Paint.Style;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 
@@ -90,8 +89,8 @@ public class ColorFieldView extends View {
     }
 
     private final int UNKNOWN_MEASURE = -1;
-    private final int DEFAULT_WIDTH = 500;
-    private final int DEFAULT_HEIGHT = 500;
+    private final int DEFAULT_WIDTH = 100;
+    private final int DEFAULT_HEIGHT = 100;
 
     private Paint mLinePaint;
     private Paint mCellPaint;

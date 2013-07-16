@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@color/fragment_background" >
+
+     <EditText
+        android:id="@+id/text_view_in"
+        android:layout_width="100dp"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+         />
+
+    <TextView
+        android:id="@+id/text_view_out"
+        android:layout_width="100dp"
+        android:layout_height="0dip"
+        android:layout_weight="1" />
+    
+</LinearLayout>

@@ -15,8 +15,9 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
     public interface LoadProcessListener {
         //public void onLoadBitmapStart();
         public void onLoadBitmapCancel();
-        public void onLoadBitmapUpdate(List<Pixel> pixels);
+        //public void onLoadBitmapUpdate(List<Pixel> pixels);
         public void onLoadBitmapComplete();
+        public void onLoadBitmapPixel(int x, int y, int color);
     }
     
     public class Pixel{
@@ -33,7 +34,7 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
     
     private Context mContext;
     private LoadProcessListener mListener;
-    private List<Pixel> mQueue;
+    //private List<Pixel> mQueue;
     //private String mFilename;
     private ProgressDialog mProgressDialog;
     
@@ -50,7 +51,7 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
     
     @Override
     protected void onPreExecute() {
-        mQueue = Collections.synchronizedList(new ArrayList<Pixel>());
+        //mQueue = Collections.synchronizedList(new ArrayList<Pixel>());
         mProgressDialog = new ProgressDialog(mContext);
         Resources resources = mContext.getResources();
         
@@ -90,11 +91,10 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
             for (int x = 0; x < width; x++) {
                 count++;
                 int pixel = bitmap.getPixel(x, y);
-                synchronized(mQueue){
-                    mQueue.add(new Pixel(x,y,pixel));
-                }
                 
-                publishProgress((count * 100) / size);
+                mListener.onLoadBitmapPixel(x, y, pixel);
+                
+                //publishProgress((count * 100) / size);
             }
         }
         
@@ -105,11 +105,11 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
     protected void onProgressUpdate(Integer... progress) {
         //int percentage = progress[0];
         //mProgressDialog.setProgress(percentage);
-        
+        /*
         mListener.onLoadBitmapUpdate(mQueue);
         synchronized (mQueue) {
             mQueue.clear();
-        }
+        }*/
         
     }
 }

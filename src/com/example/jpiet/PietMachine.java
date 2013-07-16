@@ -10,9 +10,11 @@ public class PietMachine {
     DirectionPointer mDirectionPointer;
     CodelChoser mCodelChoser;
     InOutSystem mInOutSystem;
-    CommandRunListener mCommandRunListener;
+    ArrayList<CommandRunListener> mCommandRunListeners;
     Command[][] mCommands;
-
+    
+    Command mLastCommand;
+    
     private final int DARK_COUNT = 6;
     private final int HUE_COUNT = 3;
 
@@ -25,14 +27,14 @@ public class PietMachine {
         mCommands = new Command[DARK_COUNT][HUE_COUNT];
         setupCommands();
 
-        mCommandRunListener = null;
+        mCommandRunListeners = new ArrayList<CommandRunListener>();
 
         mDirectionPointer = new DirectionPointer();
         mCodelChoser = new CodelChoser();
     }
 
-    public final void setCommandRunListener(CommandRunListener listener) {
-        mCommandRunListener = listener;
+    public final void addCommandRunListener(CommandRunListener listener) {
+        mCommandRunListeners.add(listener);
     }
 
     public final DirectionPointer getDirectionPointer() {
@@ -375,11 +377,9 @@ public class PietMachine {
     }
 
     private void onRunCommand(Command command) {
-        if (mCommandRunListener == null) {
-            return;
+        for(CommandRunListener listener: mCommandRunListeners) {
+            listener.onRunCommand(command, mStack);
         }
-
-        mCommandRunListener.onRunCommand(command, mStack);
     }
     
     public class CommandInfo {
