@@ -112,9 +112,11 @@ public class ColorFieldView extends View {
     private boolean mForceDraw;
     private Cell mCellToRedraw;
     
+    private boolean mIsInteractionAllowed;
+    
     /**
      * @param mOnCellClickListener
-     *            the mOnCellClickListener to set
+     *            the CellClickListener to set
      */
     public void setOnCellClickListener(CellClickListener onCellClickListener) {
         mOnCellClickListener = onCellClickListener;
@@ -183,7 +185,15 @@ public class ColorFieldView extends View {
             }
         }
     }
-
+    
+    public boolean isInteractionAllowed() {
+        return mIsInteractionAllowed;
+    }
+    
+    public void setInterractionAllow(boolean value) {
+        mIsInteractionAllowed = value;
+    }
+    
     public void setCellColor(int x, int y, int color) {
         mCells[y][x].color = color;
     }
@@ -271,7 +281,7 @@ public class ColorFieldView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mOnCellClickListener != null) {
+        if (mOnCellClickListener != null && isInteractionAllowed()) {
             processCellClick(event);
         }
 

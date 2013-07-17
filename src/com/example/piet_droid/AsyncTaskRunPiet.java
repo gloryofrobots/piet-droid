@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.jpiet.Codel;
 import com.example.jpiet.Piet;
@@ -16,51 +17,84 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
         public void onRunCancel();
 
         public void onRunUpdate(List<Codel> codelsToUpdate);
-
+        public void onRunUpdate(Codel codel);
         public void onRunComplete();
     }
 
     private enum State {
-        RUN, ONE_STEP, WAIT;
+        RUN, ONE_STEP, WAIT, TERMINATED;
+        
+        public State parentState = null;
     }
 
     private ExecutionProcessListener mListener;
     private List<Codel> mQueue;
     private long mDelay;
     private State mState;
-
+    private boolean mWaitForFlush;
+    Codel mCurrentCodel;
+    
     public AsyncTaskRunPiet(ExecutionProcessListener listener, long delay) {
         mListener = listener;
         mDelay = delay;
         mState = State.RUN;
     }
-
     public boolean isWaiting() {
-        return mState == State.WAIT;
+        return isOnState(State.WAIT);
     }
     
     public boolean isRunning() {
-        return mState == State.RUN;
+        return isOnState(State.RUN);
     }
     
     public void setWait() {
-        mState = State.WAIT;
+        setState(State.WAIT);
     }
 
     public void allowRun() {
-        mState = State.RUN;
+        setState(State.RUN);
     }
 
     public void allowOneStepOnly() {
-        mState = State.ONE_STEP;
+        setState(State.ONE_STEP);
     }
-
+    
+    private void waitForFlush(){
+        mWaitForFlush = true;
+    }
+    
+    public void endFlush() {
+        mWaitForFlush = false;
+    }
+    
+    public boolean isFlushed() {
+        return mWaitForFlush == false;
+    }
+    
+    private void setState(State state) {
+        state.parentState = mState;
+        mState = state;
+        Log.e("AsyncTaskRunPiet", mState.toString());
+    }
+    
+    private boolean isOnState(State state) {
+        return mState == state;
+    }
+    
     public void endStep() {
         if (mState == State.ONE_STEP) {
             mState = State.WAIT;
         }
     }
-
+    
+    public void terminate(){
+        setState(State.TERMINATED);
+    }
+    
+    public boolean isTerminated() {
+        return isOnState(State.TERMINATED);
+    }
+    
     @Override
     protected void onCancelled() {
         mListener.onRunCancel();
@@ -70,6 +104,7 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     protected void onPreExecute() {
         mQueue = Collections.synchronizedList(new ArrayList<Codel>());
         mListener.onRunStart();
+        mWaitForFlush = false;
     }
 
     @Override
@@ -86,17 +121,34 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
             if (isCancelled() == true) {
                 return null;
             }
-
+            
+            while(isFlushed() == false){
+                if(isTerminated()){
+                    return null;
+                }
+            }
+            
+            if(isTerminated()){
+                return null;
+            }
+            
             // wait while resumed
             while (isWaiting()) {
+                if(isTerminated()){
+                    return null;
+                }
             }
 
-            Codel currentCodel = piet.getCurrentCodel();
+            mCurrentCodel = piet.getCurrentCodel();
             
-            publishProgress();
-            mQueue.add(new Codel(currentCodel));
+            //mQueue.add(new Codel(currentCodel));
+            
             endStep();
+            publishProgress();
             
+            waitForFlush();
+            
+
             //publishProgress();
 
             try {
@@ -109,9 +161,11 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     }
 
     protected void onProgressUpdate(Void... progress) {
-        mListener.onRunUpdate(mQueue);
+        mListener.onRunUpdate(mCurrentCodel);
+        endFlush();
+        /*mListener.onRunUpdate(mQueue);
         synchronized (mQueue) {
             mQueue.clear();
-        }
+        }*/
     }
 }

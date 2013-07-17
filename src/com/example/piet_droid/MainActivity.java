@@ -41,7 +41,8 @@ public class MainActivity extends FragmentActivity implements
     FragmentControlToolBox mToolBoxFragment;
     // FragmentCommandHelper mCommandHelperFragment;
     FragmentStateInfo mFragmentStateInfo;
-
+    
+    
     // FragmentCommandLog mFragmentCommandLog;
     // FragmentPaletteSimple mFragmentPaletteSimple;
 
@@ -49,9 +50,11 @@ public class MainActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
+        
+        
         Resources resources = getResources();
-        mSleepBetweenStep = 2L;
+        mSleepBetweenStep = 1L;
 
         mDebugDrawable = new DrawableFilledCircle();
         int drawableColor = resources.getColor(R.color.debug_cell_highlight);
@@ -156,12 +159,14 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onInteractionRun() {
+        mColorField.setInterractionAllow(false);
+        
         if (mCurrentRunTask != null) {
             if (mCurrentRunTask.isWaiting()) {
                 mCurrentRunTask.allowRun();
                 return;
             }
-
+            
             onRunCancel();
         }
 
@@ -182,6 +187,7 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onInteractionPause() {
+        
         if (mCurrentRunTask == null) {
             return;
         }
@@ -191,10 +197,12 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onInteractionStop() {
+        mColorField.setInterractionAllow(true);
         if (mCurrentRunTask == null) {
             return;
         }
         mCurrentRunTask.cancel(true);
+        mCurrentRunTask.terminate();
     }
 
     @Override
@@ -226,7 +234,13 @@ public class MainActivity extends FragmentActivity implements
             }
         }
     }
-
+    
+    @Override
+    public void onRunUpdate(Codel codel) {
+        updateViewAfterStep();
+        mColorField.setCellDrawable(codel.x, codel.y, mDebugDrawable);
+    }
+    
     @Override
     public void onRunComplete() {
         mToolBoxFragment.setControlsToDefaultState();
