@@ -38,7 +38,8 @@ public class ColorFieldView extends View {
 
         Rect bounds;
         Rect padding;
-
+        
+        
         Cell(int x, int y, int color, Rect padding) {
             this.x = x;
             this.y = y;
@@ -104,12 +105,13 @@ public class ColorFieldView extends View {
     private int mCountY;
 
     private int mDefaultColor;
-
+    private boolean mNormaliseForLowestEdge;
+    
     private CellClickListener mOnCellClickListener;
 
     private boolean mForceDraw;
     private Cell mCellToRedraw;
-
+    
     /**
      * @param mOnCellClickListener
      *            the mOnCellClickListener to set
@@ -128,7 +130,8 @@ public class ColorFieldView extends View {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.ColorFieldView);
-
+        
+        mNormaliseForLowestEdge = a.getBoolean(R.styleable.ColorFieldView_normaliseForLowestEdge, false);
         mDefaultColor = a.getColor(R.styleable.ColorFieldView_defaultColor, 0);
 
         mCountX = a.getInt(R.styleable.ColorFieldView_countX, 30);
@@ -209,14 +212,6 @@ public class ColorFieldView extends View {
                 }
             }
         }
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int measuredHeight = measureHeight(heightMeasureSpec);
-        int measuredWidth = measureWidth(widthMeasureSpec);
-
-        setMeasuredDimension(measuredWidth, measuredHeight);
     }
 
     private void processCellClick(MotionEvent event) {
@@ -360,7 +355,7 @@ public class ColorFieldView extends View {
         
         mCellWidth = Math.round((width - totalPaddingLeft) / mCountX);
         mCellHeight = Math.round((height - totalPaddingTop) / mCountY);
-
+        
         if (mCellToRedraw == null) {
             drawFull(canvas);
         } else if (mForceDraw == true) {
@@ -386,6 +381,20 @@ public class ColorFieldView extends View {
     }
 
     // //////////////////////////////////////////////////////////////////
+    
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int measuredWidth = measureWidth(widthMeasureSpec);
+        int measuredHeight = measureHeight(heightMeasureSpec);
+        
+        if(mNormaliseForLowestEdge) {
+            int minSide = Math.min(measuredWidth, measuredHeight);
+            measuredWidth = minSide;
+            measuredHeight = minSide;
+        }
+        
+        setMeasuredDimension(measuredWidth, measuredHeight);
+    }
 
     private int measureHeight(int measureSpec) {
         int result = getSpecifiedMeasure(measureSpec);

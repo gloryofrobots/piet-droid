@@ -11,39 +11,7 @@
     <string name="control_panel_button_stop">Stop</string>
     
     
-    <string name="command_tag_push">PUSH</string>
-    <string name="command_description_push">PUSH</string>
-    <string name="command_tag_pop">POP</string>
-    <string name="command_description_pop">POP</string>
-    <string name="command_tag_add">ADD</string>
-    <string name="command_description_add">ADD</string>
-    <string name="command_tag_sub">SUB</string>
-    <string name="command_description_sub">SUB</string>
-    <string name="command_tag_mul">MUL</string>
-    <string name="command_description_mul">MUL</string>
-    <string name="command_tag_div">DIV</string>
-    <string name="command_description_div">DIV</string>
-    <string name="command_tag_mod">DIV</string>
-    <string name="command_description_mod">DIV</string>
-    <string name="command_tag_not">NOT</string>
-    <string name="command_description_not">NOT</string>
-    <string name="command_tag_greater">GREATER</string>
-    <string name="command_description_greater">GREATER</string>
-    <string name="command_tag_pointer">POINTER</string>
-    <string name="command_description_pointer">POINTER</string>
-    <string name="command_tag_switch">SWITCH</string>
-    <string name="command_description_switch">SWITCH</string>
-    <string name="command_tag_duplicate">DUPLICATE</string>
-    <string name="command_description_duplicate">DUPLICATE</string>
-    <string name="command_tag_roll">ROLL</string>
-    <string name="command_description_roll">ROLL</string>
-    <string name="command_tag_in_number">IN_NUMBER</string>
-    <string name="command_description_in_number">IN_NUMBER</string>
-    <string name="command_tag_in_char">IN_CHAR</string>
-    <string name="command_description_in_char">IN_CHAR</string>
-    <string name="command_tag_out_number">OUT_NUMBER</string>
-    <string name="command_description_out_number">OUT_NUMBER</string>
-    <string name="command_tag_out_char">OUT_CHAR</string>
-    <string name="command_description_out_char">OUT_CHAR</string>
-
+    <string name="out_buffer_title">Program output</string>
+    <string name="in_buffer_hint">Program input \n(digits separated by space)</string>
+    <string name="state_info_title">Program state</string>
 </resources>

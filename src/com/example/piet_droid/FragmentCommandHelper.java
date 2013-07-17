@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,8 +53,12 @@ public class FragmentCommandHelper extends Fragment {
         int size = command_tags.length;
         for (int i = 0; i < size; i++) {
             TextView text = new TextView(activity);
+            //FIXME
             text.setText(command_titles[i]);
             text.setTag(command_tags[i]);
+            text.setGravity(Gravity.CENTER_HORIZONTAL);
+            text.setPadding(2, 2, 2, 2);
+            text.setTextSize(12.0f);
             mContainer.addView(text);
         }
 

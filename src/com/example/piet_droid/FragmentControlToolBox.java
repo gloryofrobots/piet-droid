@@ -22,9 +22,9 @@ public class FragmentControlToolBox extends Fragment {
 
         public void onInteractionStep();
 
-        public void onInteractionStop();
+        public void onInteractionPause();
         
-        public void onInteractionReset();
+        public void onInteractionStop();
         // /
     }
 
@@ -47,8 +47,7 @@ public class FragmentControlToolBox extends Fragment {
         mButtonRun.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 mButtonPause.setEnabled(true);
-                
-                mButtonStop.setEnabled(false);
+                mButtonStop.setEnabled(true);
                 mButtonStep.setEnabled(false);
                 mButtonRun.setEnabled(false);
                 
@@ -58,6 +57,7 @@ public class FragmentControlToolBox extends Fragment {
 
         mButtonStep.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                mButtonStop.setEnabled(true);
                 mInteractionListener.onInteractionStep();
             }
         });
@@ -69,7 +69,7 @@ public class FragmentControlToolBox extends Fragment {
                 mButtonStep.setEnabled(true);
                 mButtonRun.setEnabled(true);
                 
-                mInteractionListener.onInteractionStop();
+                mInteractionListener.onInteractionPause();
                 
             }
         });
@@ -77,7 +77,7 @@ public class FragmentControlToolBox extends Fragment {
         mButtonStop.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 setControlsToDefaultState();
-                mInteractionListener.onInteractionReset();
+                mInteractionListener.onInteractionStop();
                 
             }
         });

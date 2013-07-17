@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_background"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -12,9 +12,11 @@
     tools:context=".MainActivity" >
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_weight="1"
+        android:orientation="vertical"
+        >
 
         <fragment
             android:id="@+id/fragment_control_toolbox"
@@ -23,65 +25,74 @@
             android:layout_height="wrap_content" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:orientation="horizontal" >
-
-            <com.example.piet_droid.ColorFieldView
-                android:id="@+id/codelField"
-                android:layout_width="350dp"
-                android:layout_height="350dp"
-                colorField:countX="@integer/field_count_codels_x"
-                colorField:countY="@integer/field_count_codels_y"
-                colorField:defaultColor="@color/codel_field_default_color" />
+            android:orientation="horizontal"
+             >
 
             <fragment
                 android:id="@+id/fragment_palette_simple"
                 android:name="com.example.piet_droid.FragmentPaletteSimple"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_weight="5" />
-
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+<!--  
             <fragment
                 android:id="@+id/fragment_command_helper"
                 android:name="com.example.piet_droid.FragmentCommandHelper"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                  >
 
-            <fragment
-                android:id="@+id/fragment_in_out_buffers"
-                android:name="com.example.piet_droid.FragmentInOutBuffers"
-                android:layout_height="fill_parent"
-                android:layout_width="0dp"
-                android:layout_weight="4"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+                <fragment
+                    android:id="@+id/fragment_in_out_buffers"
+                    android:name="com.example.piet_droid.FragmentInOutBuffers"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dip"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin" />
 
-            <fragment
-                android:id="@+id/fragment_state_info"
-                android:name="com.example.piet_droid.FragmentStateInfo"
-                android:layout_height="fill_parent"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
-
+                <fragment
+                    android:id="@+id/fragment_state_info"
+                    android:name="com.example.piet_droid.FragmentStateInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dip"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+            </LinearLayout>
+<!-- 
             <fragment
                 android:id="@+id/fragment_command_log"
                 android:name="com.example.piet_droid.FragmentCommandLog"
-                android:layout_width="0dp"
-                android:layout_weight="3"
-                android:layout_height="fill_parent"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin" /> -->
         </LinearLayout>
+
+        <Button
+            android:id="@+id/button_load"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_button_load" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/button_load"
-        android:layout_width="wrap_content"
+    <com.example.piet_droid.ColorFieldView
+        android:id="@+id/codelField"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:text="@string/main_button_load" />
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_weight="1"
+        colorField:countX="@integer/field_count_codels_x"
+        colorField:countY="@integer/field_count_codels_y"
+        colorField:defaultColor="@color/codel_field_default_color"
+        colorField:normaliseForLowestEdge="true" />
 
 </LinearLayout>

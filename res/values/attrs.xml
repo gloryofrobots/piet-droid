@@ -6,6 +6,7 @@
         <attr name="palette" format="reference" />
         <attr name="countX" format="integer" />
         <attr name="countY" format="integer" />
+        <attr name="normaliseForLowestEdge" format="boolean" />
     </declare-styleable>
 
 </resources>

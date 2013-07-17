@@ -37,6 +37,7 @@ public class FragmentPaletteSimple extends Fragment {
             mTextBounds = new Rect();
             mPaint = new Paint();
             mPaint.getTextBounds(text, 0, mText.length(), mTextBounds);
+            //FIXME
             mPaint.setColor(Color.BLACK);
             mPaint.setTextSize(10f);
             mPaint.setAntiAlias(true);
@@ -174,7 +175,6 @@ public class FragmentPaletteSimple extends Fragment {
             @Override
             public void onClick(View v) {
                 chooseColor(Color.BLACK);
-
             }
         });
 
@@ -205,14 +205,22 @@ public class FragmentPaletteSimple extends Fragment {
 
             mTagsAliasLink.put(tag, drawable);
         }
-
+        
+       
+        
         return view;
     }
-
-    public void setPiet(Piet piet) {
-        mPiet = piet;
+    
+    @Override
+    public void onStart(){
+        super.onStart();
+        
+        Resources resources = getResources();
+        int defaultColor = resources.getColor(R.color.default_draw_color);
+        mPalette.setDrawableForColor(defaultColor, mHighlightDrawable);
+        chooseColor(defaultColor);
     }
-
+    
     public void chooseColor(int color) {
         //GradientDrawable gd = (GradientDrawable) mDrawable.mutate();
         //gd.setColor(color);
@@ -237,15 +245,24 @@ public class FragmentPaletteSimple extends Fragment {
                     }
                 });
     }
-
+    
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        
+        Activity activity = getActivity();
+        try {
+            mOnChooseColorListener = (OnChooseColorListener) activity;
+            PietProvider provider = (PietProvider) activity;
+            mPiet = provider.getPiet();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnChooseColorListener and PietProvider");
+        }
+    }
+    
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mOnChooseColorListener = (OnChooseColorListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnChooseColorListener");
-        }
     }
 }

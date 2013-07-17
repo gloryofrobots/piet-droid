@@ -20,28 +20,45 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
         public void onRunComplete();
     }
 
+    private enum State {
+        RUN, ONE_STEP, WAIT;
+    }
+
     private ExecutionProcessListener mListener;
     private List<Codel> mQueue;
     private long mDelay;
-    boolean mLock;
-    boolean mPause;
+    private State mState;
 
     public AsyncTaskRunPiet(ExecutionProcessListener listener, long delay) {
         mListener = listener;
         mDelay = delay;
-        mPause = false;
+        mState = State.RUN;
     }
 
-    public boolean isOnPause() {
-        return mPause;
+    public boolean isWaiting() {
+        return mState == State.WAIT;
+    }
+    
+    public boolean isRunning() {
+        return mState == State.RUN;
+    }
+    
+    public void setWait() {
+        mState = State.WAIT;
     }
 
-    public void pause() {
-        mPause = true;
+    public void allowRun() {
+        mState = State.RUN;
     }
 
-    public void resume() {
-        mPause = false;
+    public void allowOneStepOnly() {
+        mState = State.ONE_STEP;
+    }
+
+    public void endStep() {
+        if (mState == State.ONE_STEP) {
+            mState = State.WAIT;
+        }
     }
 
     @Override
@@ -64,19 +81,23 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     @Override
     protected Void doInBackground(Piet... params) {
         Piet piet = params[0];
+       
         while (piet.step() == true) {
             if (isCancelled() == true) {
                 return null;
             }
 
             // wait while resumed
-            while (isOnPause()) {
+            while (isWaiting()) {
             }
 
             Codel currentCodel = piet.getCurrentCodel();
-
-            mQueue.add(new Codel(currentCodel));
+            
             publishProgress();
+            mQueue.add(new Codel(currentCodel));
+            endStep();
+            
+            //publishProgress();
 
             try {
                 Thread.sleep(mDelay);

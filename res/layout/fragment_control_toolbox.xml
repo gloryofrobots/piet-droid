@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:shrinkColumns="*"
-    android:stretchColumns="*" >
+    android:stretchColumns="*">
+<TableRow >
+    <Button
+        android:id="@+id/button_run"
+        android:layout_width="@dimen/control_button_side"
+        android:layout_height="@dimen/control_button_side"
+        android:layout_weight="2"
+        android:padding="10dp"
+        android:background="@color/button_run_color"
+        android:text="@string/control_panel_button_run" />
 
-    <TableRow>
+    <Button
+        android:id="@+id/button_step"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dip"
+        android:layout_weight="1"
+        android:background="@color/button_step_color"
+        android:text="@string/control_panel_button_step" />
 
-        <Button
-            android:id="@+id/button_run"
-            android:layout_width="@dimen/control_button_side"
-            android:layout_height="@dimen/control_button_side"
-            android:background="@color/button_run_color"
-            android:text="@string/control_panel_button_run" />
+    <Button
+        android:id="@+id/button_pause"
+        android:padding="10dp"
+        android:layout_width="@dimen/control_button_side"
+        android:layout_height="@dimen/control_button_side"
+        android:layout_marginLeft="10dip"
+        android:layout_weight="1"
+        android:background="@color/button_pause_color"
+        android:text="@string/control_panel_button_pause" />
 
-        <Button
-            android:id="@+id/button_step"
-            android:layout_width="@dimen/control_button_side"
-            android:layout_height="@dimen/control_button_side"
-            android:layout_marginLeft="10dip"
-            android:background="@color/button_step_color"
-            android:text="@string/control_panel_button_step" />
- />
-
-        <Button
-            android:id="@+id/button_pause"
-            android:layout_width="@dimen/control_button_side"
-            android:layout_height="@dimen/control_button_side"
-            android:layout_marginLeft="10dip"
-            android:background="@color/button_pause_color"
-            android:text="@string/control_panel_button_pause" />
- />
-
-        <Button
-            android:id="@+id/button_stop"
-            android:layout_width="@dimen/control_button_side"
-            android:layout_height="@dimen/control_button_side"
-            android:layout_marginLeft="10dip"
-            android:background="@color/button_stop_color"
-            android:text="@string/control_panel_button_stop" />
- />
-    </TableRow>
-
+    <Button
+        android:id="@+id/button_stop"
+        android:padding="10dp"
+        android:layout_width="@dimen/control_button_side"
+        android:layout_height="@dimen/control_button_side"
+        android:layout_marginLeft="10dip"
+        android:layout_weight="1"
+        android:background="@color/button_stop_color"
+        android:text="@string/control_panel_button_stop" />
+</TableRow>
 </TableLayout>
