@@ -11,19 +11,23 @@ public class CodelTableModel {
     protected int mWidth;
     protected int mHeight;
 
-    public CodelTableModel(int _width, int _height) {
+    public CodelTableModel(int _width, int _height, CodelColor defaultColor) {
         // TODO Auto-generated constructor stub
         mSize = _width * _height;
         
         mData = new CodelColor[mSize];
-        for( int i = 0; i < mSize; i++ ){
-        	mData[i] = CodelColor.BLACK;
-        }
+        fillWithColor(defaultColor);
         
         mWidth = _width;
         mHeight = _height;
     }
-
+    
+    public void fillWithColor(CodelColor color) {
+        for( int i = 0; i < mSize; i++ ){
+            mData[i] = color;
+        }
+    }
+    
     public int getWidth() {
         return mWidth;
     }

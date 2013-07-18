@@ -2,6 +2,7 @@ package com.example.piet_droid;
 
 import java.util.Locale;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.example.jpiet.Codel;
 import com.example.jpiet.CodelChoser;
 import com.example.jpiet.Command;
@@ -20,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class FragmentStateInfo extends Fragment {
+public class FragmentStateInfo extends SherlockFragment {
 
     private TextView mInfoText;
     Piet mPiet;

@@ -58,12 +58,16 @@ public class Piet {
 	}
 	
 	public void createModel(int width, int height){
-		mModel = new CodelTableModel(width, height);
+		mModel = new CodelTableModel(width, height, CodelColor.WHITE);
 		/*if (mInterpreter.isRun()) {
 			mInterpreter.stop();
 		}*/
 		
 		mInterpreter.setInput(mModel);
+	}
+	
+	public void clear(){
+	    mModel.fillWithColor(CodelColor.WHITE);
 	}
 	
 	public void setColor(int x, int y, int color) {

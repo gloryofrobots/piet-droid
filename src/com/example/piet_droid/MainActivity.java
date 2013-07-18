@@ -1,31 +1,50 @@
 package com.example.piet_droid;
 
+import java.io.File;
 import java.util.List;
 
 import android.os.Bundle;
+import android.os.Environment;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.FragmentActivity;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuInflater;
+
 import android.util.Log;
-import android.view.Menu;
+
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+import ar.com.daidalos.afiledialog.FileChooserDialog;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.example.jpiet.Codel;
 
 import com.example.jpiet.InOutSystem;
 
 import com.example.jpiet.Piet;
 import com.example.piet_droid.AsyncTaskLoadBitmap.Pixel;
+import com.lamerman.FileDialog;
+import com.lamerman.SelectionMode;
 
-public class MainActivity extends FragmentActivity implements
+public class MainActivity extends SherlockFragmentActivity implements
         FragmentControlToolBox.InteractionListener,
         FragmentPaletteSimple.OnChooseColorListener,
         AsyncTaskRunPiet.ExecutionProcessListener,
         AsyncTaskLoadBitmap.LoadProcessListener, PietProvider {
+
+    private static final int REQUEST_SAVE = 0;
+
+    private static final int REQUEST_OPEN = 1;
 
     Piet mPiet;
 
@@ -38,11 +57,10 @@ public class MainActivity extends FragmentActivity implements
     AsyncTaskRunPiet mCurrentRunTask;
 
     FragmentInOutBuffers mFragmentInOutBuffers;
-    FragmentControlToolBox mToolBoxFragment;
+    FragmentControlToolBox mFragmentControlToolBox;
     // FragmentCommandHelper mCommandHelperFragment;
     FragmentStateInfo mFragmentStateInfo;
-    
-    
+
     // FragmentCommandLog mFragmentCommandLog;
     // FragmentPaletteSimple mFragmentPaletteSimple;
 
@@ -50,9 +68,7 @@ public class MainActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        
-        
+
         Resources resources = getResources();
         mSleepBetweenStep = 1L;
 
@@ -62,7 +78,7 @@ public class MainActivity extends FragmentActivity implements
 
         mActiveColor = 0;
 
-        mToolBoxFragment = (FragmentControlToolBox) getSupportFragmentManager()
+        mFragmentControlToolBox = (FragmentControlToolBox) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_control_toolbox);
 
         /*
@@ -84,14 +100,6 @@ public class MainActivity extends FragmentActivity implements
         initPiet(resources);
 
         initColorField();
-
-        final Button buttonLoad = (Button) findViewById(R.id.button_load);
-        buttonLoad.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                load();
-            }
-        });
-
         /*
          * mFragmentPaletteSimple = (FragmentPaletteSimple)
          * getSupportFragmentManager()
@@ -108,8 +116,131 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        // getMenuInflater().inflate(R.menu.main, menu);
+        getSupportMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+
+        case (R.id.action_load): 
+            onActionLoad2();
+            return true;
+            
+        case (R.id.action_clear):
+            onActionClear();
+            return true;
+
+        case (R.id.action_new):
+            return true;
+        case (R.id.action_quit):
+            return true;
+        case (R.id.action_save): {
+            onActionSave();
+            return true;
+        }
+        case (R.id.action_settings):
+            return true;
+
+        default:
+            return false;
+        }
+    }
+    
+    private void onActionLoad() {
+        Intent intent = new Intent(getBaseContext(), FileDialog.class);
+
+        String sdcardPath = Environment.getExternalStorageDirectory()
+                .getPath();
+        intent.putExtra(FileDialog.START_PATH, sdcardPath);
+
+        intent.putExtra(FileDialog.CAN_SELECT_DIR, true);
+
+        // alternatively you can set file filter
+        intent.putExtra(FileDialog.FORMAT_FILTER, new String[] { "png",
+                "gif", "jpeg", "bmp", "jpg" });
+        
+        intent.putExtra(FileDialog.SELECTION_MODE, SelectionMode.MODE_OPEN);
+       
+        startActivityForResult(intent, REQUEST_OPEN);
+    }
+    
+    private void onActionLoad2() {
+        FileChooserDialog dialog = new FileChooserDialog(this);
+        dialog.loadFolder(Environment.getExternalStorageDirectory().getPath());
+        dialog.setFilter(".*jpg|.*png|.*gif|.*JPG|.*PNG|.*GIF");
+        
+        dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
+            public void onFileSelected(Dialog source, File file) {
+                source.hide();
+                MainActivity.this.loadImageFile(file.getAbsolutePath());
+            }
+            public void onFileSelected(Dialog source, File folder, String name) {
+                source.hide();
+                Toast toast = Toast.makeText(source.getContext(), "File created: " + folder.getName() + "/" + name, Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+        
+        dialog.show();
+    }
+    
+    
+    public void onActionClear() {
+        if (isOnRunMode()) {
+            onInteractionStop();
+        }
+
+        mFragmentControlToolBox.setControlsToDefaultState();
+        clearCells();
+    }
+    
+    public void onActionSave() {
+        Intent intent = new Intent(getBaseContext(), FileDialog.class);
+        String sdcardPath = Environment.getExternalStorageDirectory()
+                .getPath();
+        intent.putExtra(FileDialog.START_PATH, sdcardPath);
+
+        intent.putExtra(FileDialog.CAN_SELECT_DIR, true);
+
+        // alternatively you can set file filter
+        intent.putExtra(FileDialog.FORMAT_FILTER,
+                new String[] { "png", "gif", "jpeg", "bmp", "jpg" });
+
+        startActivityForResult(intent, REQUEST_OPEN);
+    }
+    
+    public synchronized void onActivityResult(final int requestCode,
+            int resultCode, final Intent data) {
+
+            if (resultCode == SherlockFragmentActivity.RESULT_OK) {
+
+                    if (requestCode == REQUEST_SAVE) {
+                        String filePath = data.getStringExtra(FileDialog.RESULT_PATH);
+                        saveImageFile(filePath);
+                    } else if (requestCode == REQUEST_OPEN) {
+                        String filePath = data.getStringExtra(FileDialog.RESULT_PATH);
+                        loadImageFile(filePath);
+                    }
+                    
+                    
+
+            } else if (resultCode == SherlockFragmentActivity.RESULT_CANCELED) {
+                    
+            }
+
+    }
+    
+    private void clearColorFieldDrawables() {
+        mColorField.clearDrawables();
+    }
+
+    private void clearCells() {
+        mColorField.clearAll();
+        mPiet.clear();
     }
 
     private void setCell(int x, int y, int color) {
@@ -146,9 +277,19 @@ public class MainActivity extends FragmentActivity implements
                     @Override
                     public void onCellClick(int x, int y) {
                         setCell(x, y, mActiveColor);
-                        mColorField.setCellToRedraw(x, y);
+                        // FIXME
+                        MainActivity.this.mColorField.setCellToRedraw(x, y);
+                    }
+
+                    @Override
+                    public boolean isProcessClickWanted() {
+                        return MainActivity.this.isOnRunMode() == false;
                     }
                 });
+    }
+
+    public boolean isOnRunMode() {
+        return mCurrentRunTask != null;
     }
 
     @Override
@@ -159,15 +300,12 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onInteractionRun() {
-        mColorField.setInterractionAllow(false);
-        
         if (mCurrentRunTask != null) {
             if (mCurrentRunTask.isWaiting()) {
                 mCurrentRunTask.allowRun();
-                return;
             }
-            
-            onRunCancel();
+
+            return;
         }
 
         mCurrentRunTask = new AsyncTaskRunPiet(this, mSleepBetweenStep);
@@ -187,7 +325,7 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onInteractionPause() {
-        
+
         if (mCurrentRunTask == null) {
             return;
         }
@@ -197,26 +335,24 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onInteractionStop() {
-        mColorField.setInterractionAllow(true);
         if (mCurrentRunTask == null) {
             return;
         }
+
         mCurrentRunTask.cancel(true);
-        mCurrentRunTask.terminate();
     }
 
     @Override
     public void onRunStart() {
-        mPiet.init();
         mFragmentStateInfo.init();
-        mColorField.clearDrawables();
+        clearColorFieldDrawables();
         mFragmentInOutBuffers.prepare();
     }
 
     @Override
     public void onRunCancel() {
         mPiet.init();
-        mColorField.clearDrawables();
+        clearColorFieldDrawables();
         mFragmentStateInfo.init();
         mFragmentInOutBuffers.prepare();
         mCurrentRunTask = null;
@@ -234,23 +370,31 @@ public class MainActivity extends FragmentActivity implements
             }
         }
     }
-    
+
     @Override
     public void onRunUpdate(Codel codel) {
+        if (mCurrentRunTask == null || mCurrentRunTask.isCancelled()) {
+            return;
+        }
+
         updateViewAfterStep();
         mColorField.setCellDrawable(codel.x, codel.y, mDebugDrawable);
     }
-    
+
     @Override
     public void onRunComplete() {
-        mToolBoxFragment.setControlsToDefaultState();
+        mFragmentControlToolBox.setControlsToDefaultState();
         mCurrentRunTask = null;
     }
-
-    public void load() {
+    
+    public void saveImageFile(String path) {
+    
+    }
+    
+    public void loadImageFile(String path) {
         // TODO FADE OUT FADE IN
-        Bitmap bitmap = BitmapFactory.decodeFile("/data/helloWorld_small.png");
-
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        //"/data/helloWorld_small.png"
         // TODO CODEL SIZE HERE
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -266,7 +410,6 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onLoadBitmapCancel() {
         // TODO Auto-generated method stub
-
     }
 
     /*

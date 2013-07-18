@@ -3,7 +3,7 @@ package com.example.jpiet;
 public class FakeData {
 
     public static CodelTableModel getPietModel(){
-        CodelTableModel model = new CodelTableModel( 32, 32 );
+        CodelTableModel model = new CodelTableModel( 32, 32, CodelColor.WHITE );
         model.set(0, 0, CodelColor.RED);
         model.set(1, 0, CodelColor.RED);
         model.set(2, 0, CodelColor.RED);
@@ -1032,7 +1032,7 @@ public class FakeData {
     }
 
 	public static CodelTableModel getHelloWorldModel(){
-		CodelTableModel model = new CodelTableModel( 32, 32 );
+		CodelTableModel model = new CodelTableModel( 32, 32, CodelColor.WHITE  );
 		model.set(0, 0, CodelColor.LIGHT_RED);
 		model.set(1, 0, CodelColor.RED);
 		model.set(2, 0, CodelColor.DARK_RED);

@@ -1,5 +1,6 @@
 package com.example.piet_droid;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.example.jpiet.Piet;
 import com.example.jpiet.PietMachine;
 
@@ -15,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class FragmentCommandHelper extends Fragment {
+public class FragmentCommandHelper extends SherlockFragment {
     public interface OnChooseCommandListener {
         public void onChooseCommandColor(int color);
     }

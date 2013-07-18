@@ -2,6 +2,7 @@ package com.example.piet_droid;
 
 import java.util.HashMap;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.example.jpiet.Piet;
 import com.example.jpiet.PietMachine;
 
@@ -25,7 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class FragmentPaletteSimple extends Fragment {
+public class FragmentPaletteSimple extends SherlockFragment {
     public class TextDrawable extends Drawable {
 
         private final String mText;
@@ -166,6 +167,11 @@ public class FragmentPaletteSimple extends Fragment {
                 mPalette.clearDrawables();
                 mPalette.setCellDrawable(x, y, mHighlightDrawable);
                 chooseColor(color);
+            }
+
+            @Override
+            public boolean isProcessClickWanted() {
+                return true;
             }
         });
 

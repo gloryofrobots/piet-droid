@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.example.jpiet.Command;
 import com.example.jpiet.CommandRunListener;
 import com.example.jpiet.Piet;
@@ -20,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class FragmentCommandLog extends Fragment {
+public class FragmentCommandLog extends SherlockFragment {
     List<String> mQueue;
     TextView mLogText;
 

@@ -28,6 +28,7 @@ import android.view.View;
 public class ColorFieldView extends View {
     public interface CellClickListener {
         public void onCellClick(int x, int y);
+        public boolean isProcessClickWanted();
     }
 
     private class Cell {
@@ -112,7 +113,6 @@ public class ColorFieldView extends View {
     private boolean mForceDraw;
     private Cell mCellToRedraw;
     
-    private boolean mIsInteractionAllowed;
     
     /**
      * @param mOnCellClickListener
@@ -135,7 +135,9 @@ public class ColorFieldView extends View {
         
         mNormaliseForLowestEdge = a.getBoolean(R.styleable.ColorFieldView_normaliseForLowestEdge, false);
         mDefaultColor = a.getColor(R.styleable.ColorFieldView_defaultColor, 0);
-
+        
+      
+        
         mCountX = a.getInt(R.styleable.ColorFieldView_countX, 30);
         mCountY = a.getInt(R.styleable.ColorFieldView_countY, 30);
 
@@ -186,14 +188,7 @@ public class ColorFieldView extends View {
         }
     }
     
-    public boolean isInteractionAllowed() {
-        return mIsInteractionAllowed;
-    }
-    
-    public void setInterractionAllow(boolean value) {
-        mIsInteractionAllowed = value;
-    }
-    
+   
     public void setCellColor(int x, int y, int color) {
         mCells[y][x].color = color;
     }
@@ -281,7 +276,8 @@ public class ColorFieldView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mOnCellClickListener != null && isInteractionAllowed()) {
+        if (mOnCellClickListener != null 
+                && mOnCellClickListener.isProcessClickWanted()) {
             processCellClick(event);
         }
 
@@ -443,5 +439,10 @@ public class ColorFieldView extends View {
         }
 
         return result;
+    }
+
+    public void clearAll() {
+        createCells();
+        invalidate();
     }
 }

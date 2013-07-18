@@ -1,5 +1,7 @@
 package com.example.piet_droid;
 
+import com.actionbarsherlock.app.SherlockFragment;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class FragmentControlToolBox extends Fragment {
+public class FragmentControlToolBox extends SherlockFragment {
     Button mButtonRun ;
     Button mButtonStep;
     Button mButtonPause ;

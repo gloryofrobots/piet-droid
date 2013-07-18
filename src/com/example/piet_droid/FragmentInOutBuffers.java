@@ -1,5 +1,7 @@
 package com.example.piet_droid;
 
+import com.actionbarsherlock.app.SherlockFragment;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class FragmentInOutBuffers extends Fragment {
+public class FragmentInOutBuffers extends SherlockFragment {
     
     InOutSystemEditText mInOutSystem;
     

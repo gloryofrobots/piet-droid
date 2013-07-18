@@ -11,6 +11,14 @@
     <string name="control_panel_button_stop">Stop</string>
     
     
+    <string name="action_new">New</string>
+    <string name="action_save">Save</string>
+    <string name="action_load">Load</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_quit">Quit</string>
+  
+    
+    
     <string name="out_buffer_title">Program output</string>
     <string name="in_buffer_hint">Program input \n(digits separated by space)</string>
     <string name="state_info_title">Program state</string>

@@ -50,6 +50,11 @@ public class PaletteFragment extends Fragment {
                 int color = palette.getCellColor(x, y);
                 chooseColor(color);
             }
+
+            @Override
+            public boolean isProcessClickWanted() {
+                return true;
+            }
         });
         
         

@@ -22,7 +22,7 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     }
 
     private enum State {
-        RUN, ONE_STEP, WAIT, TERMINATED;
+        RUN, ONE_STEP, WAIT/*, TERMINATED*/;
         
         public State parentState = null;
     }
@@ -74,7 +74,7 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     private void setState(State state) {
         state.parentState = mState;
         mState = state;
-        Log.e("AsyncTaskRunPiet", mState.toString());
+        //Log.e("AsyncTaskRunPiet", mState.toString());
     }
     
     private boolean isOnState(State state) {
@@ -87,13 +87,13 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
         }
     }
     
-    public void terminate(){
+    /*public void terminate(){
         setState(State.TERMINATED);
     }
     
     public boolean isTerminated() {
         return isOnState(State.TERMINATED);
-    }
+    }*/
     
     @Override
     protected void onCancelled() {
@@ -117,40 +117,32 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     protected Void doInBackground(Piet... params) {
         Piet piet = params[0];
        
-        while (piet.step() == true) {
+        while (true) {
             if (isCancelled() == true) {
-                return null;
+                break;
+            }
+             
+            if(isFlushed() == false){
+                continue;
             }
             
-            while(isFlushed() == false){
-                if(isTerminated()){
-                    return null;
-                }
+            if(isWaiting()) {
+                continue;
             }
             
-            if(isTerminated()){
-                return null;
+            if(piet.step() == false) {
+                break;
             }
-            
-            // wait while resumed
-            while (isWaiting()) {
-                if(isTerminated()){
-                    return null;
-                }
-            }
-
             mCurrentCodel = piet.getCurrentCodel();
             
             //mQueue.add(new Codel(currentCodel));
             
             endStep();
-            publishProgress();
-            
             waitForFlush();
             
-
-            //publishProgress();
-
+            publishProgress();
+            
+            
             try {
                 Thread.sleep(mDelay);
             } catch (InterruptedException e) {
