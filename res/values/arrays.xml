@@ -1,0 +1,28 @@
+<resources>
+    <string-array name="unknown_color_interpretation_entries">
+        <item>White</item>
+        <item>Black</item>
+    </string-array>
+    <string-array name="unknown_color_interpretation_values">
+        <item>#fff</item>
+        <item>#000</item>
+    </string-array>
+    <string-array name="new_field_color_entries">
+        <item>White</item>
+        <item>Black</item>
+    </string-array>
+    <string-array name="new_field_color_values">
+        <item>#fff</item>
+        <item>#000</item>
+    </string-array>
+    <string-array name="image_write_format_entries">
+        <item>JPEG</item>
+        <item>PNG</item>
+        <item>GIF</item>
+        <item>BMP</item>
+    </string-array>
+    <string-array name="image_write_format_values">
+        <item>JPEG</item>
+        <item>PNG</item>
+    </string-array>
+</resources>

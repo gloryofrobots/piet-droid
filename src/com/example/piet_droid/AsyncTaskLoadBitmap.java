@@ -1,8 +1,5 @@
 package com.example.piet_droid;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import android.app.ProgressDialog;
 import android.content.Context;

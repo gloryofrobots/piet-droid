@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:dialogTitle="@string/delay_before_step_dialog_title"
+        android:key="delay_before_step"
+        android:summary="@string/delay_before_step_summary"
+        android:title="@string/delay_before_step_title"/>
+    
+    <ListPreference
+        android:entries="@array/unknown_color_interpretation_entries"
+        android:entryValues="@array/unknown_color_interpretation_values"
+        android:key="unknown_color_interpretation"
+        android:summary="@string/unknow_color_interpretation_summary"
+        android:title="@string/unknow_color_interpretation_title"/>
+    
+    <ListPreference
+        android:entries="@array/new_field_color_entries"
+        android:entryValues="@array/new_field_color_values"
+        android:key="new_field_color"
+        android:summary="@string/new_field_color_summary"
+        android:title="@string/new_field_color_title"/>
+    <!--  
+    <ListPreference
+        android:entries="@array/image_write_format_entries"
+        android:entryValues="@array/image_write_format_values"
+        android:key="image_write_format"
+        android:summary="@string/image_write_format_summary"
+        android:title="@string/image_write_format_title"/>-->
+</PreferenceScreen>

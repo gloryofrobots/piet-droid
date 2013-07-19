@@ -51,6 +51,15 @@ public enum CodelColor {
         return argb;
     }
     
+    public int getRGBA() {
+        int rgba = R;
+        rgba = (rgba) + G;
+        rgba = (rgba << 8) + B;
+        rgba = (rgba << 8) + 255;
+  
+        return rgba;
+    }
+    
     public static CodelColor findColor(int r, int g, int b) {
         CodelColor result = BLACK;
         for (CodelColor c: CodelColor.values()) {
@@ -61,7 +70,7 @@ public enum CodelColor {
 
         return result;
     }
-
+    //FIXME ONE USE ARGB NOT RGB
     private CodelColor(String _name, int _value, int _hue, int _dark) {
         name = _name;
         value = _value;

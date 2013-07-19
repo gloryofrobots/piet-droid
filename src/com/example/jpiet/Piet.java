@@ -131,4 +131,8 @@ public class Piet {
 
         interpreter.run();*/
     }
+
+    public CodelTableModel getModel() {
+        return mModel;
+    }
 }

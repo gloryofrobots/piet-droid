@@ -5,10 +5,13 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,9 +35,6 @@ import com.example.jpiet.Codel;
 import com.example.jpiet.InOutSystem;
 
 import com.example.jpiet.Piet;
-import com.example.piet_droid.AsyncTaskLoadBitmap.Pixel;
-import com.lamerman.FileDialog;
-import com.lamerman.SelectionMode;
 
 public class MainActivity extends SherlockFragmentActivity implements
         FragmentControlToolBox.InteractionListener,
@@ -45,6 +45,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     private static final int REQUEST_SAVE = 0;
 
     private static final int REQUEST_OPEN = 1;
+
+    private static final int SHOW_PREFERENCES = 1;
 
     Piet mPiet;
 
@@ -125,15 +127,12 @@ public class MainActivity extends SherlockFragmentActivity implements
         super.onOptionsItemSelected(item);
 
         switch (item.getItemId()) {
-
-        case (R.id.action_load): 
-            onActionLoad2();
+        case (R.id.action_load):
+            onActionLoad();
             return true;
-            
         case (R.id.action_clear):
             onActionClear();
             return true;
-
         case (R.id.action_new):
             return true;
         case (R.id.action_quit):
@@ -143,52 +142,65 @@ public class MainActivity extends SherlockFragmentActivity implements
             return true;
         }
         case (R.id.action_settings):
+            onActionSettings();
             return true;
 
         default:
             return false;
         }
     }
-    
-    private void onActionLoad() {
-        Intent intent = new Intent(getBaseContext(), FileDialog.class);
 
-        String sdcardPath = Environment.getExternalStorageDirectory()
-                .getPath();
-        intent.putExtra(FileDialog.START_PATH, sdcardPath);
-
-        intent.putExtra(FileDialog.CAN_SELECT_DIR, true);
-
-        // alternatively you can set file filter
-        intent.putExtra(FileDialog.FORMAT_FILTER, new String[] { "png",
-                "gif", "jpeg", "bmp", "jpg" });
-        
-        intent.putExtra(FileDialog.SELECTION_MODE, SelectionMode.MODE_OPEN);
-       
-        startActivityForResult(intent, REQUEST_OPEN);
+    public void onActionSettings() {
+        startActivityForResult(new Intent(this, Preferences.class),
+                SHOW_PREFERENCES);
     }
-    
-    private void onActionLoad2() {
+
+    public void onActionSave() {
         FileChooserDialog dialog = new FileChooserDialog(this);
         dialog.loadFolder(Environment.getExternalStorageDirectory().getPath());
-        dialog.setFilter(".*jpg|.*png|.*gif|.*JPG|.*PNG|.*GIF");
-        
+        dialog.setFilter(".*jpg|.*jpeg|.*png|.*gif|.*JPG|.*JPEG|.*PNG|.*GIF|");
+
+        dialog.setCanCreateFiles(true);
+        dialog.setFolderMode(false);
+        dialog.setShowConfirmation(true, false);
+
+        dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
+            public void onFileSelected(Dialog source, File file) {
+                source.hide();
+                MainActivity.this.saveImageFile(file.getAbsolutePath());
+            }
+
+            public void onFileSelected(Dialog source, File folder, String name) {
+                source.hide();
+                String path = folder.getAbsolutePath() + "/" + name;
+                MainActivity.this.saveImageFile(path);
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void onActionLoad() {
+        FileChooserDialog dialog = new FileChooserDialog(this);
+        dialog.loadFolder(Environment.getExternalStorageDirectory().getPath());
+        dialog.setFilter(".*jpg|.*jpeg|.*png|.*gif|.*JPG|.*JPEG|.*PNG|.*GIF|");
+        dialog.setCanCreateFiles(false);
+        dialog.setFolderMode(false);
+
         dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
             public void onFileSelected(Dialog source, File file) {
                 source.hide();
                 MainActivity.this.loadImageFile(file.getAbsolutePath());
             }
+
             public void onFileSelected(Dialog source, File folder, String name) {
-                source.hide();
-                Toast toast = Toast.makeText(source.getContext(), "File created: " + folder.getName() + "/" + name, Toast.LENGTH_LONG);
-                toast.show();
+
             }
         });
-        
+
         dialog.show();
     }
-    
-    
+
     public void onActionClear() {
         if (isOnRunMode()) {
             onInteractionStop();
@@ -197,41 +209,22 @@ public class MainActivity extends SherlockFragmentActivity implements
         mFragmentControlToolBox.setControlsToDefaultState();
         clearCells();
     }
-    
-    public void onActionSave() {
-        Intent intent = new Intent(getBaseContext(), FileDialog.class);
-        String sdcardPath = Environment.getExternalStorageDirectory()
-                .getPath();
-        intent.putExtra(FileDialog.START_PATH, sdcardPath);
 
-        intent.putExtra(FileDialog.CAN_SELECT_DIR, true);
-
-        // alternatively you can set file filter
-        intent.putExtra(FileDialog.FORMAT_FILTER,
-                new String[] { "png", "gif", "jpeg", "bmp", "jpg" });
-
-        startActivityForResult(intent, REQUEST_OPEN);
-    }
-    
     public synchronized void onActivityResult(final int requestCode,
             int resultCode, final Intent data) {
-
-            if (resultCode == SherlockFragmentActivity.RESULT_OK) {
-
-                    if (requestCode == REQUEST_SAVE) {
-                        String filePath = data.getStringExtra(FileDialog.RESULT_PATH);
-                        saveImageFile(filePath);
-                    } else if (requestCode == REQUEST_OPEN) {
-                        String filePath = data.getStringExtra(FileDialog.RESULT_PATH);
-                        loadImageFile(filePath);
-                    }
-                    
-                    
-
-            } else if (resultCode == SherlockFragmentActivity.RESULT_CANCELED) {
-                    
-            }
-
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SHOW_PREFERENCES) {
+                updateFromPreferences();
+        }
+    }
+    //TODO CHECK REAL APPLICATION FOR PREFS EXAMPLE!
+    private void updateFromPreferences() {
+        Context context = getApplicationContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        mSleepBetweenStep = Long.valueOf(preferences.getString("delay_before_step", "0"));
+        if(isOnRunMode()) {
+            mCurrentRunTask.setStepDelay(mSleepBetweenStep);
+        }
     }
     
     private void clearColorFieldDrawables() {
@@ -358,19 +351,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         mCurrentRunTask = null;
     }
 
-    // codelsToUpdate must be synchronized
-    @Override
-    public void onRunUpdate(List<Codel> codelsToUpdate) {
-        updateViewAfterStep();
-
-        synchronized (codelsToUpdate) {
-            for (Codel codel : codelsToUpdate) {
-                // Log.e("TT",String.format("%d-%d", codel.x, codel.y));
-                mColorField.setCellDrawable(codel.x, codel.y, mDebugDrawable);
-            }
-        }
-    }
-
     @Override
     public void onRunUpdate(Codel codel) {
         if (mCurrentRunTask == null || mCurrentRunTask.isCancelled()) {
@@ -386,15 +366,39 @@ public class MainActivity extends SherlockFragmentActivity implements
         mFragmentControlToolBox.setControlsToDefaultState();
         mCurrentRunTask = null;
     }
-    
-    public void saveImageFile(String path) {
-    
+
+    private void showInToast(String msg) {
+        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
+        toast.show();
     }
-    
+
+    public void saveImageFile(String path) {
+        AsyncTaskWriteBitmap saveTask = new AsyncTaskWriteBitmap(mPiet,
+                new AsyncTaskWriteBitmap.SaveProcessListener() {
+
+                    @Override
+                    public void onSaveBitmapError() {
+                        // TODO Auto-generated method stub
+                        showInToast("Error occurred during saving bitmap");
+                    }
+
+                    @Override
+                    public void onSaveBitmapComplete() {
+                        showInToast("Bitmap saved");
+                    }
+
+                    @Override
+                    public void onSaveBitmapCancel() {
+                    }
+                }, this);
+
+        saveTask.execute(path);
+    }
+
     public void loadImageFile(String path) {
         // TODO FADE OUT FADE IN
         Bitmap bitmap = BitmapFactory.decodeFile(path);
-        //"/data/helloWorld_small.png"
+        // "/data/helloWorld_small.png"
         // TODO CODEL SIZE HERE
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -411,13 +415,6 @@ public class MainActivity extends SherlockFragmentActivity implements
     public void onLoadBitmapCancel() {
         // TODO Auto-generated method stub
     }
-
-    /*
-     * @Override public void onLoadBitmapUpdate(List<Pixel> pixels) {
-     * 
-     * synchronized (pixels) { for(Pixel pixel : pixels){ setCell(pixel.x,
-     * pixel.y, pixel.color); } } }
-     */
 
     public void onLoadBitmapPixel(int x, int y, int color) {
         setCell(x, y, color);

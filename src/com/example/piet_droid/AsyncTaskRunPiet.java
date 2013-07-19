@@ -16,19 +16,15 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
 
         public void onRunCancel();
 
-        public void onRunUpdate(List<Codel> codelsToUpdate);
         public void onRunUpdate(Codel codel);
         public void onRunComplete();
     }
 
     private enum State {
-        RUN, ONE_STEP, WAIT/*, TERMINATED*/;
-        
-        public State parentState = null;
+        RUN, ONE_STEP, WAIT/*, TERMINATED*/;        
     }
 
     private ExecutionProcessListener mListener;
-    private List<Codel> mQueue;
     private long mDelay;
     private State mState;
     private boolean mWaitForFlush;
@@ -72,7 +68,6 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     }
     
     private void setState(State state) {
-        state.parentState = mState;
         mState = state;
         //Log.e("AsyncTaskRunPiet", mState.toString());
     }
@@ -102,7 +97,6 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
 
     @Override
     protected void onPreExecute() {
-        mQueue = Collections.synchronizedList(new ArrayList<Codel>());
         mListener.onRunStart();
         mWaitForFlush = false;
     }
@@ -134,9 +128,7 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
                 break;
             }
             mCurrentCodel = piet.getCurrentCodel();
-            
-            //mQueue.add(new Codel(currentCodel));
-            
+                        
             endStep();
             waitForFlush();
             
@@ -155,9 +147,9 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     protected void onProgressUpdate(Void... progress) {
         mListener.onRunUpdate(mCurrentCodel);
         endFlush();
-        /*mListener.onRunUpdate(mQueue);
-        synchronized (mQueue) {
-            mQueue.clear();
-        }*/
+    }
+    
+    public void setStepDelay(long delay) {
+        mDelay = delay;
     }
 }

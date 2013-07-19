@@ -76,6 +76,12 @@ public class CodelTableModel {
         return index;
     }
 
+    public void fillArray(int[] colors) throws IndexOutOfBoundsException {
+        for(int i = 0; i < mSize; ++i) {
+            colors[i] = mData[i].getARGB();
+        }
+    }
+
     /*
    
 
