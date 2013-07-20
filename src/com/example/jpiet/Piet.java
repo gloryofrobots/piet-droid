@@ -1,5 +1,11 @@
 package com.example.jpiet;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 /*
 import java.awt.image.*;
 import javax.imageio.ImageIO;
@@ -92,10 +98,10 @@ public class Piet {
 		return mInterpreter.step();
 	}
 	
-    /*public static CodelTableModel createModel(String _filename){
+    public static CodelTableModel createModel(String _filename){
         try {
             BufferedImage img = ImageIO.read(new File(_filename));
-            CodelTableModel model = new CodelTableModel(img.getWidth(), img.getHeight());
+            CodelTableModel model = new CodelTableModel(img.getWidth(), img.getHeight(), CodelColor.WHITE);
 
             for(int y = 0; y < img.getHeight(); y++){
                 for(int x = 0; x < img.getWidth(); x++){
@@ -114,22 +120,41 @@ public class Piet {
             e.printStackTrace();
         }
       return  null;
-    }*/
+    }
     //CODEL SIZE !!!!!!!!
     public static void main(String[] args) {
         //CodelTableModel model = FakeData.getPietModel();
-        //CodelTableModel model = Piet.createModel("/home/gloryofrobots/bin/hipi/helloWorld.png");
+        
+        String filename = "/home/gloryofrobots/develop/piet/hipi/programs/in question/helloworld-mondrian.png";
+        filename = "/home/gloryofrobots/develop/piet/hipi/programs/in question/japh.png";
+        filename = "/home/gloryofrobots/develop/piet/hipi/programs/in question/99bottles.png";
+        filename = "/home/gloryofrobots/develop/piet/hipi/programs/in question/cowsay.png";
+        
+        filename = "/home/gloryofrobots/develop/piet/hipi/programs/in question/fib.gif"; // ERROR
+        
+        
+        //filename = "/home/gloryofrobots/develop/piet/hipi/programs/in question/hanoi.gif"; //ERROR
+        
+        //filename = "/home/gloryofrobots/develop/piet/hipi/programs/in question/hw1-1.gif"; //ERROR
+        filename = "/home/gloryofrobots/develop/piet/hipi/programs/in question/hw2-1.gif";
+        
+        CodelTableModel model = Piet.createModel(filename);
         //CodelTableModel model = Piet.createModel("/home/gloryofrobots/bin/hipi/piet.png");
         //CodelTableModel model = Piet.createModel("/home/gloryofrobots/bin/hipi/addition.png");
-        /*Logger logger = new LoggerJavaSdkStdOut();
+        
+        InOutSystemTest inOutTest = new InOutSystemTest("3\n");
+        
+        Logger logger = new LoggerJavaSdkStdOut();
 
         InOutSystem inOutSystem = new InOutSystemJDK();
         PietMachine machine = new PietMachine(inOutSystem);
 
-        Interpreter interpreter = new Interpreter(logger, machine, true);
+        Interpreter interpreter = new Interpreter(logger, machine, inOutSystem);
         interpreter.setInput(model);
 
-        interpreter.run();*/
+        interpreter.run();
+        
+        System.out.println(inOutTest.output);
     }
 
     public CodelTableModel getModel() {

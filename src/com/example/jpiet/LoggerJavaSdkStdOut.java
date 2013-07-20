@@ -10,7 +10,7 @@ public class LoggerJavaSdkStdOut implements Logger {
 	@Override
 	public void info(String _msg, Object... args) {
 		// TODO Auto-generated method stub
-		System.out.printf(_msg + "\n", args);
+		//System.out.printf(_msg + "\n", args);
 	}
 
 	@Override

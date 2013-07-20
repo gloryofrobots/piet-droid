@@ -9,12 +9,14 @@ import java.io.IOException;
 
 /**
  *
- * @author виктор
+ * @author 
  */
 public class InOutSystemJDK implements InOutSystem{
 
     public int read() throws IOException {
-        return System.in.read();
+        int sym = System.in.read();
+        System.out.println(sym);
+        return sym;
     }
 
     public void write(int output) {

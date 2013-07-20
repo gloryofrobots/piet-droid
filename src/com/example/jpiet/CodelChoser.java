@@ -17,7 +17,7 @@ public class CodelChoser {
     private int mState;
 
     CodelChoser() {
-        mState = RIGHT;
+        mState = LEFT;
     }
 
     public boolean isLeft() {

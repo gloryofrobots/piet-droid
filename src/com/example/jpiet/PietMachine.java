@@ -359,8 +359,8 @@ public class PietMachine {
 
         Command command = mCommands[y][x];
         
-        // String format = String.format("%d,%d (%d)", x,y,_input);
-        // System.out.println(format);
+        
+        //System.out.printf("\nx,y -> %d,%d ", x,y);
         
         return command;
     }
@@ -369,11 +369,11 @@ public class PietMachine {
             Integer _input) throws PietMachineExecutionError {
 
         
-        Command command = getCommand(currentColor, nextColor);
-        command.exec(mStack, _input, mDirectionPointer, mCodelChoser,
+        mLastCommand = getCommand(currentColor, nextColor);
+        mLastCommand.exec(mStack, _input, mDirectionPointer, mCodelChoser,
                 mInOutSystem);
-
-        onRunCommand(command);
+        //System.out.printf("%s -->%d \n", command,_input);
+        onRunCommand(mLastCommand);
     }
 
     private void onRunCommand(Command command) {
@@ -419,5 +419,10 @@ public class PietMachine {
             int argb = color.getARGB();
             visitor.acceptCommandOpportunity(command.getTag(), argb);
         }
+    }
+
+    public Command getLastCommand() {
+        // TODO Auto-generated method stub
+        return mLastCommand;
     }
 }

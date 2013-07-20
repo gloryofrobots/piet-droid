@@ -10,41 +10,108 @@ package com.example.jpiet;
  * size - count of elements and at fact integer data of current codel block
  */
 class CodelArea {
+    
+    private static final int MAX_X_MAX_Y = 0;
+    private static final int MAX_X_MIN_Y = 1;
+    private static final int MIN_X_MAX_Y = 2;
+    private static final int MIN_X_MIN_Y = 3;
+    
+    private static final int MAX_Y_MAX_X = 4;
+    private static final int MAX_Y_MIN_X = 5;
+    private static final int MIN_Y_MAX_X = 6;
+    private static final int MIN_Y_MIN_X = 7;
+   
+    public Codel[] mCodels;
 
-    public Codel minYCodel;
-    public Codel maxYCodel;
-    public Codel minXCodel;
-    public Codel maxXCodel;
     public CodelColor color;
     public int size;
 
     CodelArea() {
-        minXCodel = new Codel();
-        maxXCodel = new Codel();
-        minYCodel = new Codel();
-        maxYCodel = new Codel();
+        mCodels = new Codel[8];
+        for(int i = 0; i < 8; i++){
+            mCodels[i] = new Codel();
+        }
         size = 0;
     }
 
     /*
      * Add codel to block and resize bounds if necessary
      */
-    public void add(int x, int y) {
-        if (x < minXCodel.x) {
-            minXCodel.set(x, y);
-        } else if (x > maxXCodel.x) {
-            maxXCodel.set(x, y);
+    public void add(int x, int y) { 
+        Codel codel = mCodels[MAX_Y_MIN_X];
+        if( y > codel.y || x < codel.x) {
+            codel.set(x,y);
         }
-
-        if (y < minYCodel.y) {
-            minYCodel.set(x, y);
-        } else if (y > maxYCodel.y) {
-            maxYCodel.set(x, y);
+        
+        codel = mCodels[MAX_Y_MAX_X];
+        if( y > codel.y || x > codel.x) {
+            codel.set(x,y);
         }
-
+        
+        codel = mCodels[MIN_Y_MAX_X];
+        if( y < codel.y || x > codel.x) {
+            codel.set(x,y);
+        }
+        
+        codel = mCodels[MIN_Y_MIN_X];
+        if( y < codel.y || x < codel.x) {
+            codel.set(x,y);
+        }
+        
+        codel = mCodels[MAX_X_MAX_Y];
+        if( x > codel.x || y > codel.y) {
+            codel.set(x,y);
+        }
+        
+        codel = mCodels[MAX_X_MIN_Y];
+        if( x > codel.x || y < codel.y) {
+            codel.set(x,y);
+        }
+        
+        codel = mCodels[MIN_X_MAX_Y];
+        if( x < codel.x || y > codel.y) {
+            codel.set(x,y);
+        }
+        
+        codel = mCodels[MIN_X_MIN_Y];
+        if( x < codel.x || y < codel.y) {
+            codel.set(x,y);
+        }
         size++;
     }
-
+    
+    public Codel maxYMinX() {
+        return mCodels[MAX_Y_MIN_X];
+    }
+    
+    public Codel maxYMaxX() {
+        return mCodels[MAX_Y_MAX_X];
+    }
+    
+    public Codel minYMaxX() {
+        return mCodels[MIN_Y_MAX_X];
+    }
+    
+    public Codel minYMinX() {
+        return mCodels[MIN_Y_MIN_X];
+    }
+    
+    public Codel minXMinY() {
+        return mCodels[MIN_X_MIN_Y];
+    }
+    
+    public Codel minXMaxY() {
+        return mCodels[MIN_X_MAX_Y];
+    }
+    
+    public Codel maxXMaxY() {
+        return mCodels[MAX_X_MAX_Y];
+    }
+    
+    public Codel maxXMinY() {
+        return mCodels[MAX_X_MIN_Y];
+    }
+    
     /**
      * init first codel of codel area. if search will unsucces this codel
      * will be the one in block;
@@ -53,10 +120,10 @@ class CodelArea {
      * @param codelColor
      */
     public void init(int x, int y, CodelColor codelColor) {
-        minXCodel.set(x, y);
-        maxXCodel.set(x, y);
-        minYCodel.set(x, y);
-        maxYCodel.set(x, y);
+        for(Codel codel : mCodels) {
+            codel.set(x, y);
+        }
+      
         color = codelColor;
         size = 1;
     }

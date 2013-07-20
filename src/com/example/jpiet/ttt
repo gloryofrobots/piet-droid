@@ -1,0 +1,238 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.example.jpiet;
+
+/**
+ * Result of scan for codels with same color value as current codel in iterpreter
+ * [min,max][Y,X]Codel is public properties for codels on edge of area
+ * size - count of elements and at fact integer data of current codel block
+ */
+class CodelArea {
+
+   
+    
+    public Codel minYMaxXCodel;
+    public Codel minYMinXCodel;
+    
+    public Codel maxYMinXCodel;
+    public Codel maxYMaxXCodel;
+     
+    public CodelColor color;
+    public int size;
+
+    CodelArea() {
+        minYMaxXCodel = new Codel();
+        minYMinXCodel = new Codel();
+        maxYMinXCodel = new Codel();
+        maxYMaxXCodel = new Codel();
+        size = 0;
+    }
+
+    /*
+     * Add codel to block and resize bounds if necessary
+     */
+    public void add(int x, int y) {
+        if(y <= minYMaxXCodel.y && x >= minYMaxXCodel.x) {
+            minYMaxXCodel.set(x, y);
+        } else if (y <= minYMinXCodel.y && x <= minYMinXCodel.x) {
+            minYMinXCodel.set(x, y);
+        } else if (y >= maxYMinXCodel.y && x <= maxYMinXCodel.x) {
+            maxYMinXCodel.set(x, y);
+        } else if (y >= maxYMaxXCodel.y && x >= maxYMaxXCodel.x) {
+            maxYMaxXCodel.set(x, y);
+        }
+        
+        size++;
+    }
+    
+    /**
+     * init first codel of codel area. if search will unsucces this codel
+     * will be the one in block;
+     * @param x
+     * @param y
+     * @param codelColor
+     */
+    public void init(int x, int y, CodelColor codelColor) {
+        minYMaxXCodel.set(x, y);
+        minYMinXCodel.set(x, y);
+        maxYMinXCodel.set(x, y);
+        maxYMaxXCodel.set(x, y);
+        color = codelColor;
+        size = 1;
+    }
+}
+
+
+
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.example.jpiet;
+
+/**
+ * Result of scan for codels with same color value as current codel in iterpreter
+ * [min,max][Y,X]Codel is public properties for codels on edge of area
+ * size - count of elements and at fact integer data of current codel block
+ */
+class CodelArea {
+    
+    private static final int MAX_X_MAX_Y = 0;
+    private static final int MAX_X_MIN_Y = 0;
+    private static final int MIN_X_MAX_Y = 0;
+    private static final int MIN_X_MIN_Y = 0;
+    
+    private static final int MAX_Y_MAX_X = 0;
+    private static final int MAX_Y_MIN_X = 0;
+    private static final int MIN_Y_MAX_X = 0;
+    private static final int MIN_Y_MIN_X = 0;
+   
+    public Codel[] mCodels;
+
+    public CodelColor color;
+    public int size;
+
+    CodelArea() {
+        mCodels = new Codel[4];
+        for(int i = 0; i < 4; i++){
+            mCodels[i] = new Codel();
+        }
+        size = 0;
+    }
+
+    /*
+     * Add codel to block and resize bounds if necessary
+     */
+    public void add(int x, int y) {
+        if (x < mCodels[MIN_X].x) {
+            mCodels[MIN_X].set(x, y);
+        } else if (x > mCodels[MAX_X].x) {
+            mCodels[MAX_X].set(x, y);
+        }
+
+        if (y < mCodels[MIN_Y].y) {
+            mCodels[MIN_Y].set(x, y);
+        } else if (y > mCodels[MAX_Y].y) {
+            mCodels[MAX_Y].set(x, y);
+        }
+
+        size++;
+    }
+    
+    public Codel maxYMinX() {
+        Codel codel = mCodels[MAX_Y];
+        
+        for(Codel other : mCodels) {
+            if( other.y > codel.y || other.x < codel.x) {
+                codel = other;
+            }
+        }
+        
+        return codel;
+    }
+    
+    public Codel maxYMaxX() {
+        Codel codel = mCodels[MAX_Y];
+        
+        for(Codel other : mCodels) {
+            if( other.y > codel.y || other.x > codel.x) {
+                codel = other;
+            }
+        }
+        
+        
+        return codel;
+    }
+    
+    public Codel minYMaxX() {
+        Codel codel = mCodels[MIN_Y];
+        
+        for(Codel other : mCodels) {
+            if( other.y < codel.y || other.x > codel.x) {
+                codel = other;
+            }
+        }
+        
+        
+        return codel;
+    }
+    
+    public Codel minYMinX() {
+        Codel codel = mCodels[MIN_Y];
+        
+        for(Codel other : mCodels) {
+            if( other.y < codel.y || other.x < codel.x) {
+                codel = other;
+            }
+        }
+        
+        return codel;
+    }
+    
+    public Codel minXMinY() {
+        Codel codel = mCodels[MIN_X];
+        
+        for(Codel other : mCodels) {
+            if( other.x < codel.x || other.y < codel.y) {
+                codel = other;
+            }
+        }
+        
+        return codel;
+    }
+    
+    public Codel minXMaxY() {
+        Codel codel = mCodels[MIN_X];
+        
+        for(Codel other : mCodels) {
+            if( other.x < codel.x || other.y > codel.y) {
+                codel = other;
+            }
+        }
+        
+        return codel;
+    }
+    
+    public Codel maxXMaxY() {
+        Codel codel = mCodels[MAX_X];
+        
+        for(Codel other : mCodels) {
+            if( other.x > codel.x || other.y > codel.y) {
+                codel = other;
+            }
+        }
+        
+        return codel;
+    }
+    
+    public Codel maxXMinY() {
+        Codel codel = mCodels[MAX_X];
+        
+        for(Codel other : mCodels) {
+            if( other.x > codel.x || other.y < codel.y) {
+                codel = other;
+            }
+        }
+        
+        return codel;
+    }
+    
+    /**
+     * init first codel of codel area. if search will unsucces this codel
+     * will be the one in block;
+     * @param x
+     * @param y
+     * @param codelColor
+     */
+    public void init(int x, int y, CodelColor codelColor) {
+        for(Codel codel : mCodels) {
+            codel.set(x, y);
+        }
+      
+        color = codelColor;
+        size = 1;
+    }
+}

@@ -1,6 +1,7 @@
 package com.example.piet_droid;
 
 import java.io.File;
+
 import java.util.List;
 
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import com.example.jpiet.InOutSystem;
 
 import com.example.jpiet.Piet;
 
+//TODO CONTEXT MENU
 public class MainActivity extends SherlockFragmentActivity implements
         FragmentControlToolBox.InteractionListener,
         FragmentPaletteSimple.OnChooseColorListener,

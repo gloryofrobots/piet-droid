@@ -174,7 +174,8 @@ public class FragmentPaletteSimple extends SherlockFragment {
                 return true;
             }
         });
-
+        
+        //TODO black white cell highlight
         View blackCell = view.findViewById(R.id.black_palette);
         blackCell.setOnClickListener(new View.OnClickListener() {
 
