@@ -20,7 +20,9 @@ class CodelArea {
     private static final int MAX_Y_MIN_X = 5;
     private static final int MIN_Y_MAX_X = 6;
     private static final int MIN_Y_MIN_X = 7;
-   
+    
+    private boolean[][] mCheck;
+    
     public Codel[] mCodels;
 
     public CodelColor color;
@@ -37,43 +39,68 @@ class CodelArea {
     /*
      * Add codel to block and resize bounds if necessary
      */
-    public void add(int x, int y) { 
+    public void add(int x, int y) {
+        //System.out.printf("AREA %d,%d\n",x,y);
+        /*
+        if(x == 82 && y == 1) {
+            int bdsm = 1;
+        }*/
+        //FIXME
+        
+        if(mCheck != null) {
+            if(mCheck[y][x] != false) {
+                System.out.printf("AREA DUBLICATED %d,%d\n",x,y);
+            }
+            mCheck[y][x] = true;
+        }
+        
         Codel codel = mCodels[MAX_Y_MIN_X];
+        if(y >= codel.y)
         if( y > codel.y || x < codel.x) {
             codel.set(x,y);
         }
         
         codel = mCodels[MAX_Y_MAX_X];
+        if(y >= codel.y)
         if( y > codel.y || x > codel.x) {
             codel.set(x,y);
         }
         
+        
         codel = mCodels[MIN_Y_MAX_X];
+        if(y <= codel.y)
         if( y < codel.y || x > codel.x) {
             codel.set(x,y);
         }
         
+        
         codel = mCodels[MIN_Y_MIN_X];
+        if(y <= codel.y)
         if( y < codel.y || x < codel.x) {
             codel.set(x,y);
         }
         
         codel = mCodels[MAX_X_MAX_Y];
+        if(x >= codel.x)
         if( x > codel.x || y > codel.y) {
             codel.set(x,y);
         }
         
+        
         codel = mCodels[MAX_X_MIN_Y];
+        if(x >= codel.x)
         if( x > codel.x || y < codel.y) {
             codel.set(x,y);
         }
         
         codel = mCodels[MIN_X_MAX_Y];
+        if(x <= codel.x)
         if( x < codel.x || y > codel.y) {
             codel.set(x,y);
         }
         
         codel = mCodels[MIN_X_MIN_Y];
+        if(x <= codel.x)
         if( x < codel.x || y < codel.y) {
             codel.set(x,y);
         }
@@ -119,12 +146,32 @@ class CodelArea {
      * @param y
      * @param codelColor
      */
+    public void setDebugRestriction(int width, int height) {
+        mCheck = new boolean[height][width];
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                mCheck[y][x] = false;
+            }
+        }
+        
+    }
+    
     public void init(int x, int y, CodelColor codelColor) {
+        mCheck = null;
         for(Codel codel : mCodels) {
             codel.set(x, y);
         }
-      
+        //FIXME
         color = codelColor;
         size = 1;
+    }
+    
+    public String toString() {
+        String repr = "";
+        for(Codel codel : mCodels) {
+            repr += codel;
+        }
+        
+        return repr;
     }
 }

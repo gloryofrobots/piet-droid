@@ -5,10 +5,10 @@
     <string name="main_button_load">Load</string>
     
     <string name="load_bitmap_process_dialog_title">Loading image file</string>
-    <string name="load_bitmap_process_dialog_message">Please wait #8230;</string>
+    <string name="load_bitmap_process_dialog_message">Please wait...</string>
     
     <string name="save_bitmap_process_dialog_title">Saving bitmap</string>
-    <string name="save_bitmap_process_dialog_message">Please wait #8230;</string>
+    <string name="save_bitmap_process_dialog_message">Please wait...</string>
     
     <string name="control_panel_button_run">Run</string>
     <string name="control_panel_button_step">Step</string>
@@ -18,6 +18,7 @@
     
     <string name="action_new">New</string>
     <string name="action_save">Save</string>
+    <string name="action_save_as">Save As...</string>
     <string name="action_load">Load</string>
     <string name="action_clear">Clear</string>
     <string name="action_quit">Quit</string>

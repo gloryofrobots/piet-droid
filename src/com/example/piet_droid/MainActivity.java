@@ -42,14 +42,16 @@ public class MainActivity extends SherlockFragmentActivity implements
         FragmentControlToolBox.InteractionListener,
         FragmentPaletteSimple.OnChooseColorListener,
         AsyncTaskRunPiet.ExecutionProcessListener,
-        AsyncTaskLoadBitmap.LoadProcessListener, PietProvider {
+        PietProvider {
 
     private static final int REQUEST_SAVE = 0;
 
     private static final int REQUEST_OPEN = 1;
 
     private static final int SHOW_PREFERENCES = 1;
-
+    
+    PietFile mCurrentFile;
+    
     Piet mPiet;
 
     ColorFieldView mColorField;
@@ -104,11 +106,24 @@ public class MainActivity extends SherlockFragmentActivity implements
         initPiet(resources);
 
         initColorField();
+        
+        mCurrentFile = null;
+        initNewPietFile();
+        
         /*
          * mFragmentPaletteSimple = (FragmentPaletteSimple)
          * getSupportFragmentManager()
          * .findFragmentById(R.id.fragment_palette_simple);
          */
+    }
+    
+    private void initNewPietFile() {
+        if(mCurrentFile != null) {
+            mCurrentFile.finalise();
+        }
+        
+        PietFileActor actor = new PietFileActor(mColorField, mPiet, this);
+        mCurrentFile = new PietFile(actor);
     }
 
     @Override
@@ -116,15 +131,26 @@ public class MainActivity extends SherlockFragmentActivity implements
         super.onStart();
         // mCommandHelperFragment.invalidate();
     }
-
+    
+    private Menu mMenu = null;
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // getMenuInflater().inflate(R.menu.main, menu);
         getSupportMenuInflater().inflate(R.menu.main, menu);
+        mMenu = menu;
         return true;
     }
-
+    
+    public void hideFileMenu() {
+        MenuItem fileMenu = mMenu.findItem(R.id.action_file);
+        fileMenu.setVisible(false);
+    }
+    
+    public void showFileMenu() {
+        MenuItem fileMenu = mMenu.findItem(R.id.action_file);
+        fileMenu.setVisible(true);
+    }
+    
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
 
@@ -143,6 +169,10 @@ public class MainActivity extends SherlockFragmentActivity implements
             onActionSave();
             return true;
         }
+        case (R.id.action_save_as): {
+            onActionSaveAs();
+            return true;
+        }
         case (R.id.action_settings):
             onActionSettings();
             return true;
@@ -157,7 +187,16 @@ public class MainActivity extends SherlockFragmentActivity implements
                 SHOW_PREFERENCES);
     }
 
+    
     public void onActionSave() {
+        //if current file source not null save it
+    }
+    
+    public void onActionSaveAs() {
+        if(isOnRunMode()) {
+            onRunCancel();
+        }
+        
         FileChooserDialog dialog = new FileChooserDialog(this);
         dialog.loadFolder(Environment.getExternalStorageDirectory().getPath());
         dialog.setFilter(".*jpg|.*jpeg|.*png|.*gif|.*JPG|.*JPEG|.*PNG|.*GIF|");
@@ -169,13 +208,13 @@ public class MainActivity extends SherlockFragmentActivity implements
         dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
             public void onFileSelected(Dialog source, File file) {
                 source.hide();
-                MainActivity.this.saveImageFile(file.getAbsolutePath());
+                getCurrentPietFile().getActor().save(file.getAbsolutePath());
             }
 
             public void onFileSelected(Dialog source, File folder, String name) {
                 source.hide();
                 String path = folder.getAbsolutePath() + "/" + name;
-                MainActivity.this.saveImageFile(path);
+                getCurrentPietFile().getActor().save(path);
             }
         });
 
@@ -183,6 +222,10 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void onActionLoad() {
+        if(isOnRunMode()) {
+            onRunCancel();
+        }
+        
         FileChooserDialog dialog = new FileChooserDialog(this);
         dialog.loadFolder(Environment.getExternalStorageDirectory().getPath());
         dialog.setFilter(".*jpg|.*jpeg|.*png|.*gif|.*JPG|.*JPEG|.*PNG|.*GIF|");
@@ -191,8 +234,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
             public void onFileSelected(Dialog source, File file) {
+                //TODO CHECK ERROR!!!!!
                 source.hide();
-                MainActivity.this.loadImageFile(file.getAbsolutePath());
+                getCurrentPietFile().getActor().load(file.getAbsolutePath());
             }
 
             public void onFileSelected(Dialog source, File folder, String name) {
@@ -209,7 +253,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
 
         mFragmentControlToolBox.setControlsToDefaultState();
-        clearCells();
+        getCurrentPietFile().getActor().clear();
     }
 
     public synchronized void onActivityResult(final int requestCode,
@@ -229,20 +273,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     }
     
-    private void clearColorFieldDrawables() {
-        mColorField.clearDrawables();
-    }
-
-    private void clearCells() {
-        mColorField.clearAll();
-        mPiet.clear();
-    }
-
-    private void setCell(int x, int y, int color) {
-        mColorField.setCellColor(x, y, color);
-        mPiet.setColor(x, y, color);
-    }
-
     private void updateViewAfterStep() {
         Codel currentCodel = mPiet.getCurrentCodel();
         mColorField.setCellDrawable(currentCodel.x, currentCodel.y,
@@ -271,9 +301,9 @@ public class MainActivity extends SherlockFragmentActivity implements
                 .setOnCellClickListener(new ColorFieldView.CellClickListener() {
                     @Override
                     public void onCellClick(int x, int y) {
-                        setCell(x, y, mActiveColor);
-                        // FIXME
-                        MainActivity.this.mColorField.setCellToRedraw(x, y);
+                        PietFileActor actor = MainActivity.this.getCurrentPietFile().getActor();
+                        actor.setCell(x, y, MainActivity.this.getActiveColor());
+                        actor.redrawCell(x, y);
                     }
 
                     @Override
@@ -282,7 +312,15 @@ public class MainActivity extends SherlockFragmentActivity implements
                     }
                 });
     }
+    
+    protected int getActiveColor() {
+        return mActiveColor;
+    }
 
+    public PietFile getCurrentPietFile() {
+        return mCurrentFile;
+    }
+    
     public boolean isOnRunMode() {
         return mCurrentRunTask != null;
     }
@@ -299,12 +337,13 @@ public class MainActivity extends SherlockFragmentActivity implements
             if (mCurrentRunTask.isWaiting()) {
                 mCurrentRunTask.allowRun();
             }
-
-            return;
         }
-
-        mCurrentRunTask = new AsyncTaskRunPiet(this, mSleepBetweenStep);
-        mCurrentRunTask.execute(mPiet);
+        else {
+            mCurrentRunTask = new AsyncTaskRunPiet(this, mSleepBetweenStep);
+            mCurrentRunTask.execute(mPiet);
+        }
+        
+        //hideFileMenu();
     }
 
     @Override
@@ -316,15 +355,17 @@ public class MainActivity extends SherlockFragmentActivity implements
             mCurrentRunTask.allowOneStepOnly();
             mCurrentRunTask.execute(mPiet);
         }
+        
+        //hideFileMenu();
     }
 
     @Override
     public void onInteractionPause() {
-
         if (mCurrentRunTask == null) {
             return;
         }
-
+        
+        showFileMenu();
         mCurrentRunTask.setWait();
     }
 
@@ -333,21 +374,24 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (mCurrentRunTask == null) {
             return;
         }
-
+        
+        showFileMenu();
         mCurrentRunTask.cancel(true);
     }
 
     @Override
     public void onRunStart() {
         mFragmentStateInfo.init();
-        clearColorFieldDrawables();
+        PietFileActor actor =getCurrentPietFile().getActor();
+        actor.clearViewDrawables();
+        actor.setCellDrawable(0, 0, mDebugDrawable);
         mFragmentInOutBuffers.prepare();
     }
 
     @Override
     public void onRunCancel() {
         mPiet.init();
-        clearColorFieldDrawables();
+        getCurrentPietFile().getActor().clearViewDrawables();
         mFragmentStateInfo.init();
         mFragmentInOutBuffers.prepare();
         mCurrentRunTask = null;
@@ -368,66 +412,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         mFragmentControlToolBox.setControlsToDefaultState();
         mCurrentRunTask = null;
     }
-
-    private void showInToast(String msg) {
-        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
-        toast.show();
-    }
-
-    public void saveImageFile(String path) {
-        AsyncTaskWriteBitmap saveTask = new AsyncTaskWriteBitmap(mPiet,
-                new AsyncTaskWriteBitmap.SaveProcessListener() {
-
-                    @Override
-                    public void onSaveBitmapError() {
-                        // TODO Auto-generated method stub
-                        showInToast("Error occurred during saving bitmap");
-                    }
-
-                    @Override
-                    public void onSaveBitmapComplete() {
-                        showInToast("Bitmap saved");
-                    }
-
-                    @Override
-                    public void onSaveBitmapCancel() {
-                    }
-                }, this);
-
-        saveTask.execute(path);
-    }
-
-    public void loadImageFile(String path) {
-        // TODO FADE OUT FADE IN
-        Bitmap bitmap = BitmapFactory.decodeFile(path);
-        // "/data/helloWorld_small.png"
-        // TODO CODEL SIZE HERE
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-
-        mPiet.createModel(width, height);
-        mColorField.setVisibility(View.INVISIBLE);
-        mColorField.resize(width, height);
-
-        AsyncTaskLoadBitmap loadTask = new AsyncTaskLoadBitmap(this, this);
-        loadTask.execute(bitmap);
-    }
-
-    @Override
-    public void onLoadBitmapCancel() {
-        // TODO Auto-generated method stub
-    }
-
-    public void onLoadBitmapPixel(int x, int y, int color) {
-        setCell(x, y, color);
-    }
-
-    @Override
-    public void onLoadBitmapComplete() {
-        mColorField.setVisibility(View.VISIBLE);
-        mColorField.invalidate();
-    }
-
+   
     @Override
     public Piet getPiet() {
         return mPiet;

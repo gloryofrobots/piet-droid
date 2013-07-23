@@ -1,12 +1,6 @@
 package com.example.piet_droid;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import android.os.AsyncTask;
-import android.util.Log;
-
 import com.example.jpiet.Codel;
 import com.example.jpiet.Piet;
 
@@ -21,7 +15,7 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     }
 
     private enum State {
-        RUN, ONE_STEP, WAIT/*, TERMINATED*/;        
+        RUN, ONE_STEP, WAIT;        
     }
 
     private ExecutionProcessListener mListener;
@@ -82,14 +76,6 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
         }
     }
     
-    /*public void terminate(){
-        setState(State.TERMINATED);
-    }
-    
-    public boolean isTerminated() {
-        return isOnState(State.TERMINATED);
-    }*/
-    
     @Override
     protected void onCancelled() {
         mListener.onRunCancel();
@@ -110,30 +96,29 @@ class AsyncTaskRunPiet extends AsyncTask<Piet, Void, Void> {
     @Override
     protected Void doInBackground(Piet... params) {
         Piet piet = params[0];
-       
         while (true) {
+            //Task cancel
             if (isCancelled() == true) {
                 break;
             }
-             
+            //We need to flush codel
             if(isFlushed() == false){
                 continue;
             }
-            
+            //Task on pause
             if(isWaiting()) {
                 continue;
             }
             
+            //perform step and publish
             if(piet.step() == false) {
                 break;
             }
+            
             mCurrentCodel = piet.getCurrentCodel();
-                        
             endStep();
             waitForFlush();
-            
             publishProgress();
-            
             
             try {
                 Thread.sleep(mDelay);

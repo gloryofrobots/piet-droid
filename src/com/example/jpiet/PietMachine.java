@@ -372,7 +372,7 @@ public class PietMachine {
         mLastCommand = getCommand(currentColor, nextColor);
         mLastCommand.exec(mStack, _input, mDirectionPointer, mCodelChoser,
                 mInOutSystem);
-        //System.out.printf("%s -->%d \n", command,_input);
+        //System.out.printf("%s -->%d \n", mLastCommand,_input);
         onRunCommand(mLastCommand);
     }
 

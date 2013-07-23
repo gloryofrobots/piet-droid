@@ -7,19 +7,28 @@ public class InOutSystemTest implements InOutSystem {
     int[] input;
     int cursor;
     String output;
+    boolean mVerbose;
     
-    public InOutSystemTest(String input) {
-         char [] chars =  input.toCharArray();
-         this.input = new int[chars.length];
-         int i = 0;
-         for(char c : chars) {
-             this.input[i] = c;
-             i++;
-         }
-         
+    public InOutSystemTest(int[] input, boolean verbose) {
+        ///mVerbose = true;
         this.output = new String();
         this.cursor = 0;
+        this.input = input;
     }
+    
+    /*public InOutSystemTest(char[] chars, boolean verbose) {
+        
+        this.input = new int[chars.length];
+        int i = 0;
+        for(char c : chars) {
+            int x = (int) c;
+            int f = Character.getNumericValue(c);
+            int l =  c - 48;
+            
+            this.input[i] = f;
+            i++;
+        }
+   }*/
 
     @Override
     public int read() throws IOException {
@@ -30,13 +39,17 @@ public class InOutSystemTest implements InOutSystem {
 
     @Override
     public void write(int symbol) {
-        // TODO Auto-generated method stub
-        output += (char) symbol;
+        if (mVerbose) {
+            System.out.printf("OUT %s\n",String.valueOf(symbol));
+        }
+        output += String.valueOf(symbol);
     }
 
     @Override
     public void write(String str) {
-        // TODO Auto-generated method stub
+        if (mVerbose) {
+            System.out.printf("OUT %s\n", str);
+        }
         output += str;
     }
 
