@@ -67,7 +67,6 @@ public class FragmentCommandLog extends SherlockFragment {
     }
 
     public void update() {       
-       String data = mLogText.getText().toString();
        String temp = "";
        synchronized (mQueue) {
            for (String record : mQueue) {

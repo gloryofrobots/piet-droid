@@ -9,12 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 public class FragmentControlToolBox extends SherlockFragment {
-    Button mButtonRun ;
-    Button mButtonStep;
-    Button mButtonPause ;
-    Button mButtonStop;
+    ImageButton mButtonRun ;
+    ImageButton mButtonStep;
+    ImageButton mButtonPause ;
+    ImageButton mButtonStop;
     
     public FragmentControlToolBox(){
     }
@@ -39,10 +40,10 @@ public class FragmentControlToolBox extends SherlockFragment {
         View view = inflater.inflate(R.layout.fragment_control_toolbox, container,
                 false);
 
-        mButtonRun = (Button) view.findViewById(R.id.button_run);
-        mButtonStep = (Button) view.findViewById(R.id.button_step);
-        mButtonPause = (Button) view.findViewById(R.id.button_pause);
-        mButtonStop = (Button) view.findViewById(R.id.button_stop);
+        mButtonRun = (ImageButton) view.findViewById(R.id.button_run);
+        mButtonStep = (ImageButton) view.findViewById(R.id.button_step);
+        mButtonPause = (ImageButton) view.findViewById(R.id.button_pause);
+        mButtonStop = (ImageButton) view.findViewById(R.id.button_stop);
         
         setControlsToDefaultState();
         

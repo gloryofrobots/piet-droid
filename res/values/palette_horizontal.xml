@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <array name="colors_horizontal">
+        <item>#FFC0C0</item> <!-- red       -->
+        <item>#FFFFC0</item>  <!-- yellow -->
+        <item>#C0FFC0</item> <!-- green -->
+        <item>#C0FFFF</item> <!-- cyan -->
+        <item>#C0C0FF</item> <!-- blue -->
+        <item>#FFC0FF</item> <!-- magenta -->
+        
+        
+        <item>#FF0000</item>
+        <item>#FFFF00</item>
+        <item>#00FF00</item>
+        <item>#00FFFF</item>
+        <item>#0000FF</item>
+        <item>#FF00FF</item>
+        
+         
+        <item>#C00000</item> 
+        <item>#C0C000</item>  
+        <item>#00C000</item> 
+        <item>#00C0C0</item> 
+        <item>#0000C0</item> 
+        <item>#C000C0</item>
+    </array>
+</resources>

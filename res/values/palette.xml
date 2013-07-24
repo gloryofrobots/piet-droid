@@ -27,7 +27,4 @@
         <item>#FF00FF</item><!-- magenta -->
         <item>#C000C0</item>
     </array>
-    
-   <color name="white">#FFF</color>
-   <color name="black">#000</color>
 </resources>

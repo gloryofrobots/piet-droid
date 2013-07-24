@@ -53,12 +53,7 @@ public class ColorFieldView extends View {
         public Rect createBounds(int width, int height) {
             bounds.left = x * (width + padding.left);
             bounds.top = y * (height + padding.top);
-            /*
-             * if (x == 1){ bounds.left += padding.left; } else if(x != 0){
-             * bounds.left += padding.left * 2; } if (y == 1) { bounds.top +=
-             * padding.top; } else if(y != 0){ bounds.top += padding.top * 2; }
-             */
-
+            
             bounds.right = bounds.left + mCellWidth;
             bounds.bottom = bounds.top + mCellHeight;
 
@@ -201,7 +196,8 @@ public class ColorFieldView extends View {
         mCellToRedraw = mCells[y][x];
         Rect bounds = mCellToRedraw.createBounds(mCellWidth, mCellHeight);
 
-        invalidate(bounds);
+        //invalidate(bounds);
+        invalidate();
     }
 
     public void setCellDrawable(int x, int y, Drawable drawable) {
@@ -371,7 +367,7 @@ public class ColorFieldView extends View {
             drawDirty(canvas);
             mCellToRedraw = null;
         }
-
+        
         drawGrid(canvas);
     }
 

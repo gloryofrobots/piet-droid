@@ -42,7 +42,7 @@ public class PietFileActor {
         mView.setCellColor(x, y, color);
         mPiet.setColor(x, y, color);
     }
-
+    
     public void load(String path) {
         //TODO CHECK ERRORS!!!!!
         // TODO FADE OUT FADE IN

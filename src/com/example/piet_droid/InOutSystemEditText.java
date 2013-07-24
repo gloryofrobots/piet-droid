@@ -1,6 +1,7 @@
 package com.example.piet_droid;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.widget.EditText;
 import android.widget.TextView;
@@ -10,7 +11,7 @@ import com.example.jpiet.InOutSystem;
 public class InOutSystemEditText implements InOutSystem {
 	private EditText mIn;
 	private TextView mOut;
-	private CharSequence mCurrentData;
+	private ArrayList<Integer> mCurrentData;
 	private int mCurrentIndex;
 	private String mBuffer;
 	
@@ -21,9 +22,24 @@ public class InOutSystemEditText implements InOutSystem {
 	
 	public void prepare(){
 		mBuffer = "";
-		mCurrentData = mIn.getText();
+		mCurrentData = new ArrayList<Integer>();
+		
 		mCurrentIndex = 0;
 		mOut.setText("");
+		
+		String data = mIn.getText().toString();
+        String [] tokens = data.split(" ");
+        
+        for(String token : tokens) {
+            int value = 0;
+            try {
+                value = Integer.valueOf(token);
+            } catch(NumberFormatException e) {
+                value = Character.getNumericValue(value);
+            } 
+            
+            mCurrentData.add(value);
+        }
 	}
 	//flush must called from ui thread
 	public void flush(){
@@ -34,12 +50,11 @@ public class InOutSystemEditText implements InOutSystem {
 	
 	@Override
 	public int read() throws IOException {
-		if( mCurrentIndex >= mCurrentData.length()) {
+		if( mCurrentIndex >= mCurrentData.size()) {
 			throw new IOException();
 		}
 		
-		char input = mCurrentData.charAt(mCurrentIndex);
-		int result = Character.getNumericValue(input);
+		int result = mCurrentData.get(mCurrentIndex);
 		
 		mCurrentIndex++;
 		return result;
@@ -47,7 +62,7 @@ public class InOutSystemEditText implements InOutSystem {
 
 	@Override
 	public void write(int output) {
-		mBuffer += (char) output;
+		mBuffer += String.valueOf(output);
 	}
 
 	@Override

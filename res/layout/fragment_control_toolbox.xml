@@ -1,48 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:shrinkColumns="*"
-    android:stretchColumns="*">
-<TableRow >
-    <Button
+    android:orientation="horizontal">
+
+     <ImageButton
         android:id="@+id/button_run"
         android:layout_width="@dimen/control_button_side"
         android:layout_height="@dimen/control_button_side"
         android:layout_weight="2"
         android:padding="10dp"
-        android:background="@color/button_run_color"
-        android:text="@string/control_panel_button_run" />
+        
+        android:background="@null"
+        android:src="@drawable/toolbox_button_run"
+        android:contentDescription="@string/content_description_toolbox_button_run" />
 
-    <Button
+    <ImageButton
         android:id="@+id/button_step"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="10dip"
         android:layout_weight="1"
-        android:background="@color/button_step_color"
-        android:text="@string/control_panel_button_step" />
+         
+        android:background="@null"
+        android:src="@drawable/toolbox_button_step"
+        android:contentDescription="@string/content_description_toolbox_button_step"  />
 
-    <Button
+    <ImageButton
         android:id="@+id/button_pause"
         android:padding="10dp"
         android:layout_width="@dimen/control_button_side"
         android:layout_height="@dimen/control_button_side"
         android:layout_marginLeft="10dip"
         android:layout_weight="1"
-        android:background="@color/button_pause_color"
-        android:text="@string/control_panel_button_pause" />
+        
+        android:background="@null"
+        android:src="@drawable/toolbox_button_pause"
+        android:contentDescription="@string/content_description_toolbox_button_pause"  />
 
-    <Button
+    <ImageButton
         android:id="@+id/button_stop"
         android:padding="10dp"
         android:layout_width="@dimen/control_button_side"
         android:layout_height="@dimen/control_button_side"
         android:layout_marginLeft="10dip"
         android:layout_weight="1"
-        android:background="@color/button_stop_color"
-        android:text="@string/control_panel_button_stop" />
-</TableRow>
-</TableLayout>
+        
+        android:background="@null"
+        android:src="@drawable/toolbox_button_stop"
+        android:contentDescription="@string/content_description_toolbox_button_stop"  />
+</LinearLayout>

@@ -1,11 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     
     <item
-        android:id="@+id/action_file"
+        android:id="@+id/action_bitmap"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/rw_action_new"
-        android:title="@string/action_new">
+        android:icon="@drawable/rw_action_bitmap"
+        android:title="@string/action_bitmap">
         
         <menu xmlns:android="http://schemas.android.com/apk/res/android" >
         <item
@@ -49,7 +49,7 @@
             android:showAsAction="ifRoom"
             android:icon="@drawable/rw_action_quit"
             android:title="@string/action_quit"/>
-        </menu>>
+        </menu>
     </item>
      
     <item

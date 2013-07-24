@@ -80,13 +80,9 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         
-        int size = width * height;
-        int count = 0;
         // TODO CODEL SIZE HERE
-        
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                count++;
                 int pixel = bitmap.getPixel(x, y);
                 
                 mListener.onLoadBitmapPixel(x, y, pixel);

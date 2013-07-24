@@ -143,7 +143,7 @@ public class FragmentPaletteSimple extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_palette_simple, container,
+        View view = inflater.inflate(R.layout.fragment_palette_simple_horizontal, container,
                 false);
 
         Resources resources = getResources();

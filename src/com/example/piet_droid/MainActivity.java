@@ -56,8 +56,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     ColorFieldView mColorField;
     private int mActiveColor;
-    private DrawableFilledCircle mDebugDrawable;
-
+    private DrawableFilledCircle mCurrentCellDrawable;
+    private DrawableFilledCircle mPreviousCellDrawable;
+    
     long mSleepBetweenStep;
 
     AsyncTaskRunPiet mCurrentRunTask;
@@ -78,10 +79,16 @@ public class MainActivity extends SherlockFragmentActivity implements
         Resources resources = getResources();
         mSleepBetweenStep = 1L;
 
-        mDebugDrawable = new DrawableFilledCircle();
-        int drawableColor = resources.getColor(R.color.debug_cell_highlight);
-        mDebugDrawable.setColor(drawableColor);
-
+        mCurrentCellDrawable = new DrawableFilledCircle();
+        int currentDrawableColor = resources.getColor(R.color.debug_cell_highlight);
+        mCurrentCellDrawable.setColor(currentDrawableColor);
+        
+        
+        mPreviousCellDrawable = new DrawableFilledCircle();
+        int prevDrawableColor = resources.getColor(R.color.debug_previous_cell_highlight);
+        mPreviousCellDrawable.setColor(prevDrawableColor);
+        
+        
         mActiveColor = 0;
 
         mFragmentControlToolBox = (FragmentControlToolBox) getSupportFragmentManager()
@@ -107,8 +114,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         initColorField();
         
+        int countX = resources.getInteger(R.integer.field_count_codels_x);
+        int countY = resources.getInteger(R.integer.field_count_codels_y);
+        
         mCurrentFile = null;
-        initNewPietFile();
+        initNewPietFile(countX, countY);
         
         /*
          * mFragmentPaletteSimple = (FragmentPaletteSimple)
@@ -117,11 +127,14 @@ public class MainActivity extends SherlockFragmentActivity implements
          */
     }
     
-    private void initNewPietFile() {
+    private void initNewPietFile(int countX, int countY) {
         if(mCurrentFile != null) {
             mCurrentFile.finalise();
         }
         
+        mColorField.resize(countX, countY);
+        mPiet.createModel(countX, countY);
+        mColorField.invalidate();
         PietFileActor actor = new PietFileActor(mColorField, mPiet, this);
         mCurrentFile = new PietFile(actor);
     }
@@ -142,12 +155,12 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
     
     public void hideFileMenu() {
-        MenuItem fileMenu = mMenu.findItem(R.id.action_file);
+        MenuItem fileMenu = mMenu.findItem(R.id.action_bitmap);
         fileMenu.setVisible(false);
     }
     
     public void showFileMenu() {
-        MenuItem fileMenu = mMenu.findItem(R.id.action_file);
+        MenuItem fileMenu = mMenu.findItem(R.id.action_bitmap);
         fileMenu.setVisible(true);
     }
     
@@ -162,6 +175,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             onActionClear();
             return true;
         case (R.id.action_new):
+            onActionNew();
             return true;
         case (R.id.action_quit):
             return true;
@@ -182,17 +196,48 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     }
 
-    public void onActionSettings() {
+    private void onActionNew() {
+        //TODO DIALOG WITH width height!!
+        DialogFragmentNewFileSettings dialog = new DialogFragmentNewFileSettings();
+        dialog.setListener(new DialogFragmentNewFileSettings.Listener() {
+            
+            @Override
+            public void onCancelNewFileSettings() {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public boolean onAcceptNewFileSettings(int width, int height) {
+                // TODO Auto-generated method stub
+                if(width == 0 || height == 0) {
+                    return false;
+                }
+                
+                initNewPietFile(width, height);
+                return true;
+            }
+        });
+        
+        dialog.show(getSupportFragmentManager(), "DialogFragmentNewFileSettings");
+    }
+
+    private void onActionSettings() {
         startActivityForResult(new Intent(this, Preferences.class),
                 SHOW_PREFERENCES);
     }
 
     
-    public void onActionSave() {
-        //if current file source not null save it
+    private void onActionSave() {
+        if(getCurrentPietFile().hasPath() == false) {
+            onActionSaveAs();
+            return;
+        }
+        
+        getCurrentPietFile().getActor().save();
     }
     
-    public void onActionSaveAs() {
+    private void onActionSaveAs() {
         if(isOnRunMode()) {
             onRunCancel();
         }
@@ -276,7 +321,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     private void updateViewAfterStep() {
         Codel currentCodel = mPiet.getCurrentCodel();
         mColorField.setCellDrawable(currentCodel.x, currentCodel.y,
-                mDebugDrawable);
+                mCurrentCellDrawable);
         mFragmentStateInfo.update();
         mFragmentInOutBuffers.update();
         // mFragmentCommandLog.update();
@@ -287,11 +332,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         LoggerDroid logger = new LoggerDroid();
 
         mPiet = new Piet(logger, inOutSystem);
-
-        int countX = resources.getInteger(R.integer.field_count_codels_x);
-        int countY = resources.getInteger(R.integer.field_count_codels_y);
-
-        mPiet.createModel(countX, countY);
     }
 
     private void initColorField() {
@@ -361,7 +401,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     public void onInteractionPause() {
-        if (mCurrentRunTask == null) {
+        if (isOnRunMode() == false) {
             return;
         }
         
@@ -371,7 +411,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     public void onInteractionStop() {
-        if (mCurrentRunTask == null) {
+        if (isOnRunMode() == false) {
             return;
         }
         
@@ -381,30 +421,37 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     @Override
     public void onRunStart() {
+        mPreviousCodel = new Codel(0, 0);
+        mPiet.init();
         mFragmentStateInfo.init();
-        PietFileActor actor =getCurrentPietFile().getActor();
+        PietFileActor actor = getCurrentPietFile().getActor();
         actor.clearViewDrawables();
-        actor.setCellDrawable(0, 0, mDebugDrawable);
+        actor.setCellDrawable(0, 0, mCurrentCellDrawable);
         mFragmentInOutBuffers.prepare();
     }
 
     @Override
     public void onRunCancel() {
-        mPiet.init();
         getCurrentPietFile().getActor().clearViewDrawables();
         mFragmentStateInfo.init();
         mFragmentInOutBuffers.prepare();
         mCurrentRunTask = null;
     }
 
+    
+    private Codel mPreviousCodel;
+
     @Override
     public void onRunUpdate(Codel codel) {
         if (mCurrentRunTask == null || mCurrentRunTask.isCancelled()) {
             return;
         }
-
+        
         updateViewAfterStep();
-        mColorField.setCellDrawable(codel.x, codel.y, mDebugDrawable);
+        
+        mColorField.setCellDrawable(mPreviousCodel.x, mPreviousCodel.y, mPreviousCellDrawable);
+        mColorField.setCellDrawable(codel.x, codel.y, mCurrentCellDrawable);
+        mPreviousCodel.set(codel);
     }
 
     @Override

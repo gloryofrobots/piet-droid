@@ -15,7 +15,18 @@
     <string name="control_panel_button_pause">Pause</string>
     <string name="control_panel_button_stop">Stop</string>
     
+    <string name="edittext_new_file_width_hint">Width</string>
+    <string name="edittext_new_file_height_hint">Height</string>
     
+    <string name="button_text_ok">Ok</string>
+    <string name="button_text_cancel">Cancel</string>
+    
+    <string name="content_description_toolbox_button_run">Run button</string>
+    <string name="content_description_toolbox_button_step">Step button</string>
+    <string name="content_description_toolbox_button_pause">Pause button</string>
+    <string name="content_description_toolbox_button_stop">Stop button</string>
+    
+    <string name="action_bitmap">Bitmap</string>
     <string name="action_new">New</string>
     <string name="action_save">Save</string>
     <string name="action_save_as">Save As...</string>
