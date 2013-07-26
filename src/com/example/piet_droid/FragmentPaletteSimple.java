@@ -59,7 +59,7 @@ public class FragmentPaletteSimple extends SherlockFragment {
             for(float w : widths){
                 totalW += w;
             }
-            //FIXME
+
             int textSize = (int) mPaint.getTextSize();
 
             int px = bounds.left + ((bounds.width() - totalW) / 2);
@@ -129,6 +129,9 @@ public class FragmentPaletteSimple extends SherlockFragment {
     GradientDrawable mDrawable;
     CurrentColorHighlightDrawable mHighlightDrawable;
     
+    private int mActiveColor;
+    private final String SAVE_KEY_ACTIVE_COLOR = "PietPaletteActiveColor"; 
+    
     private HashMap<String, TextDrawable> mTagsAliasLink;
 
     public interface OnChooseColorListener {
@@ -143,10 +146,18 @@ public class FragmentPaletteSimple extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_palette_simple_horizontal, container,
+        View view = inflater.inflate(R.layout.fragment_palette_simple, container,
                 false);
 
         Resources resources = getResources();
+        
+        if(savedInstanceState == null) {
+            mActiveColor = resources.getColor(R.color.default_draw_color);
+        }
+        else {
+            mActiveColor = savedInstanceState.getInt(SAVE_KEY_ACTIVE_COLOR);
+        }
+        
         
         mHighlightDrawable = new CurrentColorHighlightDrawable();
         
@@ -213,25 +224,32 @@ public class FragmentPaletteSimple extends SherlockFragment {
             mTagsAliasLink.put(tag, drawable);
         }
         
-       
-        
         return view;
     }
     
     @Override
     public void onStart(){
         super.onStart();
-        
-        Resources resources = getResources();
-        int defaultColor = resources.getColor(R.color.default_draw_color);
-        mPalette.setDrawableForColor(defaultColor, mHighlightDrawable);
-        chooseColor(defaultColor);
+        mPalette.setDrawableForColor(mActiveColor, mHighlightDrawable);
+        chooseColor(mActiveColor);
     }
+    
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save UI state changes to the savedInstanceState.
+        // This bundle will be passed to onCreate and
+        // onRestoreInstanceState if the process is
+        // killed and restarted by the run time.
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putInt(SAVE_KEY_ACTIVE_COLOR, mActiveColor);
+    }
+    
     
     public void chooseColor(int color) {
         //GradientDrawable gd = (GradientDrawable) mDrawable.mutate();
         //gd.setColor(color);
         //gd.invalidateSelf();
+        mActiveColor = color;
         mOnChooseColorListener.onChooseColor(color);
 
         if (color == Color.WHITE || color == Color.BLACK) {

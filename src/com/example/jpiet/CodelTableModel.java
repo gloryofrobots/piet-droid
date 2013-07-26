@@ -1,5 +1,6 @@
 package com.example.jpiet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,12 +10,35 @@ public class CodelTableModel {
  * Use x,y coords or codel arguments for access to data
  */
    
+    public class SerializedData  implements Serializable{
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 4325689890282796352L;
+        protected int size;
+        protected CodelColor data[];
+        protected int width;
+        protected int height;
+    }
+    
     protected int mSize;
     protected CodelColor mData[];
     protected int mWidth;
     protected int mHeight;
-
-    public CodelTableModel(int _width, int _height, CodelColor defaultColor) {
+    
+    
+    //FIXME delete underscores
+    static public CodelTableModel createEmptyCodelTableModel(int _width, int _height, CodelColor defaultColor) {
+        CodelTableModel model = new CodelTableModel(_width, _height, defaultColor);
+        return model;
+    }
+    
+    static public CodelTableModel createCodelTableModelFromSerializedData(SerializedData data) {
+        CodelTableModel model = new CodelTableModel(data);
+        return model;
+    }
+    
+    private CodelTableModel(int _width, int _height, CodelColor defaultColor) {
         // TODO Auto-generated constructor stub
         mSize = _width * _height;
         
@@ -24,6 +48,27 @@ public class CodelTableModel {
         mWidth = _width;
         mHeight = _height;
     }
+    
+    private CodelTableModel(SerializedData data) {
+        // TODO Auto-generated constructor stub
+        mWidth = data.width;
+        mHeight = data.height;
+        
+        mSize = mWidth * mHeight;
+        
+        mData = data.data;
+    }
+    
+    public SerializedData getSerializeData() {
+        SerializedData data = new SerializedData();
+        data.size = mSize;
+        data.width = mWidth;
+        data.height = mHeight;
+        data.data = mData;
+        
+        return data;
+    }
+
     
     public void fillWithColor(CodelColor color) {
         for( int i = 0; i < mSize; i++ ){

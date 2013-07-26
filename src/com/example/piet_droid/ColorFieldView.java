@@ -354,7 +354,8 @@ public class ColorFieldView extends View {
         int height = getMeasuredHeight();
         int totalPaddingLeft = mPadding.left * mCountX;
         int totalPaddingTop = mPadding.top * mCountY;
-        
+        int canvasWidth = canvas.getWidth();
+        int canvasHeight = canvas.getHeight();
         mCellWidth = Math.round((width - totalPaddingLeft) / mCountX);
         mCellHeight = Math.round((height - totalPaddingTop) / mCountY);
         

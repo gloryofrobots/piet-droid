@@ -425,4 +425,8 @@ public class PietMachine {
         // TODO Auto-generated method stub
         return mLastCommand;
     }
+
+    public InOutSystem getInOutSystem() {
+        return mInOutSystem;
+    }
 }

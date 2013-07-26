@@ -2,19 +2,18 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/fragment_background" >
-   
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/state_info_title" >
-    </TextView>
+    android:background="@drawable/border_rounded_corners" >
+<!--     <TextView -->
+<!--         android:layout_width="wrap_content" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:text="@string/state_info_title" > -->
+<!--     </TextView> -->
     
     <TextView
         android:id="@+id/text_view_info"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         />
-    
 </LinearLayout>

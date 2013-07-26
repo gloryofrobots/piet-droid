@@ -13,10 +13,9 @@
 
     <LinearLayout
         android:layout_width="0dip"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical" >
 
         <fragment
             android:id="@+id/fragment_control_toolbox"
@@ -26,10 +25,9 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:orientation="horizontal"
-             >
+            android:orientation="horizontal" >
 
             <fragment
                 android:id="@+id/fragment_palette_simple"
@@ -37,44 +35,110 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin" />
-<!--  
+            <!--
             <fragment
                 android:id="@+id/fragment_command_helper"
                 android:name="com.example.piet_droid.FragmentCommandHelper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin" />
--->
-            <LinearLayout
+            -->
+
+            <TabHost
+                android:id="@android:id/tabhost"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                  >
+                android:layout_marginLeft="16dp" >
 
-                <fragment
-                    android:id="@+id/fragment_in_out_buffers"
-                    android:name="com.example.piet_droid.FragmentInOutBuffers"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dip"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" >
 
-                <fragment
-                    android:id="@+id/fragment_state_info"
-                    android:name="com.example.piet_droid.FragmentStateInfo"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dip"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin" />
-            </LinearLayout>
-<!-- 
-            <fragment
-                android:id="@+id/fragment_command_log"
-                android:name="com.example.piet_droid.FragmentCommandLog"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin" /> -->
+                    <TabWidget
+                        android:id="@android:id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+                    </TabWidget>
+
+                    <FrameLayout
+                        android:id="@android:id/tabcontent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+
+                        <LinearLayout
+                            android:id="@+id/tabInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical" >
+
+                            <EditText
+                                android:id="@+id/text_view_in"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dip"
+                                android:layout_marginTop="5dp"
+                                android:layout_weight="1"
+                                android:padding="10dp"
+                                android:background="@drawable/border_rounded_corners"
+                                android:hint="@string/in_buffer_hint"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/tabOutput"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                           >
+
+                            <ScrollView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scrollbars="vertical"
+                                 android:background="@drawable/border_rounded_corners"
+                                 android:layout_marginTop="5dp"  >
+
+
+                                    <TextView
+                                        android:id="@+id/text_view_out"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:padding="10dp"
+                                        android:textStyle="bold" />
+                            </ScrollView>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/tabState"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical" >
+
+                            <fragment
+                                android:id="@+id/fragment_state_info"
+                                android:name="com.example.piet_droid.FragmentStateInfo"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="5dp"
+                                android:layout_weight="1" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/tabLog"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical" >
+
+                            <fragment
+                                android:id="@+id/fragment_command_log"
+                                android:name="com.example.piet_droid.FragmentCommandLog"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginTop="5dp" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </LinearLayout>
+            </TabHost>
         </LinearLayout>
     </LinearLayout>
 

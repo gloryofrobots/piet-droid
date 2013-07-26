@@ -1,6 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/fragment_background"
     android:orientation="vertical" >
 
@@ -10,12 +10,19 @@
         android:layout_height="0dip"
         android:layout_weight="1"
         android:hint="@string/in_buffer_hint" />
-
+<ScrollView android:id="@+id/textAreaScroller" 
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:layout_x="0px" 
+    android:layout_y="25px" 
+    android:scrollbars="vertical">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/out_buffer_title" />
-
+        android:scrollHorizontally="true"
+        android:scrollbars="vertical"
+        />
+</ScrollView>
 
     <TextView
         android:id="@+id/text_view_out"

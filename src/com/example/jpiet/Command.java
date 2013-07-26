@@ -54,8 +54,7 @@ public abstract class Command {
                     _inOutSystem);
             // System.out.println(_stack);
         } catch (NullPointerException e) {
-            // FIXME
-            String str = "Stack Manipulation Error " + e.toString()
+            String str = "Stack Underflow Error " + e.toString()
                     + " message : " + e.getMessage();
             throw new PietMachineExecutionError(str);
         }

@@ -4,33 +4,26 @@ import android.util.Log;
 
 import com.example.jpiet.Logger;
 
-public class LoggerDroid implements Logger {
+public class LoggerDroid extends Logger {
 	private final String LABEL = "PIET_DROID_LOGGER";
-	
-	public LoggerDroid() {
-	}
 
-	public String prepare(String _msg, Object... args) {
-		String str = String.format(_msg, args);
-		return str;
-	}
-	
-	@Override
-	public void error(String _msg, Object... args) {
-		String data = prepare(_msg, args);
-		Log.e(LABEL, data);
-	}
+    @Override
+    public void _onError(String msg) {
+        // TODO Auto-generated method stub
+        Log.e(LABEL, msg);
+    }
 
-	@Override
-	public void info(String msg, Object... args) {
-		String data = prepare(msg, args);
-		Log.i(LABEL, data);
-	}
 
-	@Override
-	public void warning(String msg, Object... args) {
-		String data = prepare(msg, args);
-		Log.w(LABEL, data);
-	}
+    @Override
+    public void _onInfo(String msg) {
+        // TODO Auto-generated method stub
+        Log.i(LABEL, msg);
+    }
+
+    @Override
+    public void _onWarning(String msg) {
+        // TODO Auto-generated method stub
+        Log.w(LABEL, msg);
+    }
 
 }

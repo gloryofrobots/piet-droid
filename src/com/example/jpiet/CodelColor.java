@@ -4,7 +4,6 @@ package com.example.jpiet;
  * Supported colors in Piet Language
  */
 public enum CodelColor {
-	
     BLACK("Black", 0x000000, -10, -10),
     LIGHT_YELLOW("Light Yellow", 0xffffc0, 1, 0),
     GREEN("Green", 0x00ff00, 2, 1),

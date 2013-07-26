@@ -1,21 +1,21 @@
 package com.example.jpiet;
 
-public class LoggerJavaSdkStdOut implements Logger {
-	@Override
-	public void error(String _msg, Object... args) {
-		// TODO Auto-generated method stub
-		System.out.printf(_msg + "\n", args);
-	}
+public class LoggerJavaSdkStdOut extends Logger {
 
-	@Override
-	public void info(String _msg, Object... args) {
-		// TODO Auto-generated method stub
-		//System.out.printf(_msg + "\n", args);
-	}
+    @Override
+    public void _onError(String msg) {
+        System.out.println(msg);
+        
+    }
 
-	@Override
-	public void warning(String _msg, Object... args) {
-		// TODO Auto-generated method stub
-		System.out.printf(_msg + "\n", args);
-	}
+    @Override
+    public void _onInfo(String msg) {
+        System.out.println(msg);
+    }
+
+    @Override
+    public void _onWarning(String msg) {
+        System.out.println(msg);
+    }
+	
 }

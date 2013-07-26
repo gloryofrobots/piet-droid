@@ -18,7 +18,7 @@
     <string name="edittext_new_file_width_hint">Width</string>
     <string name="edittext_new_file_height_hint">Height</string>
     
-    <string name="button_text_ok">Ok</string>
+    <string name="button_text_ok">OK</string>
     <string name="button_text_cancel">Cancel</string>
     
     <string name="content_description_toolbox_button_run">Run button</string>
@@ -35,7 +35,7 @@
     <string name="action_quit">Quit</string>
     
     <string name="out_buffer_title">Program output</string>
-    <string name="in_buffer_hint">Program input \n(digits separated by space)</string>
+    <string name="in_buffer_hint">Values must be separated by space</string>
     <string name="state_info_title">Program state</string>
     
     <string name="delay_before_step_title">Step delay</string>
@@ -51,5 +51,9 @@
     <string name="preferences_header_summary">PietDroid preferences</string>
     <string name="preferences_header_title">PietDroid preferences</string>
     
+    <string name="tab_in">Input</string>
+    <string name="tab_out">Output</string>
+    <string name="tab_state">State</string>
+    <string name="tab_log">Log</string>
     
 </resources>

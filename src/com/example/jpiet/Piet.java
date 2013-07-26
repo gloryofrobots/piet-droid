@@ -1,5 +1,8 @@
 package com.example.jpiet;
 
+import java.util.LinkedList;
+import java.util.List;
+
 //import java.awt.image.BufferedImage;
 //import java.io.File;
 //import java.io.IOException;
@@ -10,10 +13,12 @@ package com.example.jpiet;
 
 
 public class Piet {
+    
 	CodelTableModel mModel;
 	Interpreter mInterpreter;
 	PietMachine mMachine;
 	Command mLastCommand;
+	
 	
 	public Piet(Logger logger, InOutSystem inOutSystem){
         mMachine = new PietMachine(inOutSystem);
@@ -21,6 +26,7 @@ public class Piet {
         policy.setLogger(logger);
         policy.setDebugMode(false);
         policy.setModelScaner(CodelTableModelScanerRecursive.class);
+        
         mInterpreter = new Interpreter(mMachine);
 	}
 	
@@ -35,12 +41,17 @@ public class Piet {
              }
          });*/
 	}
-	 public CodelTableModel getModel() {
+	
+	public CodelTableModel getModel() {
 	        return mModel;
 	    }
 	    
 	public int getStepNumber(){
 	    return mInterpreter.getStepNumber();
+	}
+	
+	public InOutSystem getInOutSystem() {
+	    return mMachine.getInOutSystem();
 	}
 	
 	public DirectionPointer getDirectionPointer() {
@@ -64,10 +75,15 @@ public class Piet {
 	}
 	
 	public void createModel(int width, int height){
-		mModel = new CodelTableModel(width, height, CodelColor.WHITE);
+		mModel = CodelTableModel.createEmptyCodelTableModel(width, height, CodelColor.WHITE);
 		mInterpreter.setInput(mModel);
 	}
 	
+	public void setModel(CodelTableModel model){
+        mModel = model;
+        mInterpreter.setInput(mModel);
+    }
+    
 	public void clear(){
 	    mModel.fillWithColor(CodelColor.WHITE);
 	}

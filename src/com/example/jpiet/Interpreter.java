@@ -120,9 +120,9 @@ public class Interpreter {
             PolicyStorage
                     .getInstance()
                     .getLogger()
-                    .error("BAD COMMAND EXECUTE ON STEP %d command %s error: %s",
+                    .error("Step %d %s ERROR : %s",
                             mStepNumber, mMachine.getLastCommand().getTag(),
-                            exception.toString());
+                            exception.getMessage());
         }
     }
 

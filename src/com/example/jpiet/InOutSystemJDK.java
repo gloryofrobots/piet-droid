@@ -26,4 +26,16 @@ public class InOutSystemJDK implements InOutSystem{
     public void write(String output) {
         System.out.print(output);
     }
+
+    @Override
+    public void flush() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void prepare() {
+        // TODO Auto-generated method stub
+        
+    }
 }

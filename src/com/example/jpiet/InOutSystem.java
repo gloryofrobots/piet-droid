@@ -14,4 +14,6 @@ public interface InOutSystem {
     public int read() throws IOException;
     public void write(int output);
     public void write(String output);
+    public void flush();
+    public void prepare();
 }

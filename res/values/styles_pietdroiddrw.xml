@@ -29,12 +29,17 @@
         <item name="actionModeBackground">@drawable/cab_background_top_pietdroiddrw</item>
         <item name="actionModeSplitBackground">@drawable/cab_background_bottom_pietdroiddrw</item>
         <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Pietdroiddrw</item>
-
+        
+        <item name="android:tabWidgetStyle">@style/CustomTabWidget</item>
                 <!-- Light.DarkActionBar specific -->
         <item name="actionBarWidgetTheme">@style/Theme.Pietdroiddrw.Widget</item>
 
     </style>
-
+    
+    <style name="CustomTabWidget" parent="@android:style/Widget.TabWidget">
+        <item name="android:background">@drawable/tab_widget_bg</item>
+    </style>
+    
     <style name="ActionBar.Solid.Pietdroiddrw" parent="@style/Widget.Sherlock.Light.ActionBar.Solid.Inverse">
         <item name="background">@drawable/ab_solid_pietdroiddrw</item>
         <item name="backgroundStacked">@drawable/ab_stacked_solid_pietdroiddrw</item>

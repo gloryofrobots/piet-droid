@@ -1,5 +1,7 @@
 package com.example.piet_droid;
 
+import java.util.LinkedList;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,20 +9,116 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.jpiet.Codel;
+import com.example.jpiet.CodelColor;
+import com.example.jpiet.CodelTableModel;
 import com.example.jpiet.Piet;
+import com.example.piet_droid.AsyncTaskRunPiet.ExecutionProcessListener;
 
 public class PietFileActor {
+    
+    public interface ExecutionListener {
+        public void onRunStart();
+        public void onRunCancel();
+        public void onRunUpdate(Codel codel);
+        public void onRunComplete();
+    }
+    
+    
+    
     PietFile mPietFile;
     Piet mPiet;
     ColorFieldView mView;
     Context mContext;
+    AsyncTaskRunPiet mCurrentRunTask;
+    
+    LinkedList<ExecutionListener> mExecutionListeners;
+    
+    
+    AsyncTaskRunPiet.ExecutionProcessListener mAsyncTaskRunPietListener = 
+            new AsyncTaskRunPiet.ExecutionProcessListener() {
 
+                @Override
+                public void onRunStart() {
+                    for(ExecutionListener listener : mExecutionListeners) {
+                        listener.onRunStart();
+                    }
+                    
+                }
+
+                @Override
+                public void onRunCancel() {
+                    for(ExecutionListener listener : mExecutionListeners) {
+                        listener.onRunCancel();
+                    }
+                    
+                    mCurrentRunTask = null;
+                }
+
+                @Override
+                public void onRunUpdate(Codel codel) {
+                    if (mCurrentRunTask == null || mCurrentRunTask.isCancelled()) {
+                        return;
+                    }
+                    
+                    for(ExecutionListener listener : mExecutionListeners) {
+                        listener.onRunUpdate(codel);
+                    }
+                }
+
+                @Override
+                public void onRunComplete() {
+                    for(ExecutionListener listener : mExecutionListeners) {
+                        listener.onRunComplete();
+                    }
+                }
+        };
+    
     public PietFileActor(ColorFieldView view, Piet piet, Context context) {
         mPiet = piet;
         mView = view;
         mContext = context;
     }
-
+    
+    public void setStepDelay(long delay) {
+        mCurrentRunTask.setStepDelay(delay);
+    }
+    
+    public void addExecutionListener(ExecutionListener listener) {
+        mExecutionListeners.add(listener);
+    }
+    
+    public void run(long delay) {
+        if (mCurrentRunTask != null) {
+            if (mCurrentRunTask.isWaiting()) {
+                mCurrentRunTask.allowRun();
+            }
+        } else {
+            mCurrentRunTask = new AsyncTaskRunPiet(mAsyncTaskRunPietListener, delay);
+            mCurrentRunTask.execute(mPiet);
+        }
+    }
+    
+    public void step(long delay) {
+        if (mCurrentRunTask != null) {
+            mCurrentRunTask.allowOneStepOnly();
+        } else {
+            mCurrentRunTask = new AsyncTaskRunPiet(mAsyncTaskRunPietListener, delay);
+            mCurrentRunTask.allowOneStepOnly();
+            mCurrentRunTask.execute(mPiet);
+        }
+    }
+    
+    public void pause() {
+        mCurrentRunTask.setWait();
+    }
+    
+    public void stop() {
+        mCurrentRunTask.cancel(true);
+        
+    }
+    
+    
     public void setPietFile(PietFile file) {
         mPietFile = file;
     }
@@ -119,7 +217,7 @@ public class PietFileActor {
     }
 
     public void showMessage(String msg) {
-        Toast toast = Toast.makeText(mContext, msg, Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(mContext, msg, Toast.LENGTH_SHORT);
         toast.show();
     }
 
@@ -132,4 +230,31 @@ public class PietFileActor {
             Drawable drawable) {
         mView.setCellDrawable(x, y, drawable);
     }
+
+    public void attachModel(CodelTableModel model) {
+        int countX = model.getWidth();
+        int countY = model.getHeight();
+        for(int y = 0; y < countY; ++y) {
+            for (int x = 0; x < countX; ++x) {
+                CodelColor color = model.getValue(x, y);
+                mView.setCellColor(x, y, color.getARGB());
+            }
+        }
+        
+        mPiet.setModel(model);
+        
+    }
+
+    public void invalidateView() {
+        mView.invalidate();
+    }
+
+    public void resize(int countX, int countY) {
+        // TODO Auto-generated method stub
+        mView.resize(countX, countY);
+        mPiet.createModel(countX, countY);
+    }
+    
+    
+    
 }
