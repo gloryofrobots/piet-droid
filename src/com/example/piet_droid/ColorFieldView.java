@@ -33,7 +33,7 @@ public class ColorFieldView extends View {
     }
 
     private class Cell {
-        public int x;
+        public int x2;
         public int y;
         int color;
         Drawable drawable;
@@ -43,7 +43,7 @@ public class ColorFieldView extends View {
         
         
         Cell(int x, int y, int color, Rect padding) {
-            this.x = x;
+            this.x2 = x;
             this.y = y;
             this.color = color;
             this.bounds = new Rect();
@@ -52,7 +52,7 @@ public class ColorFieldView extends View {
         }
 
         public Rect createBounds(int width, int height) {
-            bounds.left = x * (width + padding.left);
+            bounds.left = x2 * (width + padding.left);
             bounds.top = y * (height + padding.top);
             
             bounds.right = bounds.left + mCellWidth;
@@ -84,14 +84,85 @@ public class ColorFieldView extends View {
                     bounds.bottom - strokeWidth
                     , paint2);*/
             }
+
+        public boolean contains(float x2, float y2) {
+            // TODO Auto-generated method stub
+            return bounds.contains((int)x2, (int)y2);
+        }
     }
     
     View.OnTouchListener mOnTouchListener = new View.OnTouchListener(){
-
+        private Cell mPreviousCell;
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             // TODO Auto-generated method stub
+            if (mOnCellClickListener != null 
+                    && mOnCellClickListener.isProcessClickWanted()) {
+                processCellClick(event);
+                return true;
+            }
             return false;
+        }
+        
+        private void processCellClick(MotionEvent event) {
+            // Get the type of action this event represents
+            int action = event.getAction();
+            float x = event.getX();
+            float y = event.getY();
+            
+            switch (action) {
+            case MotionEvent.ACTION_MOVE:
+                
+                if(mPreviousCell != null && mPreviousCell.contains(x,y)) {
+                    Log.e("ss","IN BOUNDS");
+                    break;
+                }
+                
+            case MotionEvent.ACTION_DOWN:
+                // Touch screen pressed
+                Cell cell = findClickedCell(x, y);
+                if (cell == null) {
+                    // TODO throw something here
+                    return;
+                }
+                mPreviousCell = cell;
+                mOnCellClickListener.onCellClick(cell.x2, cell.y);
+                // invalidate();
+                break;
+            }
+        }
+
+        private Cell findClickedCell(float eventX, float eventY) {
+            // TODO Auto-generated method stub
+            Cell[] findedRow = null;
+
+            for (int y = 0; y < mCountY; y++) {
+                Cell[] row = mCells[y];
+
+                float boundTop = y * mCellHeight * 1.0f;
+                float boundBottom = boundTop + mCellHeight;
+
+                if (eventY >= boundTop && eventY < boundBottom) {
+                    findedRow = row;
+                    break;
+                }
+            }
+            
+            if(findedRow == null) {
+                return null;
+            }
+            
+            Cell findedCell = null;
+            for (int x = 0; x < mCountX; x++) {
+                float boundLeft = x * mCellWidth * 1.0f;
+                float boundRight = boundLeft + mCellWidth;
+
+                if (eventX >= boundLeft && eventX < boundRight) {
+                    findedCell = findedRow[x];
+                }
+            }
+            
+            return findedCell;
         }
         
     };
@@ -121,7 +192,6 @@ public class ColorFieldView extends View {
     private boolean mForceDraw;
     private Cell mCellToRedraw;
     
-    
     /**
      * @param mOnCellClickListener
      *            the CellClickListener to set
@@ -131,25 +201,29 @@ public class ColorFieldView extends View {
     }
 
     Cell[][] mCells;
-
+    
+    public ColorFieldView(Context context) {
+        super(context);
+        init();
+    }
+    
     public ColorFieldView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
     public ColorFieldView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs);
+        
+        init();
+        
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.ColorFieldView);
         
         mNormaliseForLowestEdge = a.getBoolean(R.styleable.ColorFieldView_normaliseForLowestEdge, false);
         mDefaultColor = a.getColor(R.styleable.ColorFieldView_defaultColor, 0);
         
-      
-        
         mCountX = a.getInt(R.styleable.ColorFieldView_countX, 30);
         mCountY = a.getInt(R.styleable.ColorFieldView_countY, 30);
-
-        mPadding = new Rect(0, 0, 0, 0);
 
         createCells();
 
@@ -160,10 +234,16 @@ public class ColorFieldView extends View {
         }
 
         a.recycle();
-
-        init();
     }
-
+    
+    public void setDefaultColor(int color) {
+        mDefaultColor = color;
+    }
+    
+    public void setNormaliseForLowestEdge(boolean value) {
+        mNormaliseForLowestEdge = value;
+    }
+    
     // Load colors from array resource in order which it have in xml
     private void loadCellColorsFromResources(int resourceId) {
         Resources resources = getResources();
@@ -176,7 +256,7 @@ public class ColorFieldView extends View {
 
             setCellColor(x, y, color);
             x++;
-
+            //FIXME
             if (((i + 1) % mCountX) == 0) {
                 y++;
                 x = 0;
@@ -228,63 +308,7 @@ public class ColorFieldView extends View {
         }
     }
 
-    private void processCellClick(MotionEvent event) {
-        // Get the type of action this event represents
-        int action = event.getAction();
-        float x = event.getX();
-        float y = event.getY();
-        
-        switch (action) {
-        case MotionEvent.ACTION_MOVE:
-            int bdsm = 1;
-            int b = bdsm;
-            break;
-        case MotionEvent.ACTION_DOWN:
-            // Touch screen pressed
-            
-
-            Cell cell = findClickedCell(x, y);
-            if (cell == null) {
-                // TODO throw something here
-                return;
-            }
-
-            mOnCellClickListener.onCellClick(cell.x, cell.y);
-            // invalidate();
-            break;
-        }
-    }
-
-    private Cell findClickedCell(float eventX, float eventY) {
-        // TODO Auto-generated method stub
-        Cell[] findedRow = null;
-
-        for (int y = 0; y < mCountY; y++) {
-            Cell[] row = mCells[y];
-
-            float boundTop = y * mCellHeight * 1.0f;
-            float boundBottom = boundTop + mCellHeight;
-
-            if (eventY >= boundTop && eventY < boundBottom) {
-                findedRow = row;
-                break;
-            }
-        }
-
-        Cell findedCell = null;
-        for (int x = 0; x < mCountX; x++) {
-            float boundLeft = x * mCellWidth * 1.0f;
-            float boundRight = boundLeft + mCellWidth;
-
-            if (eventX >= boundLeft && eventX < boundRight) {
-                findedCell = findedRow[x];
-            }
-        }
-
-        return findedCell;
-    }
-
-    @Override
+    /*@Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.e("onTouchEvent", String.format("acion %d", event.getAction()));
         if (mOnCellClickListener != null 
@@ -293,15 +317,15 @@ public class ColorFieldView extends View {
         }
         super.onTouchEvent(event);
         //return super.onTouchEvent(event);
-        return false;
-    }
-    
-    public boolean onInterceptTouchEvent (MotionEvent ev) {
-        Log.e("onInterceptTouchEvent", String.format("acion %d", ev.getAction()));
-        return false;
-    }
+        return true;
+    }*/
     
     protected void init() {
+        
+        mPadding = new Rect(0, 0, 0, 0);
+        
+        this.setOnTouchListener(mOnTouchListener);
+        
         Resources res = getResources();
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
