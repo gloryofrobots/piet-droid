@@ -2,6 +2,7 @@ package com.example.jpiet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CodelTableModel {
@@ -10,68 +11,48 @@ public class CodelTableModel {
  * Use x,y coords or codel arguments for access to data
  */
    
-    public class SerializedData  implements Serializable{
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 4325689890282796352L;
-        protected int size;
-        protected CodelColor data[];
-        protected int width;
-        protected int height;
-    }
-    
-    protected int mSize;
     protected CodelColor mData[];
     protected int mWidth;
     protected int mHeight;
-    
-    
+     
     //FIXME delete underscores
     static public CodelTableModel createEmptyCodelTableModel(int _width, int _height, CodelColor defaultColor) {
         CodelTableModel model = new CodelTableModel(_width, _height, defaultColor);
         return model;
     }
     
-    static public CodelTableModel createCodelTableModelFromSerializedData(SerializedData data) {
+    static public CodelTableModel createCodelTableModelFromSerializedData(CodelTableModelSerializedData data) {
         CodelTableModel model = new CodelTableModel(data);
         return model;
     }
     
     private CodelTableModel(int _width, int _height, CodelColor defaultColor) {
-        // TODO Auto-generated constructor stub
-        mSize = _width * _height;
-        
-        mData = new CodelColor[mSize];
-        fillWithColor(defaultColor);
-        
         mWidth = _width;
         mHeight = _height;
+        
+        mData = new CodelColor[mWidth *  mHeight];
+        fillWithColor(defaultColor);
     }
     
-    private CodelTableModel(SerializedData data) {
+    private CodelTableModel(CodelTableModelSerializedData data) {
         // TODO Auto-generated constructor stub
         mWidth = data.width;
         mHeight = data.height;
         
-        mSize = mWidth * mHeight;
-        
-        mData = data.data;
+        mData = Arrays.copyOf(data.values, data.values.length);
     }
     
-    public SerializedData getSerializeData() {
-        SerializedData data = new SerializedData();
-        data.size = mSize;
+    public CodelTableModelSerializedData getSerializeData() {
+        CodelTableModelSerializedData data = new CodelTableModelSerializedData();
         data.width = mWidth;
         data.height = mHeight;
-        data.data = mData;
+        data.values = Arrays.copyOf(mData, mData.length);
         
         return data;
     }
 
-    
     public void fillWithColor(CodelColor color) {
-        for( int i = 0; i < mSize; i++ ){
+        for( int i = 0; i < mData.length; i++ ){
             mData[i] = color;
         }
     }
@@ -90,7 +71,7 @@ public class CodelTableModel {
     }
 
     public void set(int _index, CodelColor _item) {
-        if (_index >= mSize) {
+        if (_index >= mData.length) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -99,14 +80,21 @@ public class CodelTableModel {
 
     public CodelColor getValue(int x, int y) {
         int index = getIndex(x, y);
-        if(index == 196){
-            int bdsm = 1;
+        CodelColor result = null;
+        try{
+            result =  mData[index];
+            return result;
         }
-        return mData[index];
+        catch(ArrayIndexOutOfBoundsException e) {
+            PolicyStorage.getInstance().getLogger().error(e.toString());
+        }
+        
+        return null;
     }
 
     public CodelColor getValue(Codel _cursor) {
         return getValue(_cursor.x, _cursor.y);
+        
     }
 
     public boolean isValid(int x, int y) {
@@ -128,15 +116,15 @@ public class CodelTableModel {
     }
 
     public void fillArray(int[] colors) throws IndexOutOfBoundsException {
-        for(int i = 0; i < mSize; ++i) {
+        for(int i = 0; i < mData.length; ++i) {
             colors[i] = mData[i].getARGB();
         }
     }
 
     public List<CodelColor> getRow(int index) {
         ArrayList<CodelColor> row = new ArrayList<CodelColor>();
-        int first = mWidth*index;
-        int last = first + mWidth;
+        //int first = mWidth*index;
+        //int last = first + mWidth;
         for(int i = 0; i < mWidth; ++i) {
             CodelColor color = getValue(i, index);
             row.add(color);

@@ -10,7 +10,8 @@ public abstract class Command {
      */
     String mRepr;
     String mTag;
-
+    String mError;
+    
     Command(String tag) {
         mRepr = new String();
         mTag = tag;
@@ -19,7 +20,15 @@ public abstract class Command {
     public String getTag() {
         return mTag;
     }
-
+    
+    protected void setError(String error) {
+        mError = error;
+    }
+    
+    public String getError() {
+        return mError;
+    }
+    
     /**
      * Set`s string representation of command. Each derived class must do that
      * for logging capabilities
@@ -54,9 +63,13 @@ public abstract class Command {
                     _inOutSystem);
             // System.out.println(_stack);
         } catch (NullPointerException e) {
-            String str = "Stack Underflow Error " + e.toString()
-                    + " message : " + e.getMessage();
+            /*String str = "Stack Underflow Error " + e.toString()
+                    + " message : " + e.getMessage();*/
+            String str = "Stack underflow error ";
             throw new PietMachineExecutionError(str);
+        }
+        catch (IllegalArgumentException e) {
+            throw new PietMachineExecutionError(mError);
         }
     }
 

@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import android.view.MotionEvent;
 import android.view.View;
@@ -84,7 +85,19 @@ public class ColorFieldView extends View {
                     , paint2);*/
             }
     }
+    
+    View.OnTouchListener mOnTouchListener = new View.OnTouchListener(){
 
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        
+    };
+    
+    
+    
     private final int UNKNOWN_MEASURE = -1;
     private final int DEFAULT_WIDTH = 100;
     private final int DEFAULT_HEIGHT = 100;
@@ -218,16 +231,17 @@ public class ColorFieldView extends View {
     private void processCellClick(MotionEvent event) {
         // Get the type of action this event represents
         int action = event.getAction();
-
+        float x = event.getX();
+        float y = event.getY();
+        
         switch (action) {
-        /*
-         * case (MotionEvent.ACTION_DOWN): // Touch screen pressed break;
-         */
-
-        case (MotionEvent.ACTION_DOWN):
+        case MotionEvent.ACTION_MOVE:
+            int bdsm = 1;
+            int b = bdsm;
+            break;
+        case MotionEvent.ACTION_DOWN:
             // Touch screen pressed
-            float x = event.getX();
-            float y = event.getY();
+            
 
             Cell cell = findClickedCell(x, y);
             if (cell == null) {
@@ -272,14 +286,21 @@ public class ColorFieldView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.e("onTouchEvent", String.format("acion %d", event.getAction()));
         if (mOnCellClickListener != null 
                 && mOnCellClickListener.isProcessClickWanted()) {
             processCellClick(event);
         }
-
-        return super.onTouchEvent(event);
+        super.onTouchEvent(event);
+        //return super.onTouchEvent(event);
+        return false;
     }
-
+    
+    public boolean onInterceptTouchEvent (MotionEvent ev) {
+        Log.e("onInterceptTouchEvent", String.format("acion %d", ev.getAction()));
+        return false;
+    }
+    
     protected void init() {
         Resources res = getResources();
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);

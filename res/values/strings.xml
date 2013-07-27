@@ -56,4 +56,6 @@
     <string name="tab_state">State</string>
     <string name="tab_log">Log</string>
     
+    <string name="dialog_title_save_changes">All changes will be lost. Are you sure?</string>
+    <string name="dialog_title_file_settings">Bitmap dimensions.</string>
 </resources>

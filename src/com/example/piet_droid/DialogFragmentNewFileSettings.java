@@ -19,10 +19,17 @@ public class DialogFragmentNewFileSettings extends SherlockDialogFragment {
         
     }
     
+    private int mDefaultWidth = 0;
+    private int mDefaultHeight = 0;
     private Listener mListener;
     
     public void setListener(Listener listener) {
         mListener = listener;
+    }
+    
+    public void setBitmapDimensions(int width, int height) {
+        mDefaultWidth = width;
+        mDefaultHeight = height;
     }
     
     // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
@@ -52,9 +59,13 @@ public class DialogFragmentNewFileSettings extends SherlockDialogFragment {
         
         final EditText widthEdit = (EditText) dialogView.findViewById(R.id.edittext_new_file_width);
         final EditText heightEdit = (EditText) dialogView.findViewById(R.id.edittext_new_file_height);
-
+        
+        widthEdit.setText(String.valueOf(mDefaultWidth));
+        heightEdit.setText(String.valueOf(mDefaultHeight));
+        
         builder.setView(dialogView)
-        // Add action buttons
+               .setTitle(R.string.dialog_title_file_settings)
+               //Add action buttons
                .setPositiveButton(R.string.button_text_ok, new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int id) {

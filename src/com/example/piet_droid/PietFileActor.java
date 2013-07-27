@@ -1,127 +1,35 @@
 package com.example.piet_droid;
 
-import java.util.LinkedList;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.jpiet.Codel;
 import com.example.jpiet.CodelColor;
 import com.example.jpiet.CodelTableModel;
+import com.example.jpiet.CodelTableModelSerializedData;
 import com.example.jpiet.Piet;
-import com.example.piet_droid.AsyncTaskRunPiet.ExecutionProcessListener;
 
 public class PietFileActor {
-    
-    public interface ExecutionListener {
-        public void onRunStart();
-        public void onRunCancel();
-        public void onRunUpdate(Codel codel);
-        public void onRunComplete();
-    }
-    
-    
-    
     PietFile mPietFile;
     Piet mPiet;
     ColorFieldView mView;
     Context mContext;
-    AsyncTaskRunPiet mCurrentRunTask;
     
-    LinkedList<ExecutionListener> mExecutionListeners;
-    
-    
-    AsyncTaskRunPiet.ExecutionProcessListener mAsyncTaskRunPietListener = 
-            new AsyncTaskRunPiet.ExecutionProcessListener() {
-
-                @Override
-                public void onRunStart() {
-                    for(ExecutionListener listener : mExecutionListeners) {
-                        listener.onRunStart();
-                    }
-                    
-                }
-
-                @Override
-                public void onRunCancel() {
-                    for(ExecutionListener listener : mExecutionListeners) {
-                        listener.onRunCancel();
-                    }
-                    
-                    mCurrentRunTask = null;
-                }
-
-                @Override
-                public void onRunUpdate(Codel codel) {
-                    if (mCurrentRunTask == null || mCurrentRunTask.isCancelled()) {
-                        return;
-                    }
-                    
-                    for(ExecutionListener listener : mExecutionListeners) {
-                        listener.onRunUpdate(codel);
-                    }
-                }
-
-                @Override
-                public void onRunComplete() {
-                    for(ExecutionListener listener : mExecutionListeners) {
-                        listener.onRunComplete();
-                    }
-                }
-        };
-    
-    public PietFileActor(ColorFieldView view, Piet piet, Context context) {
-        mPiet = piet;
-        mView = view;
-        mContext = context;
+    public PietFileActor(PietFile pietFile) {
+        mPietFile = pietFile;
+        mPiet = mPietFile.getPiet();
+        mView = mPietFile.getView();
+        mContext = mPietFile.getContext();
     }
     
-    public void setStepDelay(long delay) {
-        mCurrentRunTask.setStepDelay(delay);
-    }
-    
-    public void addExecutionListener(ExecutionListener listener) {
-        mExecutionListeners.add(listener);
-    }
-    
-    public void run(long delay) {
-        if (mCurrentRunTask != null) {
-            if (mCurrentRunTask.isWaiting()) {
-                mCurrentRunTask.allowRun();
-            }
-        } else {
-            mCurrentRunTask = new AsyncTaskRunPiet(mAsyncTaskRunPietListener, delay);
-            mCurrentRunTask.execute(mPiet);
-        }
-    }
-    
-    public void step(long delay) {
-        if (mCurrentRunTask != null) {
-            mCurrentRunTask.allowOneStepOnly();
-        } else {
-            mCurrentRunTask = new AsyncTaskRunPiet(mAsyncTaskRunPietListener, delay);
-            mCurrentRunTask.allowOneStepOnly();
-            mCurrentRunTask.execute(mPiet);
-        }
-    }
-    
-    public void pause() {
-        mCurrentRunTask.setWait();
-    }
-    
-    public void stop() {
-        mCurrentRunTask.cancel(true);
-        
-    }
-    
-    
+    /*
     public void setPietFile(PietFile file) {
         mPietFile = file;
-    }
+    }*/
     
     public void redrawCell(int x, int y) {
         mView.setCellToRedraw(x, y);
@@ -139,7 +47,10 @@ public class PietFileActor {
     public void setCell(int x, int y, int color) {
         mView.setCellColor(x, y, color);
         mPiet.setColor(x, y, color);
+        mPietFile.touch();
     }
+    
+    AsyncTaskLoadBitmap mLoadTask;
     
     public void load(String path) {
         //TODO CHECK ERRORS!!!!!
@@ -155,11 +66,11 @@ public class PietFileActor {
         mView.resize(width, height);
         
         final String filePath = path;
-        AsyncTaskLoadBitmap loadTask = new AsyncTaskLoadBitmap(
+        mLoadTask = new AsyncTaskLoadBitmap(
                 new AsyncTaskLoadBitmap.LoadProcessListener() {
                     @Override
                     public void onLoadBitmapCancel() {
-                        // TODO Auto-generated method stub
+                        mLoadTask = null;
                     }
 
                     public void onLoadBitmapPixel(int x, int y, int color) {
@@ -171,9 +82,11 @@ public class PietFileActor {
                         mView.setVisibility(View.VISIBLE);
                         mView.invalidate();
                         mPietFile.setPath(filePath);
+                        mPietFile.untouch();
+                        mLoadTask = null;
                     }
                 }, mContext);
-        loadTask.execute(bitmap);
+        mLoadTask.execute(bitmap);
     }
     
     public void save(String path) {
@@ -189,10 +102,12 @@ public class PietFileActor {
         save(path);
     }
     
+    AsyncTaskWriteBitmap mSaveTask;
+    
     private void doSave(String path) {
         final String filePath = path;
         
-        AsyncTaskWriteBitmap saveTask = new AsyncTaskWriteBitmap(mPiet,
+        mSaveTask = new AsyncTaskWriteBitmap(mPiet,
                 new AsyncTaskWriteBitmap.SaveProcessListener() {
 
                     @Override
@@ -204,16 +119,18 @@ public class PietFileActor {
                     @Override
                     public void onSaveBitmapComplete() {
                         mPietFile.setPath(filePath);
-                        
+                        mPietFile.untouch();
                         showMessage("Bitmap saved");
+                        mSaveTask = null;
                     }
 
                     @Override
                     public void onSaveBitmapCancel() {
+                        mSaveTask = null;
                     }
                 }, mContext);
 
-        saveTask.execute(path);
+        mSaveTask.execute(path);
     }
 
     public void showMessage(String msg) {
@@ -223,26 +140,77 @@ public class PietFileActor {
 
     public void finalise() {
         mPietFile = null;
-        // IF RUN TASK AND BLA BLA
+        if (mSaveTask != null) {
+            mSaveTask.cancel(true);
+            mSaveTask = null;
+        }
+        if (mLoadTask != null) {
+            mLoadTask.cancel(true);
+            mLoadTask = null;
+        }
     }
 
     public void setCellDrawable(int x, int y,
             Drawable drawable) {
         mView.setCellDrawable(x, y, drawable);
     }
+    
+    private final String SAVE_KEY_MODEL = "PietCodelTableModel";
+    private final String SAVE_KEY_CURRENT_FILENAME = "PietCurrentFileName";
+    
+    public void saveInstanceState(Bundle savedInstanceState) {
+        CodelTableModel model = mPiet.getModel();
+        CodelTableModelSerializedData data = model.getSerializeData();
+        savedInstanceState.putSerializable(SAVE_KEY_MODEL, data);
 
+        if (mPietFile.hasPath() == false) {
+            return;
+        }
+        
+        savedInstanceState.putString(SAVE_KEY_CURRENT_FILENAME, mPietFile.getPath());
+    }
+    
+    public void restoreFromSavedState(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        CodelTableModelSerializedData data = (CodelTableModelSerializedData) savedInstanceState
+                .getSerializable(SAVE_KEY_MODEL);
+        
+        CodelTableModel model = CodelTableModel.createCodelTableModelFromSerializedData(data);
+
+        attachModel(model);
+        invalidateView();
+        
+        String fileName = savedInstanceState
+                .getString(SAVE_KEY_CURRENT_FILENAME);
+        
+        if (fileName == null) {
+            return;
+        }
+        
+        mPietFile.setPath(fileName);
+    }
+    
     public void attachModel(CodelTableModel model) {
         int countX = model.getWidth();
         int countY = model.getHeight();
+        mView.resize(countX, countY);
+        
         for(int y = 0; y < countY; ++y) {
             for (int x = 0; x < countX; ++x) {
                 CodelColor color = model.getValue(x, y);
-                mView.setCellColor(x, y, color.getARGB());
+                try{
+                    mView.setCellColor(x, y, color.getARGB());
+                    
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+               
             }
         }
         
         mPiet.setModel(model);
-        
+        mPietFile.touch();
     }
 
     public void invalidateView() {
@@ -253,8 +221,7 @@ public class PietFileActor {
         // TODO Auto-generated method stub
         mView.resize(countX, countY);
         mPiet.createModel(countX, countY);
+        mPietFile.untouch();
     }
-    
-    
     
 }

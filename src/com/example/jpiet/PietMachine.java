@@ -126,6 +126,12 @@ public class PietMachine {
                     InOutSystem _inOutSystem) {
                 Integer top = _stack.pop();
                 Integer next = _stack.pop();
+                
+                if(top == 0) {
+                    setError(String.format("Division by zero %d / %d", next, top));
+                    throw new IllegalArgumentException();
+                }
+                
                 _stack.push(next / top);
 
                 setRepresentation("%d %d", next, top);

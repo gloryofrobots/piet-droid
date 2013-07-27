@@ -8,6 +8,7 @@
     <ListPreference
         android:entries="@array/unknown_color_interpretation_entries"
         android:entryValues="@array/unknown_color_interpretation_values"
+        android:defaultValue="0"
         android:key="unknown_color_interpretation"
         android:summary="@string/unknow_color_interpretation_summary"
         android:title="@string/unknow_color_interpretation_title"/>
@@ -16,6 +17,7 @@
         android:entries="@array/new_field_color_entries"
         android:entryValues="@array/new_field_color_values"
         android:key="new_field_color"
+        android:defaultValue="0"
         android:summary="@string/new_field_color_summary"
         android:title="@string/new_field_color_title"/>
     <!--  

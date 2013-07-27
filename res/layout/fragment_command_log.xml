@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/list_view_log"
-        android:padding="10dp"
+        android:padding="@dimen/medium_vertical_margin"
         android:background="@drawable/border_rounded_corners"/>
     
     <!--  <TextView

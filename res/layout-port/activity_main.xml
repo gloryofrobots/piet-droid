@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_background"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/main_screen_padding"
     android:paddingLeft="@dimen/main_screen_padding"
     android:paddingRight="@dimen/main_screen_padding"
@@ -12,21 +12,21 @@
     tools:context=".MainActivity" >
 
     <LinearLayout
-        android:layout_width="0dip"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         android:orientation="vertical" >
 
         <fragment
             android:id="@+id/fragment_control_toolbox"
             android:name="com.example.piet_droid.FragmentControlToolBox"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/big_vertical_margin"
             android:orientation="horizontal" >
 
             <fragment
@@ -34,12 +34,33 @@
                 android:name="com.example.piet_droid.FragmentPaletteSimple"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/big_horizontal_margin" />          
+                android:layout_marginLeft="@dimen/medium_horizontal_margin" />
+
+            <com.example.piet_droid.ColorFieldView
+                android:id="@+id/codelField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/medium_horizontal_margin"
+                colorField:countX="@integer/field_count_codels_x"
+                colorField:countY="@integer/field_count_codels_y"
+                colorField:defaultColor="@color/codel_field_default_color"
+                colorField:normaliseForLowestEdge="true" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        
+        android:orientation="vertical" >
+
             <TabHost
                 android:id="@android:id/tabhost"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/big_horizontal_margin" >
+                android:layout_marginLeft="@dimen/medium_horizontal_margin"
+                android:layout_marginTop="@dimen/small_horizontal_margin" >
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -67,11 +88,11 @@
                                 android:id="@+id/text_view_in"
                                 android:layout_width="match_parent"
                                 android:layout_height="0dip"
-                                android:layout_marginTop="@dimen/small_vertical_margin"
+                                android:layout_marginTop="@dimen/small_horizontal_margin"
                                 android:layout_weight="1"
-                                android:padding="@dimen/medium_vertical_margin"
                                 android:background="@drawable/border_rounded_corners"
                                 android:hint="@string/in_buffer_hint"
+                                android:padding="@dimen/main_screen_padding"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
@@ -79,23 +100,21 @@
                             android:id="@+id/tabOutput"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="vertical">
-                           
+                            android:orientation="vertical" >
 
                             <ScrollView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:scrollbars="vertical"
-                                 android:background="@drawable/border_rounded_corners"
-                                 android:layout_marginTop="@dimen/small_vertical_margin"  >
+                                android:layout_marginTop="@dimen/small_horizontal_margin"
+                                android:background="@drawable/border_rounded_corners"
+                                android:scrollbars="vertical" >
 
-
-                                    <TextView
-                                        android:id="@+id/text_view_out"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:padding="@dimen/medium_vertical_margin"
-                                        android:textStyle="bold" />
+                                <TextView
+                                    android:id="@+id/text_view_out"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="@dimen/main_screen_padding"
+                                    android:textStyle="bold" />
                             </ScrollView>
                         </LinearLayout>
 
@@ -110,7 +129,7 @@
                                 android:name="com.example.piet_droid.FragmentStateInfo"
                                 android:layout_width="match_parent"
                                 android:layout_height="0dp"
-                                android:layout_marginTop="@dimen/small_vertical_margin"
+                                android:layout_marginTop="@dimen/small_horizontal_margin"
                                 android:layout_weight="1" />
                         </LinearLayout>
 
@@ -125,23 +144,12 @@
                                 android:name="com.example.piet_droid.FragmentCommandLog"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_marginTop="@dimen/small_vertical_margin" />
+                                android:layout_marginTop="@dimen/small_horizontal_margin" />
                         </LinearLayout>
                     </FrameLayout>
                 </LinearLayout>
             </TabHost>
-        </LinearLayout>
+        
     </LinearLayout>
-
-    <com.example.piet_droid.ColorFieldView
-        android:id="@+id/codelField"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/big_horizontal_margin"
-        android:layout_weight="1"
-        colorField:countX="@integer/field_count_codels_x"
-        colorField:countY="@integer/field_count_codels_y"
-        colorField:defaultColor="@color/codel_field_default_color"
-        colorField:normaliseForLowestEdge="true" />
 
 </LinearLayout>

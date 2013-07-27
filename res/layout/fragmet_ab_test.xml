@@ -5,7 +5,7 @@
     android:orientation="horizontal">
 
      <ImageButton
-        android:id="@+id/button_run"
+        android:id="@+id/button_run2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="2"
@@ -16,7 +16,7 @@
         android:contentDescription="@string/content_description_toolbox_button_run" />
 
     <ImageButton
-        android:id="@+id/button_step"
+        android:id="@+id/button_step2"
         android:padding="@dimen/control_toolbox_padding"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
         android:contentDescription="@string/content_description_toolbox_button_step"  />
 
     <ImageButton
-        android:id="@+id/button_pause"
+        android:id="@+id/button_pause2"
         android:padding="@dimen/control_toolbox_padding"
       
         android:layout_marginLeft="@dimen/medium_horizontal_margin"
@@ -40,7 +40,7 @@
         android:contentDescription="@string/content_description_toolbox_button_pause"  />
 
     <ImageButton
-        android:id="@+id/button_stop"
+        android:id="@+id/button_stop2"
         android:padding="@dimen/control_toolbox_padding"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

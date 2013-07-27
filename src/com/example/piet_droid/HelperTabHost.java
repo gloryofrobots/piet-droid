@@ -17,6 +17,7 @@ public class HelperTabHost {
     int mTextColor;
     int mTabWidth;
     int mTabHeight;
+    float mTextSize;
     
     public final int DEFAULT_DIMENSION = -1;
     ArrayList<TabHost.TabSpec> mTabs;
@@ -27,6 +28,7 @@ public class HelperTabHost {
         mTabHost.setup();
         mTabWidth = DEFAULT_DIMENSION;
         mTabHeight = DEFAULT_DIMENSION;
+        mTextSize = 12;
     }
     
     public static HelperTabHost  create(TabHost tabs) {
@@ -36,6 +38,11 @@ public class HelperTabHost {
  
     public HelperTabHost setActiveTabColor(int activeTabColor) {
         this.mActiveTabColor = activeTabColor;
+        return this;
+    }
+    
+    public HelperTabHost setTextSize(float size) {
+        this.mTextSize = size;
         return this;
     }
 
@@ -104,6 +111,7 @@ public class HelperTabHost {
         TextView tv = (TextView) tab.findViewById(android.R.id.title); //Unselected Tabs
         tv.setTextColor(textColor);
         tv.setBackgroundColor(backgroundColor);
+        tv.setTextSize(mTextSize);
         
         if(mTabHeight != DEFAULT_DIMENSION) {
             tab.getLayoutParams().height = 50;

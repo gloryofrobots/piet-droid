@@ -10,7 +10,7 @@
         android:id="@+id/command_helper_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp">
+        android:paddingBottom="@dimen/medium_vertical_margin">
         
     </LinearLayout>
 
