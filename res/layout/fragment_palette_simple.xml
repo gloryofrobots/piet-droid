@@ -12,7 +12,7 @@
         android:layout_height="@dimen/palette_height"
         colorField:countX="@integer/palette_count_codels_x"
         colorField:countY="@integer/palette_count_codels_y"
-        colorField:defaultColor="@color/codel_field_default_color"
+        colorField:defaultCellColor="@color/codel_field_default_color"
         colorField:palette="@array/colors" />
 
     <LinearLayout

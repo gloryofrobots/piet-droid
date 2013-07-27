@@ -2,10 +2,13 @@
 <resources>
 
     <declare-styleable name="ColorFieldView">
-        <attr name="defaultColor" format="color" />
+        <attr name="defaultCellColor" format="color" />
+        <attr name="lineColor" format="color" />
         <attr name="palette" format="reference" />
         <attr name="countX" format="integer" />
         <attr name="countY" format="integer" />
+        <attr name="cellPadding" format="integer" />
+        <attr name="strokeWidth" format="integer" />
         <attr name="normaliseForLowestEdge" format="boolean" />
     </declare-styleable>
 

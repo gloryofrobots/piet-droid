@@ -132,7 +132,7 @@
             </TabHost>
         </LinearLayout>
     </LinearLayout>
-<!-- 
+
     <com.example.piet_droid.ColorFieldView
         android:id="@+id/codelField"
         android:layout_width="0dip"
@@ -141,7 +141,7 @@
         android:layout_weight="1"
         colorField:countX="@integer/field_count_codels_x"
         colorField:countY="@integer/field_count_codels_y"
-        colorField:defaultColor="@color/codel_field_default_color"
-        colorField:normaliseForLowestEdge="true" /> -->
+        colorField:defaultCellColor="@color/codel_field_default_color"
+        colorField:normaliseForLowestEdge="true" /> 
 
 </LinearLayout>

@@ -218,48 +218,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void initColorField() {
-        LinearLayout container = (LinearLayout) findViewById(R.id.codelFieldContainer);
-        
-        mColorField = new ColorFieldView(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                (LayoutParams.WRAP_CONTENT), (LayoutParams.WRAP_CONTENT));
-        
-        mColorField.setLayoutParams(lp);
-        
-        mColorField.setDefaultColor(Color.WHITE);
-        mColorField.setNormaliseForLowestEdge(true);
-        mColorField.resize(5,5);
-        
-        container.addView(mColorField);
-        
-        mColorField
-        .setOnCellClickListener(new ColorFieldView.CellClickListener() {
-            @Override
-            public void onCellClick(int x, int y) {
-                PietFileActor actor = MainActivity.this
-                        .getCurrentPietFile().getActor();
-                actor.setCell(x, y, MainActivity.this.getActiveColor());
-                actor.redrawCell(x, y);
-            }
-
-            @Override
-            public boolean isProcessClickWanted() {
-                if (MainActivity.this.isOnRunMode() == true) {
-                    getCurrentPietFile()
-                            .getActor()
-                            .showMessage(
-                                    "Edit mode disabled until program executed.");
-                    return false;
-                }
-
-                return true;
-            }
-        });
-        
-                
-                /*
         mColorField = (ColorFieldView) findViewById(R.id.codelField);
-
+    
         mColorField
                 .setOnCellClickListener(new ColorFieldView.CellClickListener() {
                     @Override
@@ -269,7 +229,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                         actor.setCell(x, y, MainActivity.this.getActiveColor());
                         actor.redrawCell(x, y);
                     }
-
+    
                     @Override
                     public boolean isProcessClickWanted() {
                         if (MainActivity.this.isOnRunMode() == true) {
@@ -279,10 +239,10 @@ public class MainActivity extends SherlockFragmentActivity implements
                                             "Edit mode disabled until program executed.");
                             return false;
                         }
-
+    
                         return true;
                     }
-                });*/
+                });
     }
 
     private void initNewPietFile(int countX, int countY) {
@@ -547,10 +507,6 @@ public class MainActivity extends SherlockFragmentActivity implements
                     return false;
                 }
                 
-                LinearLayout container = (LinearLayout) findViewById(R.id.codelFieldContainer);
-                container.removeView(mColorField);
-                mColorField = null;
-                initColorField();
                 initNewPietFile(width, height);
                 return true;
             }

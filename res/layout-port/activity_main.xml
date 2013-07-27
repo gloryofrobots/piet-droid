@@ -43,7 +43,7 @@
                 android:layout_marginLeft="@dimen/medium_horizontal_margin"
                 colorField:countX="@integer/field_count_codels_x"
                 colorField:countY="@integer/field_count_codels_y"
-                colorField:defaultColor="@color/codel_field_default_color"
+                colorField:defaultCellColor="@color/codel_field_default_color"
                 colorField:normaliseForLowestEdge="true" />
         </LinearLayout>
     </LinearLayout>

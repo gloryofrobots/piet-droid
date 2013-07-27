@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -61,7 +62,7 @@ public class ColorFieldView extends View {
             return bounds;
         }
         
-        public void draw(Canvas canvas, Paint paint){
+        public void draw(Canvas canvas, Paint paint, Paint paintBounds){
             paint.setColor(color);
             canvas.drawRect(bounds, paint);
 
@@ -70,19 +71,18 @@ public class ColorFieldView extends View {
                 drawable.draw(canvas);
             }
             
-            /*
-            Paint paint2 = new Paint();
-            paint2.setColor(Color.BLACK);
-            paint2.setStrokeWidth(1);
-            paint2.setStyle(Style.STROKE);
-            
             int strokeWidth = (int) paint.getStrokeWidth() / 2;
-
+            
+            Paint pppp = new Paint();
+            pppp.setColor(Color.BLACK);
+            pppp.setStrokeWidth(mStrokeWidth);
+            pppp.setStyle(Style.STROKE);
+            
             canvas.drawRect(bounds.left + strokeWidth,
                     bounds.top + strokeWidth,
                     bounds.right - strokeWidth,
                     bounds.bottom - strokeWidth
-                    , paint2);*/
+                    , pppp);
             }
 
         public boolean contains(float x2, float y2) {
@@ -112,10 +112,8 @@ public class ColorFieldView extends View {
             
             switch (action) {
             case MotionEvent.ACTION_MOVE:
-                
                 if(mPreviousCell != null && mPreviousCell.contains(x,y)) {
-                    Log.e("ss","IN BOUNDS");
-                    break;
+                    return;
                 }
                 
             case MotionEvent.ACTION_DOWN:
@@ -139,7 +137,7 @@ public class ColorFieldView extends View {
             for (int y = 0; y < mCountY; y++) {
                 Cell[] row = mCells[y];
 
-                float boundTop = y * mCellHeight * 1.0f;
+                float boundTop = y * (mCellHeight + mPadding.top);
                 float boundBottom = boundTop + mCellHeight;
 
                 if (eventY >= boundTop && eventY < boundBottom) {
@@ -154,7 +152,7 @@ public class ColorFieldView extends View {
             
             Cell findedCell = null;
             for (int x = 0; x < mCountX; x++) {
-                float boundLeft = x * mCellWidth * 1.0f;
+                float boundLeft = x * (mCellWidth + mPadding.left);
                 float boundRight = boundLeft + mCellWidth;
 
                 if (eventX >= boundLeft && eventX < boundRight) {
@@ -175,7 +173,7 @@ public class ColorFieldView extends View {
 
     private Paint mLinePaint;
     private Paint mCellPaint;
-
+    private Paint mCellBoundsPaint;
     private Rect mPadding;
 
     private int mCellWidth = 1;
@@ -184,9 +182,12 @@ public class ColorFieldView extends View {
     private int mCountX;
     private int mCountY;
 
-    private int mDefaultColor;
+    private int mDefaultCellColor;
     private boolean mNormaliseForLowestEdge;
     
+    private int mLineColor;
+    
+    private int mStrokeWidth;
     private CellClickListener mOnCellClickListener;
 
     private boolean mForceDraw;
@@ -204,6 +205,7 @@ public class ColorFieldView extends View {
     
     public ColorFieldView(Context context) {
         super(context);
+        mPadding = new Rect();
         init();
     }
     
@@ -220,11 +222,19 @@ public class ColorFieldView extends View {
                 R.styleable.ColorFieldView);
         
         mNormaliseForLowestEdge = a.getBoolean(R.styleable.ColorFieldView_normaliseForLowestEdge, false);
-        mDefaultColor = a.getColor(R.styleable.ColorFieldView_defaultColor, 0);
+        mDefaultCellColor = a.getColor(R.styleable.ColorFieldView_defaultCellColor, 0);
         
-        mCountX = a.getInt(R.styleable.ColorFieldView_countX, 30);
-        mCountY = a.getInt(R.styleable.ColorFieldView_countY, 30);
-
+        mCountX = a.getInt(R.styleable.ColorFieldView_countX, 0);
+        mCountY = a.getInt(R.styleable.ColorFieldView_countY, 0);
+        
+        mLineColor = a.getColor(R.styleable.ColorFieldView_lineColor, 0);
+        
+        //Now only square padding supported but Rect used for future
+        int paddingSide = a.getInt(R.styleable.ColorFieldView_cellPadding, 0);
+        mPadding = new Rect(paddingSide, paddingSide, paddingSide, paddingSide);
+        
+        mStrokeWidth = a.getInt(R.styleable.ColorFieldView_strokeWidth, 1);
+        
         createCells();
 
         int colorsResourceId = a.getResourceId(
@@ -236,8 +246,29 @@ public class ColorFieldView extends View {
         a.recycle();
     }
     
+    protected void init() {
+        this.setOnTouchListener(mOnTouchListener);
+        
+        Resources res = getResources();
+        mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        mLinePaint.setColor(mLineColor);
+        mLinePaint.setStrokeWidth(mStrokeWidth);
+        mLinePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        
+        
+        mCellBoundsPaint = new Paint();
+        mCellBoundsPaint.setColor(mLineColor);
+        mCellBoundsPaint.setStrokeWidth(mStrokeWidth);
+        mCellBoundsPaint.setStyle(Style.STROKE);
+        
+        mCellPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mCellPaint.setStrokeWidth(mStrokeWidth);
+        mCellPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+    }
+
     public void setDefaultColor(int color) {
-        mDefaultColor = color;
+        mDefaultCellColor = color;
     }
     
     public void setNormaliseForLowestEdge(boolean value) {
@@ -271,12 +302,11 @@ public class ColorFieldView extends View {
 
         for (int y = 0; y < mCountY; y++) {
             for (int x = 0; x < mCountX; x++) {
-                mCells[y][x] = new Cell(x, y, mDefaultColor, mPadding);
+                mCells[y][x] = new Cell(x, y, mDefaultCellColor, mPadding);
             }
         }
     }
     
-   
     public void setCellColor(int x, int y, int color) {
         mCells[y][x].color = color;
     }
@@ -320,24 +350,6 @@ public class ColorFieldView extends View {
         return true;
     }*/
     
-    protected void init() {
-        
-        mPadding = new Rect(0, 0, 0, 0);
-        
-        this.setOnTouchListener(mOnTouchListener);
-        
-        Resources res = getResources();
-        mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-        mLinePaint.setColor(res.getColor(R.color.codel_field_line_color));
-        mLinePaint.setStrokeWidth(1);
-        mLinePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-
-        mCellPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mCellPaint.setStrokeWidth(1);
-        mCellPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-    }
-
     public void clearDrawables() {
         for (int y = 0; y < mCountY; y++) {
             for (int x = 0; x < mCountX; x++) {
@@ -371,7 +383,7 @@ public class ColorFieldView extends View {
                 try {
                     Cell cell = mCells[y][x];
                     cell.createBounds(mCellWidth, mCellHeight);
-                    cell.draw(canvas, mCellPaint);
+                    cell.draw(canvas, mCellPaint, mCellBoundsPaint);
                     
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -389,14 +401,15 @@ public class ColorFieldView extends View {
             return;
         }
 
-        mCellToRedraw.draw(canvas, mCellPaint);
+        mCellToRedraw.draw(canvas, mCellPaint, mCellBoundsPaint);
         canvas.save();
     }
-
+    
     @Override
     protected void onDraw(Canvas canvas) {
-        int width = getMeasuredWidth();
-        int height = getMeasuredHeight();
+        //Subtract stroke width for removing artifacts on canvas edge
+        int width = getMeasuredWidth() - mStrokeWidth;
+        int height = getMeasuredHeight() - mStrokeWidth;
         int totalPaddingLeft = mPadding.left * mCountX;
         int totalPaddingTop = mPadding.top * mCountY;
         int canvasWidth = canvas.getWidth();
@@ -414,7 +427,7 @@ public class ColorFieldView extends View {
             mCellToRedraw = null;
         }
         
-        drawGrid(canvas);
+        //drawGrid(canvas);
     }
 
     // //////////////////////////////////////////////////////////////////////
