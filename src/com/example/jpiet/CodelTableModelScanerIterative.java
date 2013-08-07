@@ -2,8 +2,9 @@
 package com.example.jpiet;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+
+///import com.sun.xml.internal.bind.v2.runtime.reflect.ListIterator;
 
 public class CodelTableModelScanerIterative implements CodelTableModelScaner {
     
@@ -317,10 +318,6 @@ public class CodelTableModelScanerIterative implements CodelTableModelScaner {
             int last = segment.getLastIndex();
             int first = segment.x;
             for(int i = first; i < last; ++i) {
-              //FIXME THIS IS WEIGHT
-                if(x == i && y == segment.y){
-                    continue;
-                }
                 mArea.add(i, segment.y);
             }
         }

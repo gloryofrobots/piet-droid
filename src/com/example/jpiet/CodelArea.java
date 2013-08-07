@@ -163,7 +163,7 @@ class CodelArea {
         }
         //FIXME
         color = codelColor;
-        size = 1;
+        size = 0;
     }
     
     public String toString() {

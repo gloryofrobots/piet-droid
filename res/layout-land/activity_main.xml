@@ -145,8 +145,8 @@
         colorField:countY="@integer/field_count_codels_y"
         colorField:defaultCellColor="@color/codel_field_default_color"
         colorField:normaliseForLowestEdge="true"
-        colorField:cellPadding="2"
-        colorField:strokeWidth="4"
+        colorField:cellPadding="@integer/codel_field_cell_padding"
+        colorField:strokeWidth="@integer/codel_field_stroke_width"
         colorField:lineColor="@color/black" /> 
 
 </LinearLayout>

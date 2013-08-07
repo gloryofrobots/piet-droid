@@ -12,7 +12,7 @@
     <dimen name="log_list_text_size">12sp</dimen>
     <dimen name="log_list_padding">6dp</dimen>
     
-    <dimen name="tab_text_size">4dp</dimen>
+    <dimen name="tab_text_size">4sp</dimen>
     
     <dimen name="main_screen_padding">10dp</dimen>
     

@@ -1,5 +1,7 @@
 package com.example.jpiet;
 
+import java.util.concurrent.Callable;
+
 public class CodelTableModelScanerRecursive implements CodelTableModelScaner{
     /*
      * Search neighbours of input codel with same color value in model
@@ -38,12 +40,12 @@ public class CodelTableModelScanerRecursive implements CodelTableModelScaner{
         CodelColor value = mModel.getValue(x, y);
 
         mArea.init(x, y, value);
+        
+        addNeighbour(x, y, checked);
         mArea.setDebugRestriction(width, height);
-        checked[y][x] = true;
-
         addNeighbours(x, y, checked);
     }
-
+    
     private void addNeighbour(int x, int y, boolean[][] checked) {
         if (mModel.isValid(x, y) == false) {
             return;
@@ -64,15 +66,15 @@ public class CodelTableModelScanerRecursive implements CodelTableModelScaner{
 
         addNeighbours(x, y, checked);
     }
-
+    
     private void addNeighbours(int x, int y, boolean[][] checked) {
         int left = x - 1;
         int top = y - 1;
         int bottom = y + 1;
         int right = x + 1;
-        addNeighbour(left, y, checked);
         addNeighbour(right, y, checked);
         addNeighbour(x, bottom, checked);
         addNeighbour(x, top, checked);
+        addNeighbour(left, y, checked);
     }
 }
