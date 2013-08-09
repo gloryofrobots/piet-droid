@@ -89,7 +89,7 @@ public class FragmentPaletteSimple extends SherlockFragment {
 
         public CurrentColorHighlightDrawable() {
             this.paint = new Paint();
-            paint.setColor(Color.BLACK);
+            paint.setColor(Color.LTGRAY);
             paint.setStrokeWidth(4);
             paint.setStyle(Style.STROKE);
         }
@@ -185,7 +185,7 @@ public class FragmentPaletteSimple extends SherlockFragment {
                 return true;
             }
         });
-        
+        /*
         //TODO black white cell highlight
         View blackCell = view.findViewById(R.id.black_palette);
         blackCell.setOnClickListener(new View.OnClickListener() {
@@ -204,7 +204,7 @@ public class FragmentPaletteSimple extends SherlockFragment {
                 chooseColor(Color.WHITE);
             }
         });
-
+        */
         String[] command_tags = resources.getStringArray(R.array.command_tags);
         String[] command_alias = resources
                 .getStringArray(R.array.command_alias);

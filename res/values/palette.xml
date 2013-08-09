@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <array name="colors">
+    <array name="palette_colors">
         <item>#FFC0C0</item> 
         <item>#FF0000</item> <!-- red       -->
         <item>#C00000</item> 
@@ -26,5 +26,8 @@
         <item>#FFC0FF</item>
         <item>#FF00FF</item><!-- magenta -->
         <item>#C000C0</item>
+        
+        <item>#FFFFFF</item>
+        <item>#000000</item>
     </array>
 </resources>

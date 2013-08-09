@@ -16,8 +16,11 @@
     
     <dimen name="main_screen_padding">10dp</dimen>
     
-    <dimen name="palette_width">60dp</dimen>
-    <dimen name="palette_height">120dp</dimen>
+    <dimen name="button_scroll_toggle_side">30dp</dimen>
+    
+    <dimen name="palette_slide_panel_width">35dp</dimen>
+    <dimen name="palette_width">30dp</dimen>
+    <dimen name="palette_height">540dp</dimen>
     <dimen name="palette_white_cell_side">28dp</dimen>
     <dimen name="palette_black_cell_side">30dp</dimen>
 </resources>

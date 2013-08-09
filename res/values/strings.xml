@@ -25,6 +25,8 @@
     <string name="content_description_toolbox_button_step">Step button</string>
     <string name="content_description_toolbox_button_pause">Pause button</string>
     <string name="content_description_toolbox_button_stop">Stop button</string>
+    <string name="content_description_button_scroll_toggle">Scroll toggle button</string>
+
     
     <string name="action_bitmap">Bitmap</string>
     <string name="action_new">New</string>

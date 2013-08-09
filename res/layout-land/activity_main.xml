@@ -16,7 +16,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical" >
-
+        
         <fragment
             android:id="@+id/fragment_control_toolbox"
             android:name="com.example.piet_droid.FragmentControlToolBox"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <array name="colors_horizontal">
+    <array name="palette_colors_horizontal">
         <item>#FFC0C0</item> <!-- red       -->
         <item>#FFFFC0</item>  <!-- yellow -->
         <item>#C0FFC0</item> <!-- green -->

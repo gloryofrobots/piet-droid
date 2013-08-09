@@ -11,5 +11,9 @@
         <attr name="strokeWidth" format="integer" />
         <attr name="normaliseForLowestEdge" format="boolean" />
     </declare-styleable>
-
+    
+    <declare-styleable name="ColorFieldViewEditBoard">
+        <attr name="preferedCellWidth" format="integer"/>
+        <attr name="preferedCellHeight" format="integer"/>
+    </declare-styleable>
 </resources>

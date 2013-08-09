@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
@@ -59,9 +60,23 @@ public class MainActivity extends SherlockFragmentActivity implements
         FragmentPaletteSimple.OnChooseColorListener,
         PietProvider {
     
-    
-    PietFileRunner.RunEventListener mRunListener = new PietFileRunner.RunEventListener(){
+    private class RunListener implements PietFileRunner.RunEventListener {
         private Codel mPreviousCodel;
+        private DrawableFilledCircle mCurrentCellDrawable;
+        private DrawableFilledCircle mPreviousCellDrawable;
+        
+        public void initDebugDrawables(Resources resources) {
+            mCurrentCellDrawable = new DrawableFilledCircle();
+            int currentDrawableColor = resources
+                    .getColor(R.color.debug_cell_highlight);
+            mCurrentCellDrawable.setColor(currentDrawableColor);
+
+            mPreviousCellDrawable = new DrawableFilledCircle();
+            int prevDrawableColor = resources
+                    .getColor(R.color.debug_previous_cell_highlight);
+            
+            mPreviousCellDrawable.setColor(prevDrawableColor);
+        }
         
         @Override
         public void onRunStart() {
@@ -115,61 +130,30 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     Piet mPiet;
 
-    ColorFieldView mColorField;
+    ColorFieldViewEditBoard mColorField;
     private int mActiveColor;
-    private DrawableFilledCircle mCurrentCellDrawable;
-    private DrawableFilledCircle mPreviousCellDrawable;
 
+    RunListener mRunListener;
     long mSleepBetweenStep;
 
     FragmentControlToolBox mFragmentControlToolBox;
-    // FragmentCommandHelper mCommandHelperFragment;
     FragmentStateInfo mFragmentStateInfo;
 
     FragmentCommandLog mFragmentCommandLog;
-
-    // FragmentPaletteSimple mFragmentPaletteSimple;
+    
+    boolean mOnScrollMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Resources resources = getResources();
         mSleepBetweenStep = 1L;
-
-        mCurrentCellDrawable = new DrawableFilledCircle();
-        int currentDrawableColor = resources
-                .getColor(R.color.debug_cell_highlight);
-        mCurrentCellDrawable.setColor(currentDrawableColor);
-
-        mPreviousCellDrawable = new DrawableFilledCircle();
-        int prevDrawableColor = resources
-                .getColor(R.color.debug_previous_cell_highlight);
-        mPreviousCellDrawable.setColor(prevDrawableColor);
-
         mActiveColor = 0;
-
-        mFragmentControlToolBox = (FragmentControlToolBox) getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_control_toolbox);
-
-        /*
-         * mCommandHelperFragment = (FragmentCommandHelper)
-         * getSupportFragmentManager()
-         * .findFragmentById(R.id.fragment_command_helper);
-         */
-
-        /*
-         * mFragmentPaletteSimple = (FragmentPaletteSimple)
-         * getSupportFragmentManager()
-         * .findFragmentById(R.id.fragment_palette_simple);
-         */
-
-        mFragmentStateInfo = (FragmentStateInfo) getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_state_info);
-
-        mFragmentCommandLog = (FragmentCommandLog) getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_command_log);
+        
+        Resources resources = getResources();
+        
+        initRunListener(resources);
+        initFragments();
 
         initPiet(resources);
         mCurrentFile = null;
@@ -178,23 +162,40 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (savedInstanceState != null) {
             initRestoredState(savedInstanceState);
         } else {
-            initDefaultState();
+            initDefaultState(resources);
         }
         
         initHelpersTabHost();
-        
+        initActionBar();
+        initScrollLock();
+    }
+    
+    private void initRunListener(Resources resources) {
+        mRunListener = new RunListener();
+        mRunListener.initDebugDrawables(resources);
+    }
+    
+    private void initActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setCustomView(R.layout.action_bar_custom);
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
                 | ActionBar.DISPLAY_SHOW_HOME);
         //EditText search = (EditText) actionBar.getCustomView().findViewById(R.id.searchfield);
-        
     }
 
-    private void initDefaultState() {
-        // TODO Auto-generated method stub
+    private void initFragments() {
+        mFragmentControlToolBox = (FragmentControlToolBox) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_control_toolbox);
 
-        Resources resources = getResources();
+        
+        mFragmentStateInfo = (FragmentStateInfo) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_state_info);
+
+        mFragmentCommandLog = (FragmentCommandLog) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_command_log);
+    }
+    
+    private void initDefaultState(Resources resources) {
         int countX = resources.getInteger(R.integer.field_count_codels_x);
         int countY = resources.getInteger(R.integer.field_count_codels_y);
 
@@ -202,7 +203,6 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void initRestoredState(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         initNewPietFile(savedInstanceState);
     }
 
@@ -218,8 +218,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void initColorField() {
-        mColorField = (ColorFieldView) findViewById(R.id.codelField);
-    
+        mColorField = (ColorFieldViewEditBoard) findViewById(R.id.codelField);
+        
         mColorField
                 .setOnCellClickListener(new ColorFieldView.CellClickListener() {
                     @Override
@@ -239,12 +239,46 @@ public class MainActivity extends SherlockFragmentActivity implements
                                             "Edit mode disabled until program executed.");
                             return false;
                         }
-    
+                        else if(mOnScrollMode == true) {
+                            return false;
+                        }
+                        
                         return true;
                     }
                 });
+        
+        
     }
-
+    
+    private void initScrollLock() {
+        final ImageButton buttonScroll =  (ImageButton) 
+                findViewById(R.id.button_scroll_toggle);
+        
+        //set to true because we swap it in manual click call
+        mOnScrollMode = true;
+        
+        buttonScroll.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                
+                mOnScrollMode = mOnScrollMode == false ? true : false;
+                setScrollMode();
+                buttonScroll.setSelected(!mOnScrollMode);
+                //buttonScroll.setEnabled(!mOnScrollMode);
+            }
+        });
+        //manual click call to disable swap scroll 
+        buttonScroll.callOnClick();
+    }
+    
+    private void setScrollMode() {
+        final ScrollViewLockable scrollVertical = (ScrollViewLockable) 
+                findViewById(R.id.scrollview_codelField_vertical);
+        final HorizontalScrollViewLockable scrollHorizontal = (HorizontalScrollViewLockable) 
+                findViewById(R.id.scrollview_codelField_horizontal);
+        scrollVertical.setScrollingEnabled(mOnScrollMode);
+        scrollHorizontal.setScrollingEnabled(mOnScrollMode);
+    }
+    
     private void initNewPietFile(int countX, int countY) {
         if (mCurrentFile != null) {
             mCurrentFile.finalise();
@@ -272,7 +306,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private void initHelpersTabHost() {
         Resources resources = getResources();
-
+        //final View tabsInclude = findViewById(R.id.tablayout);
         final TabHost tabs = (TabHost) findViewById(android.R.id.tabhost);
         
         HelperTabHost

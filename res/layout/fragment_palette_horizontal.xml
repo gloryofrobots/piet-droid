@@ -1,0 +1,41 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:colorField="http://schemas.android.com/apk/res/com.example.piet_droid"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    
+    >
+
+    <com.example.piet_droid.ColorFieldView
+        android:id="@+id/colorPalette"
+        android:layout_width="@dimen/palette_width"
+        android:layout_height="@dimen/palette_height"
+        colorField:countX="@integer/palette_count_codels_x"
+        colorField:countY="@integer/palette_count_codels_y"
+        colorField:defaultCellColor="@color/codel_field_default_color"
+        colorField:palette="@array/palette_colors_horizontal" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" 
+        android:layout_marginTop="@dimen/small_vertical_margin"
+        android:background="#000"
+        >
+
+        <View
+            android:id="@+id/white_palette"
+            android:layout_width="@dimen/palette_white_cell_side"
+            android:layout_height="@dimen/palette_white_cell_side"
+            android:background="@color/white"
+            android:layout_margin="1dp"
+            />
+        
+         <View
+            android:id="@+id/black_palette"
+            android:layout_width="@dimen/palette_black_cell_side"
+            android:layout_height="@dimen/palette_black_cell_side"
+            android:background="@color/black"
+             />
+    </LinearLayout>
+</LinearLayout>
