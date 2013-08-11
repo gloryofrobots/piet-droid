@@ -56,15 +56,14 @@ import com.example.jpiet.Piet;
 
 //TODO CONTEXT MENU
 public class MainActivity extends SherlockFragmentActivity implements
-        FragmentControlToolBox.InteractionListener,
-        FragmentPaletteSimple.OnChooseColorListener,
-        PietProvider {
-    
+        ControlToolboxView.InteractionListener,
+        FragmentPaletteSimple.OnChooseColorListener, PietProvider {
+
     private class RunListener implements PietFileRunner.RunEventListener {
         private Codel mPreviousCodel;
         private DrawableFilledCircle mCurrentCellDrawable;
         private DrawableFilledCircle mPreviousCellDrawable;
-        
+
         public void initDebugDrawables(Resources resources) {
             mCurrentCellDrawable = new DrawableFilledCircle();
             int currentDrawableColor = resources
@@ -74,13 +73,13 @@ public class MainActivity extends SherlockFragmentActivity implements
             mPreviousCellDrawable = new DrawableFilledCircle();
             int prevDrawableColor = resources
                     .getColor(R.color.debug_previous_cell_highlight);
-            
+
             mPreviousCellDrawable.setColor(prevDrawableColor);
         }
-        
+
         @Override
         public void onRunStart() {
-            
+
             mPreviousCodel = new Codel(0, 0);
             getPiet().init();
             mFragmentStateInfo.init();
@@ -114,16 +113,18 @@ public class MainActivity extends SherlockFragmentActivity implements
         public void onRunComplete() {
             getCurrentPietFile().getActor().setCellDrawable(mPreviousCodel.x,
                     mPreviousCodel.y, mPreviousCellDrawable);
-            if(mFragmentControlToolBox == null) {
+            if (mFragmentControlToolBox == null) {
                 int bdsm = 1;
-                int k = bdsm;;
+                int k = bdsm;
+                ;
             }
             mFragmentControlToolBox.setControlsToDefaultState();
         }
-        
+
     };
-    //////////////////////////////////////////////////////////////////////////
-    
+
+    // ////////////////////////////////////////////////////////////////////////
+
     private static final int REQUEST_SAVE = 0;
 
     private static final int REQUEST_OPEN = 1;
@@ -134,17 +135,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     Piet mPiet;
 
-    ColorFieldViewEditBoard mColorField;
+    ColorFieldView mColorField;
     private int mActiveColor;
 
     RunListener mRunListener;
     long mSleepBetweenStep;
 
-    FragmentControlToolBox mFragmentControlToolBox;
+    // FragmentControlToolBox mFragmentControlToolBox;
     FragmentStateInfo mFragmentStateInfo;
-
+    ControlToolboxView mFragmentControlToolBox;
     FragmentCommandLog mFragmentCommandLog;
-    
+
     boolean mOnScrollMode;
 
     @Override
@@ -153,9 +154,9 @@ public class MainActivity extends SherlockFragmentActivity implements
         setContentView(R.layout.activity_main);
         mSleepBetweenStep = 1L;
         mActiveColor = 0;
-        
+
         Resources resources = getResources();
-        
+
         initRunListener(resources);
         initFragments();
 
@@ -168,37 +169,45 @@ public class MainActivity extends SherlockFragmentActivity implements
         } else {
             initDefaultState(resources);
         }
-        
+
         initHelpersTabHost();
         initActionBar();
         initScrollLock();
     }
-    
+
     private void initRunListener(Resources resources) {
         mRunListener = new RunListener();
         mRunListener.initDebugDrawables(resources);
     }
-    
+
     private void initActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setCustomView(R.layout.action_bar_custom);
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
                 | ActionBar.DISPLAY_SHOW_HOME);
-        //EditText search = (EditText) actionBar.getCustomView().findViewById(R.id.searchfield);
+        mFragmentControlToolBox = (ControlToolboxView) actionBar
+                .getCustomView().findViewById(R.id.fragment_control_toolbox);
+        
+        mFragmentControlToolBox.setInteractionListener(this);
+        // EditText search = (EditText)
+        // actionBar.getCustomView().findViewById(R.id.searchfield);
     }
 
     private void initFragments() {
-        mFragmentControlToolBox = (FragmentControlToolBox) getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_control_toolbox);
 
-        
+        /*
+         * mFragmentControlToolBox = (FragmentControlToolBox)
+         * getSupportFragmentManager()
+         * .findFragmentById(R.id.fragment_control_toolbox);
+         */
+
         mFragmentStateInfo = (FragmentStateInfo) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_state_info);
 
         mFragmentCommandLog = (FragmentCommandLog) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_command_log);
     }
-    
+
     private void initDefaultState(Resources resources) {
         int countX = resources.getInteger(R.integer.field_count_codels_x);
         int countY = resources.getInteger(R.integer.field_count_codels_y);
@@ -222,8 +231,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void initColorField() {
-        mColorField = (ColorFieldViewEditBoard) findViewById(R.id.codelField);
-        
+        mColorField = (ColorFieldView) findViewById(R.id.codelField);
+
         mColorField
                 .setOnCellClickListener(new ColorFieldView.CellClickListener() {
                     @Override
@@ -233,7 +242,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                         actor.setCell(x, y, MainActivity.this.getActiveColor());
                         actor.redrawCell(x, y);
                     }
-    
+
                     @Override
                     public boolean isProcessClickWanted() {
                         if (MainActivity.this.isOnRunMode() == true) {
@@ -242,58 +251,53 @@ public class MainActivity extends SherlockFragmentActivity implements
                                     .showMessage(
                                             "Edit mode disabled until program executed.");
                             return false;
-                        }
-                        else if(mOnScrollMode == true) {
+                        } else if (mOnScrollMode == true) {
                             return false;
                         }
-                        
+
                         return true;
                     }
                 });
-        
-        
+
     }
-    
+
     private void initScrollLock() {
-        final ImageButton buttonScroll =  (ImageButton) 
-                findViewById(R.id.button_scroll_toggle);
-        
-        //set to true because we swap it in manual click call
+        final ImageButton buttonScroll = (ImageButton) findViewById(R.id.button_scroll_toggle);
+
+        // set to true because we swap it in manual click call
         mOnScrollMode = true;
-        
+
         buttonScroll.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                
+
                 mOnScrollMode = mOnScrollMode == false ? true : false;
                 setScrollMode();
                 buttonScroll.setSelected(!mOnScrollMode);
-                //buttonScroll.setEnabled(!mOnScrollMode);
+                // buttonScroll.setEnabled(!mOnScrollMode);
             }
         });
-        //manual click call to disable swap scroll 
+        // manual click call to disable swap scroll
         buttonScroll.callOnClick();
     }
-    
+
     private void setScrollMode() {
-        final ScrollViewLockable scrollVertical = (ScrollViewLockable) 
-                findViewById(R.id.scrollview_codelField_vertical);
-        final HorizontalScrollViewLockable scrollHorizontal = (HorizontalScrollViewLockable) 
-                findViewById(R.id.scrollview_codelField_horizontal);
+        final ScrollViewLockable scrollVertical = (ScrollViewLockable) findViewById(R.id.scrollview_codelField_vertical);
+        final HorizontalScrollViewLockable scrollHorizontal = (HorizontalScrollViewLockable) findViewById(R.id.scrollview_codelField_horizontal);
         scrollVertical.setScrollingEnabled(mOnScrollMode);
         scrollHorizontal.setScrollingEnabled(mOnScrollMode);
     }
-    
+
     private void initNewPietFile(int countX, int countY) {
         if (mCurrentFile != null) {
             mCurrentFile.finalise();
         }
-        
+
         mCurrentFile = new PietFile(mColorField, mPiet, this);
-        
+
         PietFileActor actor = mCurrentFile.getActor();
         actor.resize(countX, countY);
         actor.invalidateView();
-        
+
         mCurrentFile.getRunner().addExecutionListener(mRunListener);
     }
 
@@ -302,7 +306,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             mCurrentFile.finalise();
         }
         mCurrentFile = new PietFile(mColorField, mPiet, this);
-        
+
         PietFileActor actor = mCurrentFile.getActor();
         actor.restoreFromSavedState(savedInstanceState);
         mCurrentFile.getRunner().addExecutionListener(mRunListener);
@@ -310,16 +314,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private void initHelpersTabHost() {
         Resources resources = getResources();
-        //final View tabsInclude = findViewById(R.id.tablayout);
+        // final View tabsInclude = findViewById(R.id.tablayout);
         final TabHost tabs = (TabHost) findViewById(android.R.id.tabhost);
-        
+
         HelperTabHost
                 .create(tabs)
                 .setActiveTabColor(Color.parseColor("#9a0000"))
                 .setPassiveTabColor(Color.parseColor("#555555"))
                 .setTabHeight(50)
                 .setTextColor(Color.parseColor("#ffffff"))
-                .setTextSize(resources.getDimensionPixelSize(R.dimen.tab_text_size))
+                .setTextSize(
+                        resources.getDimensionPixelSize(R.dimen.tab_text_size))
                 .addTab(R.id.tabInput, "input",
                         resources.getString(R.string.tab_in))
                 .addTab(R.id.tabOutput, "output",
@@ -363,8 +368,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         // mCommandHelperFragment.invalidate();
     }
 
-   
-
     // Called to save UI state changes at the
     // end of the active lifecycle.
     @Override
@@ -378,7 +381,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (hasPietFile() == false) {
             return;
         }
-        
+
         getCurrentPietFile().getActor().saveInstanceState(savedInstanceState);
     }
 
@@ -441,39 +444,39 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         switch (item.getItemId()) {
         case (R.id.action_load):
-            doActionIfUserDontWantToSaveChanges(new Callable<Void>(){
+            doActionIfUserDontWantToSaveChanges(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
                     onActionLoad();
                     return null;
                 }
-                
+
             });
-        
+
             return true;
-        
+
         case (R.id.action_clear):
-            doActionIfUserDontWantToSaveChanges(new Callable<Void>(){
+            doActionIfUserDontWantToSaveChanges(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
                     onActionClear();
                     return null;
                 }
-                
+
             });
             return true;
-            
+
         case (R.id.action_new):
-            doActionIfUserDontWantToSaveChanges(new Callable<Void>(){
+            doActionIfUserDontWantToSaveChanges(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
                     onActionNew();
                     return null;
                 }
-                
+
             });
             return true;
-        
+
         case (R.id.action_quit):
             return true;
         case (R.id.action_save): {
@@ -492,18 +495,18 @@ public class MainActivity extends SherlockFragmentActivity implements
             return false;
         }
     }
-    
-    public void doActionIfUserDontWantToSaveChanges(final Callable<Void> callable ) {
-        if(mCurrentFile.isTouched() == false) {
+
+    public void doActionIfUserDontWantToSaveChanges(
+            final Callable<Void> callable) {
+        if (mCurrentFile.isTouched() == false) {
             try {
                 callable.call();
             } catch (Exception e) {
                 Log.e("", e.toString());
             }
-        }
-        else{
+        } else {
             DialogFragmentSaveChanges dialog = new DialogFragmentSaveChanges();
-            
+
             dialog.setOnAcceptListener(new DialogFragmentSaveChanges.OnAcceptListener() {
                 @Override
                 public void onAccept() {
@@ -512,15 +515,15 @@ public class MainActivity extends SherlockFragmentActivity implements
                     } catch (Exception e) {
                         Log.e("", e.toString());
                     }
-                    
+
                 }
             });
-            
+
             dialog.show(getSupportFragmentManager(),
                     "DialogFragmentSaveChanges");
         }
     }
-    
+
     private void onActionNew() {
         // TODO DIALOG WITH width height!!
         DialogFragmentNewFileSettings dialog = new DialogFragmentNewFileSettings();
@@ -529,7 +532,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             int height = getCurrentPietFile().getHeight();
             dialog.setBitmapDimensions(width, height);
         }
-        
+
         dialog.setListener(new DialogFragmentNewFileSettings.Listener() {
 
             @Override
@@ -544,7 +547,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 if (width == 0 || height == 0) {
                     return false;
                 }
-                
+
                 initNewPietFile(width, height);
                 return true;
             }
@@ -635,11 +638,11 @@ public class MainActivity extends SherlockFragmentActivity implements
     public synchronized void onActivityResult(final int requestCode,
             int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        
+
         if (requestCode != SHOW_PREFERENCES) {
             return;
         }
-        
+
         updateFromPreferences();
     }
 
@@ -650,11 +653,11 @@ public class MainActivity extends SherlockFragmentActivity implements
                 .getDefaultSharedPreferences(context);
         mSleepBetweenStep = Long.valueOf(preferences.getString(
                 "delay_before_step", "0"));
-        
+
         if (isOnRunMode() == false) {
-           return;
+            return;
         }
-        
+
         getCurrentPietFile().getRunner().setStepDelay(mSleepBetweenStep);
     }
 
@@ -679,7 +682,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         mActiveColor = color;
         // mCommandHelperFragment.setColor(color);
     }
-    
+
     @Override
     public void onInteractionRun() {
         getCurrentPietFile().getRunner().run(mSleepBetweenStep);
@@ -708,7 +711,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (isOnRunMode() == false) {
             return;
         }
-        
+
         showFileMenu();
         getCurrentPietFile().getRunner().stop();
     }

@@ -1,7 +1,0 @@
-<resources>
-    <integer name="field_count_codels_x">10</integer>
-    <integer name="field_count_codels_y">10</integer>
-    
-    <integer name="palette_count_codels_x">3</integer>
-    <integer name="palette_count_codels_y">6</integer>
-</resources>

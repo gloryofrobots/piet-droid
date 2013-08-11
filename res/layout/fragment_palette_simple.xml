@@ -1,6 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:colorField="http://schemas.android.com/apk/res/com.example.piet_droid"
-    xmlns:colorFieldEditBoard="http://schemas.android.com/apk/res/com.example.piet_droid"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -16,16 +15,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <com.example.piet_droid.ColorFieldViewEditBoard
+            <com.example.piet_droid.ColorFieldView
                 android:id="@+id/colorPalette"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
                 colorField:countX="@integer/palette_count_codels_x"
                 colorField:countY="@integer/palette_count_codels_y"
                 colorField:defaultCellColor="@color/codel_field_default_color"
                 colorField:palette="@array/palette_colors" 
-                colorFieldEditBoard:preferedCellWidth="@dimen/palette_cell_side"
-                colorFieldEditBoard:preferedCellHeight="@dimen/palette_cell_side" />
+                colorField:cellWidth="@dimen/palette_cell_side"
+                colorField:cellHeight="@dimen/palette_cell_side" />
 
          
         </LinearLayout>

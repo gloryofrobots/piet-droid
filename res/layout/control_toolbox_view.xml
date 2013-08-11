@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <ImageButton
+        android:id="@+id/button_run"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:contentDescription="@string/content_description_toolbox_button_run"
+        android:padding="@dimen/control_toolbox_padding"
+        android:src="@drawable/toolbox_button_run" />
+
+    <ImageButton
+        android:id="@+id/button_step"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/medium_horizontal_margin"
+        android:background="@null"
+        android:contentDescription="@string/content_description_toolbox_button_step"
+        android:padding="@dimen/control_toolbox_padding"
+        android:src="@drawable/toolbox_button_step" />
+
+    <ImageButton
+        android:id="@+id/button_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/medium_horizontal_margin"
+        android:background="@null"
+        android:contentDescription="@string/content_description_toolbox_button_pause"
+        android:padding="@dimen/control_toolbox_padding"
+        android:src="@drawable/toolbox_button_pause" />
+
+    <ImageButton
+        android:id="@+id/button_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/medium_horizontal_margin"
+        android:background="@null"
+        android:contentDescription="@string/content_description_toolbox_button_stop"
+        android:padding="@dimen/control_toolbox_padding"
+        android:src="@drawable/toolbox_button_stop" />
+
+</merge>

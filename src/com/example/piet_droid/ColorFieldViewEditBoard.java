@@ -32,9 +32,7 @@ public class ColorFieldViewEditBoard extends ColorFieldView {
         mPreferredCellHeight = a.getDimensionPixelSize(
                 R.styleable.ColorFieldViewEditBoard_preferedCellWidth, 1);
 
-        mAlignCellsToCenter = a.getBoolean(
-                R.styleable.ColorFieldViewEditBoard_alignCellsToCenter, true);
-
+       
         a.recycle();
         // this.setLayoutParams(new LinearLayout.LayoutParams(1000, 1000));
     }
@@ -45,29 +43,8 @@ public class ColorFieldViewEditBoard extends ColorFieldView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        if(mFitOnViewPort == true) {
-//            Rect margin = getCellMargin();
-//            int w = getMeasuredWidth();
-//            int h = getMeasuredHeight();
-//            setMeasuredDimension(w, h);
-//            return;
-//        }
-        
-        int measuredWidth = measureWidth(widthMeasureSpec);
-        int measuredHeight = measureHeight(heightMeasureSpec);
-
-        if (measuredHeight == 0 && measuredWidth == 0) {
-            setMeasuredDimension(0, 0);
-            return;
-        } else if (measuredHeight != 0 && measuredWidth != 0) {
-            mFitOnViewPort = true;
-            int bdsm = 1;
-            int l = bdsm;
-        }
-        
-        
         ViewGroup.MarginLayoutParams vlp = (ViewGroup.MarginLayoutParams) getLayoutParams();
-        //resetNewCellMargin();
+
         int marginLeft = getCellMarginLeft();
         int marginTop = getCellMarginTop();
         
@@ -82,34 +59,6 @@ public class ColorFieldViewEditBoard extends ColorFieldView {
                         + vlp.bottomMargin + vlp.topMargin + (marginTop * 2));
 
         setMeasuredDimension(minMeasureWidth, minMeasureHeight);
-        
-//        if (getAlignCellsToCenter() == true) {
-//            if (minMeasureWidth < measuredWidth) {
-//                int delta = measuredWidth - minMeasureWidth;
-//                marginLeft = delta / 2;
-//            } else {
-//                measuredWidth = minMeasureWidth;
-//            }
-//            if (minMeasureHeight < measuredHeight) {
-//                int delta = measuredHeight - minMeasureHeight;
-//                marginTop = delta / 2;
-//            } else {
-//                measuredHeight = minMeasureHeight;
-//            }
-//
-//        } else {
-//            measuredWidth = minMeasureWidth;
-//            measuredHeight = minMeasureHeight;
-//        }
-//        setCellMarginLeft(marginLeft);
-//        setCellMarginTop(marginTop);
-//        
-//        if(getCellCountX() == 2 && getCellCountY() == 2) {
-//            int bdsm = 1;
-//            int l = bdsm;
-//        }
-//        
-//        setMeasuredDimension(measuredWidth, measuredHeight);
     }
 
     protected void makeCellDimensions() {

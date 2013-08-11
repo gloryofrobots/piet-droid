@@ -168,8 +168,6 @@ public class ColorFieldView extends View {
     };
 
     private final int UNKNOWN_MEASURE = -1;
-    private final int DEFAULT_WIDTH = 100;
-    private final int DEFAULT_HEIGHT = 100;
 
     private Paint mLinePaint;
     private Paint mCellPaint;
@@ -194,7 +192,7 @@ public class ColorFieldView extends View {
 
     private boolean mForceDraw;
     private Cell mCellToRedraw;
-
+    protected final int CELL_SIDE_DEFAULT = 10;
     /**
      * @param mOnCellClickListener
      *            the CellClickListener to set
@@ -238,7 +236,12 @@ public class ColorFieldView extends View {
 
         mCellCountX = a.getInt(R.styleable.ColorFieldView_countX, 0);
         mCellCountY = a.getInt(R.styleable.ColorFieldView_countY, 0);
-
+        
+        mCellWidth = a.getDimensionPixelSize(
+                R.styleable.ColorFieldView_cellWidth, CELL_SIDE_DEFAULT);
+        mCellHeight = a.getDimensionPixelSize(
+                R.styleable.ColorFieldView_cellHeight, CELL_SIDE_DEFAULT);
+        
         mLineColor = a.getColor(R.styleable.ColorFieldView_lineColor,
                 Color.BLACK);
 
@@ -489,19 +492,19 @@ public class ColorFieldView extends View {
         return mCellPadding.top * mCellCountY;
     }
 
-    protected int makeTotalCellWidth() {
-        // Subtract stroke width for removing artifacts on canvas edge
-        int width = getMeasuredWidth() - mStrokeWidth;
-        int totalCellwidth = width - getTotalPaddingLeft();
-        return totalCellwidth;
-    }
-
-    protected int makeTotalCellHeight() {
-        // Subtract stroke width for removing artifacts on canvas edge
-        int height = getMeasuredHeight() - mStrokeWidth;
-        int totalCellHeight = height - getTotalPaddingTop();
-        return totalCellHeight;
-    }
+//    protected int makeTotalCellWidth() {
+//        // Subtract stroke width for removing artifacts on canvas edge
+//        int width = getMeasuredWidth() - mStrokeWidth;
+//        int totalCellwidth = width - getTotalPaddingLeft();
+//        return totalCellwidth;
+//    }
+//
+//    protected int makeTotalCellHeight() {
+//        // Subtract stroke width for removing artifacts on canvas edge
+//        int height = getMeasuredHeight() - mStrokeWidth;
+//        int totalCellHeight = height - getTotalPaddingTop();
+//        return totalCellHeight;
+//    }
 
     protected int makeMinimalCanvasWidth() {
         ViewGroup.MarginLayoutParams vlp = (ViewGroup.MarginLayoutParams) getLayoutParams();
@@ -526,16 +529,16 @@ public class ColorFieldView extends View {
         return minMeasureHeight;
     }
 
-    protected void makeCellDimensions() {
-        mCellWidth = Math.round(makeTotalCellWidth() / mCellCountX);
-        mCellHeight = Math.round(makeTotalCellHeight() / mCellCountY);
-
-        if (mNormaliseForLowestEdge == true) {
-            int lowestSide = Math.min(mCellWidth, mCellHeight);
-            mCellWidth = lowestSide;
-            mCellHeight = lowestSide;
-        }
-    }
+//    protected void makeCellDimensions() {
+//        mCellWidth = Math.round(makeTotalCellWidth() / mCellCountX);
+//        mCellHeight = Math.round(makeTotalCellHeight() / mCellCountY);
+//
+//        if (mNormaliseForLowestEdge == true) {
+//            int lowestSide = Math.min(mCellWidth, mCellHeight);
+//            mCellWidth = lowestSide;
+//            mCellHeight = lowestSide;
+//        }
+//    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -546,7 +549,7 @@ public class ColorFieldView extends View {
          * paint.setColor(Color.LTGRAY); canvas.drawRect(0, 0,
          * canvas.getWidth(), canvas.getHeight(), paint); canvas.save();
          */
-        makeCellDimensions();
+        //makeCellDimensions();
 
         if (mCellToRedraw == null) {
             drawFull(canvas);
@@ -584,54 +587,51 @@ public class ColorFieldView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int measuredWidth = measureWidth(widthMeasureSpec);
+        /*int measuredWidth = measureWidth(widthMeasureSpec);
         int measuredHeight = measureHeight(heightMeasureSpec);
-        /*
-         * if(mNormaliseForLowestEdge) { int minSide = Math.min(measuredWidth,
-         * measuredHeight); measuredWidth = minSide; measuredHeight = minSide; }
-         */
-
-        setMeasuredDimension(measuredWidth, measuredHeight);
+        
+        setMeasuredDimension(measuredWidth, measuredHeight);*/
+        setMeasuredDimension(makeMinimalCanvasWidth(), makeMinimalCanvasHeight());
     }
 
-    protected int measureHeight(int measureSpec) {
-        int result = getSpecifiedMeasure(measureSpec);
-        if (result == UNKNOWN_MEASURE) {
-            result = 0;
-        }
-        return result;
-    }
-
-    protected int measureWidth(int measureSpec) {
-        int result = getSpecifiedMeasure(measureSpec);
-        if (result == UNKNOWN_MEASURE) {
-            result = 0;
-        }
-        return result;
-    }
-
-    protected int getSpecifiedMeasure(int measureSpec) {
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
-
-        // Default size if no limits are specified.
-        int result;
-
-        if (specMode == MeasureSpec.AT_MOST) {
-            // Calculate the ideal size of your
-            // control within this maximum size.
-            // If your control fills the available
-            // space return the outer bound.
-            result = specSize;
-        } else if (specMode == MeasureSpec.EXACTLY) {
-            // If your control can fit within these bounds return that value.
-            result = specSize;
-        } else {
-            result = UNKNOWN_MEASURE;
-        }
-
-        return result;
-    }
+//    protected int measureHeight(int measureSpec) {
+//        int result = getSpecifiedMeasure(measureSpec);
+//        if (result == UNKNOWN_MEASURE) {
+//            result = 0;
+//        }
+//        return result;
+//    }
+//
+//    protected int measureWidth(int measureSpec) {
+//        int result = getSpecifiedMeasure(measureSpec);
+//        if (result == UNKNOWN_MEASURE) {
+//            result = 0;
+//        }
+//        return result;
+//    }
+//
+//    protected int getSpecifiedMeasure(int measureSpec) {
+//        int specMode = MeasureSpec.getMode(measureSpec);
+//        int specSize = MeasureSpec.getSize(measureSpec);
+//
+//        // Default size if no limits are specified.
+//        int result;
+//
+//        if (specMode == MeasureSpec.AT_MOST) {
+//            // Calculate the ideal size of your
+//            // control within this maximum size.
+//            // If your control fills the available
+//            // space return the outer bound.
+//            result = specSize;
+//        } else if (specMode == MeasureSpec.EXACTLY) {
+//            // If your control can fit within these bounds return that value.
+//            result = specSize;
+//        } else {
+//            result = UNKNOWN_MEASURE;
+//        }
+//
+//        return result;
+//    }
 
     public void clearAll() {
         createCells();

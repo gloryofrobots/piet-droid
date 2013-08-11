@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:colorField="http://schemas.android.com/apk/res/com.example.piet_droid"
-    xmlns:colorFieldEditBoard="http://schemas.android.com/apk/res/com.example.piet_droid"
+    
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:orientation="vertical"
+        android:gravity="right"
 		 >
 
         <ImageButton
@@ -21,13 +22,14 @@
             android:layout_height="@dimen/button_scroll_toggle_side"
             android:contentDescription="@string/content_description_button_scroll_toggle"
 			android:src="@drawable/button_scroll_toggle"
-			android:layout_gravity="top|center"/>
+			/>
 
         <fragment
             android:id="@+id/fragment_palette_simple"
             android:name="com.example.piet_droid.FragmentPaletteSimple"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+	    />
     </LinearLayout>
 
     <LinearLayout
@@ -39,7 +41,7 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:weightSum="4" 
-        android:background="@color/tool_background" >
+        android:background="@color/editboard_background" >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -70,7 +72,7 @@
                            
                         android:orientation="vertical" >
 
-						<com.example.piet_droid.ColorFieldViewEditBoard
+						<com.example.piet_droid.ColorFieldView
 							 android:layout_gravity="center"
                             android:id="@+id/codelField"
                             android:layout_width="1dp"
@@ -80,8 +82,8 @@
                             colorField:countY="@integer/field_count_codels_y"
                             colorField:defaultCellColor="@color/codel_field_default_color"
                             colorField:normaliseForLowestEdge="true"
-                            colorFieldEditBoard:preferedCellHeight="30dp"
-                            colorFieldEditBoard:preferedCellWidth="30dp" />
+                            colorField:cellHeight="30dp"
+                            colorField:cellWidth="30dp" />
                     </LinearLayout>
                 </com.example.piet_droid.HorizontalScrollViewLockable>
             </com.example.piet_droid.ScrollViewLockable>
