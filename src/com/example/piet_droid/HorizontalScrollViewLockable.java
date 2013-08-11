@@ -9,20 +9,17 @@ public class HorizontalScrollViewLockable extends HorizontalScrollView {
 
     public HorizontalScrollViewLockable(Context context) {
         super(context);
-        // TODO Auto-generated constructor stub
     }
 
     public HorizontalScrollViewLockable(Context context, AttributeSet attrs) {
         super(context, attrs);
-        // TODO Auto-generated constructor stub
     }
 
     public HorizontalScrollViewLockable(Context context, AttributeSet attrs,
             int defStyle) {
         super(context, attrs, defStyle);
-        // TODO Auto-generated constructor stub
     }
- // true if we can scroll (not locked)
+    // true if we can scroll (not locked)
     // false if we cannot scroll (locked)
     private boolean mScrollable = true;
 
@@ -33,7 +30,7 @@ public class HorizontalScrollViewLockable extends HorizontalScrollView {
     public boolean isScrollable() {
         return mScrollable;
     }
-
+    
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         if(mScrollable == false) {
@@ -50,8 +47,5 @@ public class HorizontalScrollViewLockable extends HorizontalScrollView {
         }
         
         return super.onInterceptTouchEvent(ev);
-        //return super.onInterceptTouchEvent(ev);
-//        if (!mScrollable) return false;
-//        else return super.onInterceptTouchEvent(ev);
     }
 }

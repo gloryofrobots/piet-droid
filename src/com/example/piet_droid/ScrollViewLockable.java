@@ -9,17 +9,14 @@ public class ScrollViewLockable extends ScrollView {
 
     public ScrollViewLockable(Context context) {
         super(context);
-        // TODO Auto-generated constructor stub
     }
 
     public ScrollViewLockable(Context context, AttributeSet attrs) {
         super(context, attrs);
-        // TODO Auto-generated constructor stub
     }
 
     public ScrollViewLockable(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        // TODO Auto-generated constructor stub
     }
     
     // true if we can scroll (not locked)
@@ -50,15 +47,5 @@ public class ScrollViewLockable extends ScrollView {
         }
         
         return super.onInterceptTouchEvent(ev);
-        /*int action = ev.getAction();
-        if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP) {
-            return super.onInterceptTouchEvent(ev);
-        }*/
-        
-        //return false;
-        
-        /*if (!mScrollable) return false;
-        else return super.onInterceptTouchEvent(ev);*/
     }
-
 }

@@ -220,6 +220,7 @@ public class PietFileActor {
     public void resize(int countX, int countY) {
         // TODO Auto-generated method stub
         mView.resize(countX, countY);
+        
         mPiet.createModel(countX, countY);
         mPietFile.untouch();
     }

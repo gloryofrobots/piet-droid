@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:id="@+id/list_view_log"
         android:padding="@dimen/medium_vertical_margin"
-        android:background="@drawable/border_rounded_corners"/>
+        android:background="@drawable/border"/>
     
     <!--  <TextView
         android:id="@+id/text_view_log"

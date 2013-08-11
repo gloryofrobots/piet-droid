@@ -7,13 +7,15 @@
         <attr name="palette" format="reference" />
         <attr name="countX" format="integer" />
         <attr name="countY" format="integer" />
-        <attr name="cellPadding" format="integer" />
+        <attr name="cellPadding" format="dimension" />
         <attr name="strokeWidth" format="integer" />
         <attr name="normaliseForLowestEdge" format="boolean" />
+        <attr name="cellMargin" format="dimension" />
     </declare-styleable>
     
     <declare-styleable name="ColorFieldViewEditBoard">
-        <attr name="preferedCellWidth" format="integer"/>
-        <attr name="preferedCellHeight" format="integer"/>
+        <attr name="preferedCellWidth" format="dimension"/>
+        <attr name="preferedCellHeight" format="dimension"/>
+        <attr name="alignCellsToCenter" format="boolean"/>
     </declare-styleable>
 </resources>

@@ -1,9 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:colorField="http://schemas.android.com/apk/res/com.example.piet_droid"
+    xmlns:colorFieldEditBoard="http://schemas.android.com/apk/res/com.example.piet_droid"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
-
+    android:orientation="vertical"
+     >
+<!-- android:background="#9c0303" -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,14 +16,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <com.example.piet_droid.ColorFieldView
+            <com.example.piet_droid.ColorFieldViewEditBoard
                 android:id="@+id/colorPalette"
-                android:layout_width="@dimen/palette_width"
-                android:layout_height="@dimen/palette_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 colorField:countX="@integer/palette_count_codels_x"
                 colorField:countY="@integer/palette_count_codels_y"
                 colorField:defaultCellColor="@color/codel_field_default_color"
-                colorField:palette="@array/palette_colors" />
+                colorField:palette="@array/palette_colors" 
+                colorFieldEditBoard:preferedCellWidth="@dimen/palette_cell_side"
+                colorFieldEditBoard:preferedCellHeight="@dimen/palette_cell_side" />
 
          
         </LinearLayout>

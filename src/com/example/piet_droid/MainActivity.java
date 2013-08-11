@@ -114,6 +114,10 @@ public class MainActivity extends SherlockFragmentActivity implements
         public void onRunComplete() {
             getCurrentPietFile().getActor().setCellDrawable(mPreviousCodel.x,
                     mPreviousCodel.y, mPreviousCellDrawable);
+            if(mFragmentControlToolBox == null) {
+                int bdsm = 1;
+                int k = bdsm;;
+            }
             mFragmentControlToolBox.setControlsToDefaultState();
         }
         
