@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-      <fragment  xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/fragment_abtest"
-            android:name="com.example.piet_droid.FragmentABTest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
--->
-<!-- <fragment -->
-<!-- xmlns:android="http://schemas.android.com/apk/res/android" -->
-<!-- android:id="@+id/fragment_control_toolbox" -->
-<!-- android:name="com.example.piet_droid.FragmentControlToolBox" -->
-<!-- android:layout_width="wrap_content" -->
-<!-- android:layout_height="wrap_content" -->
-<!-- android:layout_marginTop="2dp" /> -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
-<com.example.piet_droid.widget.ControlToolboxView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_control_toolbox"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dp" />
+    <com.example.piet_droid.widget.ControlToolboxView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fragment_control_toolbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+         />
+
+    <ImageButton
+        android:id="@+id/button_scroll_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@null"
+        android:contentDescription="@string/content_description_button_scroll_toggle"
+        android:paddingTop="@dimen/control_toolbox_padding"
+        android:layout_marginRight="@dimen/small_horizontal_margin"
+        android:src="@drawable/button_scroll_toggle" />
+
+</RelativeLayout>

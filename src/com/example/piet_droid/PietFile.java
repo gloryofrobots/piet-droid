@@ -1,5 +1,6 @@
 package com.example.piet_droid;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 
@@ -11,21 +12,21 @@ public class PietFile {
     private String mPath;
     private PietFileActor mActor;
     private PietFileRunner mRunner;
-    private Context mContext;
+    private Activity mActivity;
     private ColorFieldView mView;
     boolean mTouched;
     Piet mPiet;
     
-    public PietFile(ColorFieldView view, Piet piet, Context context) {
-        mContext = context;
+    public PietFile(ColorFieldView view, Piet piet, Activity activity) {
+        mActivity = activity;
         mView = view;
         mPiet = piet;
         mActor = new PietFileActor(this);
         mRunner = new PietFileRunner(this);
     }
     
-    public Context getContext() {
-        return mContext;
+    public Activity getActivity() {
+        return mActivity;
     }
     
     public ColorFieldView getView() {

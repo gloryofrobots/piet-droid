@@ -58,6 +58,7 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
     @Override
     protected void onCancelled() {
         mListener.onSaveBitmapCancel();
+        mProgressDialog.dismiss();
     }
     
     

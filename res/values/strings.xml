@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Piet-Droid</string>
-    <string name="action_settings">Settings</string>
-    <string name="main_button_load">Load</string>
     
-    <string name="load_bitmap_process_dialog_title">Loading image file</string>
-    <string name="load_bitmap_process_dialog_message">Please wait...</string>
-    
-    <string name="save_bitmap_process_dialog_title">Saving bitmap</string>
-    <string name="save_bitmap_process_dialog_message">Please wait...</string>
-    
-    <string name="edittext_new_file_width_hint">Width</string>
-    <string name="edittext_new_file_height_hint">Height</string>
-    
+    <string name="app_name">Piet Droid</string>
+
     <string name="button_text_ok">OK</string>
     <string name="button_text_cancel">Cancel</string>
-    
+
+    <!-- CONTROL -->
     <string name="content_description_toolbox_button_run">Run button</string>
     <string name="content_description_toolbox_button_step">Step button</string>
     <string name="content_description_toolbox_button_pause">Pause button</string>
     <string name="content_description_toolbox_button_stop">Stop button</string>
     <string name="content_description_button_scroll_toggle">Scroll toggle button</string>
 
-    
+    <!-- ACTIONS -->
     <string name="action_bitmap">Bitmap</string>
     <string name="action_new">New</string>
     <string name="action_save">Save</string>
@@ -31,11 +22,10 @@
     <string name="action_clear">Clear</string>
     <string name="action_quit">Quit</string>
     <string name="action_clear_log">Clear Log</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_hide_tabhost">Show info widget</string>
     
-    <string name="out_buffer_title">Program output</string>
-    <string name="in_buffer_hint">Values must be separated by space</string>
-    <string name="state_info_title">Program state</string>
-    
+    <!-- PREFERENCES -->
     <string name="delay_before_step_title">Step delay</string>
     <string name="delay_before_step_summary">Delay in ms between each step of program interpretation</string>
     <string name="delay_before_step_dialog_title">Step delay</string>
@@ -45,18 +35,31 @@
     <string name="new_field_color_title">New picture default color</string>
     <string name="image_write_format_summary">Supported image output formats</string>
     <string name="image_write_format_title">Save image formats</string>
-    
     <string name="cell_padding_title">Codel padding</string>
-    <string name="cell_padding_summary">Left and top padding between codels in edited bitmap</string>
+    <string name="cell_padding_summary">Padding between codels in pixels</string>
+    <string name="cell_size_title">Codel size</string>
+    <string name="cell_size_summary">Side size of each codel in pixels</string>
+    <string name="preferences_header_summary">Piet Droid preferences</string>
+    <string name="preferences_header_title">Piet Droid preferences</string>
     
-    <string name="preferences_header_summary">PietDroid preferences</string>
-    <string name="preferences_header_title">PietDroid preferences</string>
+    <string name="edittext_new_file_width_hint">Width</string>
+    <string name="edittext_new_file_height_hint">Height</string>
     
+    <!-- TABHOST -->
     <string name="tab_in">Input</string>
     <string name="tab_out">Output</string>
     <string name="tab_state">State</string>
     <string name="tab_log">Log</string>
-    
+    <string name="out_buffer_title">Program output</string>
+    <string name="in_buffer_hint">Values must be separated by space</string>
+    <string name="state_info_title">Program state</string>
+
+    <!-- DIALOGS -->
     <string name="dialog_title_save_changes">All changes will be lost. Are you sure?</string>
     <string name="dialog_title_file_settings">Bitmap dimensions.</string>
+    <string name="load_bitmap_process_dialog_title">Loading image file</string>
+    <string name="load_bitmap_process_dialog_message">Please wait...</string>
+    <string name="save_bitmap_process_dialog_title">Saving bitmap</string>
+    <string name="save_bitmap_process_dialog_message">Please wait...</string>
+
 </resources>

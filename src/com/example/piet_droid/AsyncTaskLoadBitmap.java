@@ -44,6 +44,7 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
     @Override
     protected void  onCancelled(){
         mListener.onLoadBitmapCancel();
+        mProgressDialog.dismiss();
     }
     
     @Override

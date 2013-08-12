@@ -1,67 +1,68 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    
+
     <item
         android:id="@+id/action_bitmap"
+        android:icon="@drawable/rw_action_bitmap"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/rw_action_bitmap"
         android:title="@string/action_bitmap">
-        
         <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-        <item
-            android:id="@+id/action_new"
-            android:orderInCategory="100"
-            android:showAsAction="ifRoom"
-            android:icon="@drawable/rw_action_new"
-            android:title="@string/action_new"/>
-        
-        <item
-            android:id="@+id/action_load"
-            android:orderInCategory="100"
-            android:showAsAction="ifRoom"
-            android:icon="@drawable/rw_action_load"
-            android:title="@string/action_load"/>
-        
-         <item
-            android:id="@+id/action_save"
-            android:orderInCategory="100"
-            android:showAsAction="ifRoom"
-            android:icon="@drawable/rw_action_save"
-            android:title="@string/action_save"/>
-         
-         <item
-            android:id="@+id/action_save_as"
-            android:orderInCategory="100"
-            android:showAsAction="ifRoom"
-            android:icon="@drawable/rw_action_save"
-            android:title="@string/action_save_as"/>
-         
-         <item
-            android:id="@+id/action_clear"
-            android:orderInCategory="100"
-            android:showAsAction="ifRoom"
-            android:icon="@drawable/rw_action_clear"
-            android:title="@string/action_clear"/>
-         
-         <item
-            android:id="@+id/action_quit"
-            android:orderInCategory="100"
-            android:showAsAction="ifRoom"
-            android:icon="@drawable/rw_action_quit"
-            android:title="@string/action_quit"/>
+            <item
+                android:id="@+id/action_new"
+                android:icon="@drawable/rw_action_new"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/action_new"/>
+            <item
+                android:id="@+id/action_load"
+                android:icon="@drawable/rw_action_load"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/action_load"/>
+            <item
+                android:id="@+id/action_save"
+                android:icon="@drawable/rw_action_save"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/action_save"/>
+            <item
+                android:id="@+id/action_save_as"
+                android:icon="@drawable/rw_action_save"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/action_save_as"/>
+            <item
+                android:id="@+id/action_clear"
+                android:icon="@drawable/rw_action_clear"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/action_clear"/>
+            <item
+                android:id="@+id/action_quit"
+                android:icon="@drawable/rw_action_quit"
+                android:orderInCategory="100"
+                android:showAsAction="ifRoom"
+                android:title="@string/action_quit"/>
         </menu>
     </item>
-     
     <item
         android:id="@+id/action_settings"
+        android:icon="@drawable/rw_action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:icon="@drawable/rw_action_settings"
         android:title="@string/action_settings"/>
-   
     <item
         android:id="@+id/action_clear_log"
         android:orderInCategory="200"
         android:showAsAction="never"
         android:title="@string/action_clear_log"/>
+
+    <item
+        android:id="@+id/action_hide_tabhost"
+        android:checkable="true"
+        android:checked="true"
+        android:orderInCategory="300"
+        android:showAsAction="never"
+        android:title="@string/action_hide_tabhost"/>
+
 </menu>

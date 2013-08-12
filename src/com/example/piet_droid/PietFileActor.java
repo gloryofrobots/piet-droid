@@ -1,9 +1,5 @@
 package com.example.piet_droid;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.View;
@@ -30,24 +25,19 @@ public class PietFileActor {
     PietFile mPietFile;
     Piet mPiet;
     ColorFieldView mView;
-    Context mContext;
-    
+    Activity mActivity;
+
     public PietFileActor(PietFile pietFile) {
         mPietFile = pietFile;
         mPiet = mPietFile.getPiet();
         mView = mPietFile.getView();
-        mContext = mPietFile.getContext();
+        mActivity = mPietFile.getActivity();
     }
-    
-    /*
-    public void setPietFile(PietFile file) {
-        mPietFile = file;
-    }*/
-    
+
     public void redrawCell(int x, int y) {
         mView.setCellToRedraw(x, y);
     }
-    
+
     public void clearViewDrawables() {
         mView.clearDrawables();
     }
@@ -62,12 +52,11 @@ public class PietFileActor {
         mPiet.setColor(x, y, color);
         mPietFile.touch();
     }
-    
+
     AsyncTaskLoadBitmap mLoadTask;
-    
-    
+
     public void load(String path) {
-        //TODO CHECK ERRORS!!!!!
+        // TODO CHECK ERRORS!!!!!
         // TODO FADE OUT FADE IN
         Bitmap bitmap = BitmapFactory.decodeFile(path);
         // TODO CODEL SIZE HERE
@@ -78,7 +67,7 @@ public class PietFileActor {
 
         mView.setVisibility(View.INVISIBLE);
         mView.resize(width, height);
-        
+
         final String filePath = path;
         mLoadTask = new AsyncTaskLoadBitmap(
                 new AsyncTaskLoadBitmap.LoadProcessListener() {
@@ -99,95 +88,58 @@ public class PietFileActor {
                         mPietFile.untouch();
                         mLoadTask = null;
                     }
-                }, mContext);
-        mLoadTask.execute(bitmap);
+                }, mActivity);
+         mLoadTask.execute(bitmap);
     }
-    public  static  void lockOrientation(Activity activity) {
-        Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
+    public void lockOrientation() {
+        Display display = ((WindowManager) mActivity
+                .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int rotation = display.getRotation();
-        int tempOrientation = activity.getResources().getConfiguration().orientation;
+        int tempOrientation = mActivity.getResources().getConfiguration().orientation;
         int orientation = 0;
-        switch(tempOrientation)
-        {
+        switch (tempOrientation) {
         case Configuration.ORIENTATION_LANDSCAPE:
-            if(rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_90)
+            if (rotation == Surface.ROTATION_0
+                    || rotation == Surface.ROTATION_90) {
                 orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-            else
+            } else {
                 orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+            }
             break;
         case Configuration.ORIENTATION_PORTRAIT:
-            if(rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_270)
+            if (rotation == Surface.ROTATION_0
+                    || rotation == Surface.ROTATION_270) {
                 orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-            else
+            } else {
                 orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+            }
         }
-        activity.setRequestedOrientation(orientation);
+        mActivity.setRequestedOrientation(orientation);
     }
-    
-    public void unlockOrientation(Activity activity) {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+    public void unlockOrientation() {
+        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
-//    public void save() {
-//        String fileName = params[0];
-//        
-//        int width = mModel.getWidth();
-//        int height = mModel.getHeight();
-//
-//        int size = width * height;
-//        int[] colors = new int[size];
-//
-//        Bitmap bitmap = null;
-//        FileOutputStream fileOStream = null;
-//
-//        try {
-//            mModel.fillArray(colors);
-//            bitmap = Bitmap.createBitmap(colors, width, height,
-//                    Bitmap.Config.ARGB_8888);
-//
-//            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//            
-//            Bitmap.CompressFormat format = getBitmapDecodeFormat();
-//            bitmap.compress(format, 100, bytes);
-//
-//            File file = new File(fileName);
-//
-//            fileOStream = new FileOutputStream(file);
-//            fileOStream.write(bytes.toByteArray());
-//            fileOStream.close();
-//            
-//        } catch (IndexOutOfBoundsException e) {
-//            Log.e("LOAD_IMAGE", "IndexOutOfBoundsException while saving "
-//                    + fileName);
-//            mListener.onSaveBitmapError();
-//        } catch (IOException e) {
-//            Log.e("LOAD_IMAGE", "IOException while saving " + fileName);
-//            mListener.onSaveBitmapError();
-//        } finally {
-//            if (bitmap != null && bitmap.isRecycled() == false) {
-//                bitmap.recycle();
-//            }
-//        }
-//    }
-    
-    
+
     public void saveAsync(String path) {
         doSaveAsync(path);
     }
-    
+
     public void saveAsync() {
-        if(mPietFile.hasPath() == false) {
-            //TODO THROW!!!!!
+        if (mPietFile.hasPath() == false) {
+            // TODO THROW!!!!!
         }
-        
+
         String path = mPietFile.getPath();
         saveAsync(path);
     }
-    
+
     AsyncTaskWriteBitmap mSaveTask;
-    
+
     private void doSaveAsync(String path) {
         final String filePath = path;
-        
+
         mSaveTask = new AsyncTaskWriteBitmap(mPiet,
                 new AsyncTaskWriteBitmap.SaveProcessListener() {
 
@@ -208,13 +160,13 @@ public class PietFileActor {
                     public void onSaveBitmapCancel() {
                         mSaveTask = null;
                     }
-                }, mContext);
-
+                }, mActivity);
+        
         mSaveTask.execute(path);
     }
 
     public void showMessage(String msg) {
-        Toast toast = Toast.makeText(mContext, msg, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(mActivity, msg, Toast.LENGTH_SHORT);
         toast.show();
     }
 
@@ -230,14 +182,13 @@ public class PietFileActor {
         }
     }
 
-    public void setCellDrawable(int x, int y,
-            Drawable drawable) {
+    public void setCellDrawable(int x, int y, Drawable drawable) {
         mView.setCellDrawable(x, y, drawable);
     }
-    
+
     private final String SAVE_KEY_MODEL = "PietCodelTableModel";
     private final String SAVE_KEY_CURRENT_FILENAME = "PietCurrentFileName";
-    
+
     public void saveInstanceState(Bundle savedInstanceState) {
         CodelTableModel model = mPiet.getModel();
         CodelTableModelSerializedData data = model.getSerializeData();
@@ -246,48 +197,49 @@ public class PietFileActor {
         if (mPietFile.hasPath() == false) {
             return;
         }
-        
-        savedInstanceState.putString(SAVE_KEY_CURRENT_FILENAME, mPietFile.getPath());
+
+        savedInstanceState.putString(SAVE_KEY_CURRENT_FILENAME,
+                mPietFile.getPath());
     }
-    
+
     public void restoreFromSavedState(Bundle savedInstanceState) {
         CodelTableModelSerializedData data = (CodelTableModelSerializedData) savedInstanceState
                 .getSerializable(SAVE_KEY_MODEL);
-        
-        CodelTableModel model = CodelTableModel.createCodelTableModelFromSerializedData(data);
+
+        CodelTableModel model = CodelTableModel
+                .createCodelTableModelFromSerializedData(data);
 
         attachModel(model);
         invalidateView();
-        
+
         String fileName = savedInstanceState
                 .getString(SAVE_KEY_CURRENT_FILENAME);
-        
+
         if (fileName == null) {
             return;
         }
-        
+
         mPietFile.setPath(fileName);
     }
-    
+
     public void attachModel(CodelTableModel model) {
         int countX = model.getWidth();
         int countY = model.getHeight();
         mView.resize(countX, countY);
-        
-        for(int y = 0; y < countY; ++y) {
+
+        for (int y = 0; y < countY; ++y) {
             for (int x = 0; x < countX; ++x) {
                 CodelColor color = model.getValue(x, y);
-                try{
+                try {
                     mView.setCellColor(x, y, color.getARGB());
-                    
-                }
-                catch (Exception e) {
+
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-               
+
             }
         }
-        
+
         mPiet.setModel(model);
         mPietFile.touch();
     }
@@ -298,9 +250,9 @@ public class PietFileActor {
 
     public void resize(int countX, int countY) {
         mView.resize(countX, countY);
-        
+
         mPiet.createModel(countX, countY);
         mPietFile.untouch();
     }
-    
+
 }
