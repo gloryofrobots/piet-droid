@@ -1,4 +1,4 @@
-package com.example.piet_droid;
+package com.example.piet_droid.fragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +14,10 @@ import com.example.jpiet.Piet;
 import com.example.jpiet.PietMachineStack;
 import com.example.jpiet.PolicyStorage;
 import com.example.jpiet.Logger;
+import com.example.piet_droid.PietProvider;
+import com.example.piet_droid.R;
+import com.example.piet_droid.R.id;
+import com.example.piet_droid.R.layout;
 
 
 import android.app.Activity;
@@ -30,14 +34,13 @@ import android.widget.TextView;
 
 public class FragmentCommandLog extends SherlockFragment {
     List<String> mQueue;
-    //TextView mLogText;
     ArrayList<String> mItems;
     ArrayAdapter<String> mAdapter;
     ListView mListView;
-    //List<String> mErrors;
+    private final String SAVE_KEY_ITEMS = "SAVE_KEY_ITEMS";
+    
     public FragmentCommandLog() {
         mQueue = Collections.synchronizedList(new LinkedList<String>());
-        mItems = new ArrayList<String>();
     }
 
     @Override
@@ -45,13 +48,24 @@ public class FragmentCommandLog extends SherlockFragment {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_command_log,
                 container, false);
-
-        //mLogText = (TextView) view.findViewById(R.id.text_view_log);
+        
+        if(savedInstanceState != null) {
+            mItems = savedInstanceState.getStringArrayList(SAVE_KEY_ITEMS);
+        }
+        else {
+            mItems = new ArrayList<String>();
+        }
+        
         mListView = (ListView) view.findViewById(R.id.list_view_log);
-        //mLogText.setMovementMethod(new ScrollingMovementMethod());
         return view;
     }
-
+    
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putStringArrayList(SAVE_KEY_ITEMS, mItems);
+    }
+    
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -102,17 +116,19 @@ public class FragmentCommandLog extends SherlockFragment {
     }
 
     public void update() {       
-       String temp = "";
        synchronized (mQueue) {
            for (String record : mQueue) {
                mItems.add(record);
-               //temp += record;
            }
-            
-            //mLogText.setText(mLogText.getText() + temp);
-        }
+       }
        
        mAdapter.notifyDataSetChanged();
        mQueue.clear();
+    }
+
+    public void clear() {
+        mItems.clear();
+        mAdapter.notifyDataSetChanged();
+        mQueue.clear();
     }
 }

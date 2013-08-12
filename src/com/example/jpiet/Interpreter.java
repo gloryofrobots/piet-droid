@@ -9,7 +9,7 @@ public class Interpreter {
     int mStepNumber;
 
     CodelTableModel mModel;
-    CodelTableModelScaner mModelScaner;
+    CodelTableModelScanner mModelScanner;
 
     PietMachine mMachine;
 
@@ -28,27 +28,21 @@ public class Interpreter {
         mNextCodel = new Codel();
         mEdgeCodel = new Codel();
         
-        mModelScaner = PolicyStorage.getInstance().createModelScaner();
+        mModelScanner = PolicyStorage.getInstance().createModelScaner();
     }
 
-    /**
-     * @param mExecutionStepListener
-     *            the mExecutionStepListener to set
-     */
     public void setExecutionStepListener(
             ExecutionStepListener executionStepListener) {
         mExecutionStepListener = executionStepListener;
     }
 
     public void setInput(CodelTableModel _model) {
-        //TODO rename scaner to scanner
-        //very important check because in iterative scanner we must setModel only once
         if( _model.equals(mModel)) {
             return;
         }
         
         mModel = _model;
-        mModelScaner.setModel(_model);
+        mModelScanner.setModel(_model);
     }
 
     public int getStepNumber() {
@@ -113,7 +107,6 @@ public class Interpreter {
     private void executeCommand(Codel _current, Codel _next, Integer _input) {
         CodelColor currentColor = mModel.getValue(_current);
         CodelColor nextColor = mModel.getValue(_next);
-        //TODO error reporting
         try {
             mMachine.runCommand(currentColor, nextColor, _input);
         } catch (PietMachineExecutionError exception) {
@@ -161,8 +154,8 @@ public class Interpreter {
     }
 
     private CodelArea findCodelArea(Codel codel) {
-        mModelScaner.scanForCodelNeighbors(codel.x, codel.y);
-        CodelArea area = mModelScaner.getCodelArea();
+        mModelScanner.scanForCodelNeighbors(codel.x, codel.y);
+        CodelArea area = mModelScanner.getCodelArea();
         debugTrace("STEP:%d %s\n", mStepNumber, area);
         return area;
     }
@@ -195,17 +188,6 @@ public class Interpreter {
         }
     }
 
-    /*
-     * public void notifyBeforeStep() { if (mExecutionStepListener == null) {
-     * return; }
-     * 
-     * //TODO May be use public constants DirectionPointer directionPointer =
-     * mMachine.getDirectionPointer(); CodelChoser codelChoser =
-     * mMachine.getCodelChoser();
-     * 
-     * mExecutionStepListener.beforeStep(mCurrentCodel, directionPointer,
-     * codelChoser); }
-     */
     public boolean step() {
         CodelColor currentColor = mModel.getValue(mCurrentCodel);
         boolean whiteCrossed = (currentColor == CodelColor.WHITE);

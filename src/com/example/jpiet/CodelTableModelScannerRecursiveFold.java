@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public class CodelTableModelScanerRecursiveFold implements
-        CodelTableModelScaner {
+public class CodelTableModelScannerRecursiveFold implements
+        CodelTableModelScanner {
     /*
      * Search neighbours of input codel with same color value in model
      *
@@ -19,7 +19,7 @@ public class CodelTableModelScanerRecursiveFold implements
     private CodelTableModel mModel;
     protected CodelArea mArea;
 
-    CodelTableModelScanerRecursiveFold() {
+    CodelTableModelScannerRecursiveFold() {
         mArea = new CodelArea();
     }
 

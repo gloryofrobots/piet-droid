@@ -1,4 +1,4 @@
-package com.example.piet_droid;
+package com.example.piet_droid.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -9,20 +9,17 @@ public class LoggerDroid extends Logger {
 
     @Override
     public void _onError(String msg) {
-        // TODO Auto-generated method stub
         Log.e(LABEL, msg);
     }
 
 
     @Override
     public void _onInfo(String msg) {
-        // TODO Auto-generated method stub
         Log.i(LABEL, msg);
     }
 
     @Override
     public void _onWarning(String msg) {
-        // TODO Auto-generated method stub
         Log.w(LABEL, msg);
     }
 

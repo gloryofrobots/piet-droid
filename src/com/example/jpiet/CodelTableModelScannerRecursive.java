@@ -2,7 +2,7 @@ package com.example.jpiet;
 
 import java.util.concurrent.Callable;
 
-public class CodelTableModelScanerRecursive implements CodelTableModelScaner{
+public class CodelTableModelScannerRecursive implements CodelTableModelScanner{
     /*
      * Search neighbours of input codel with same color value in model
      *
@@ -16,7 +16,7 @@ public class CodelTableModelScanerRecursive implements CodelTableModelScaner{
     private CodelTableModel mModel;
     protected CodelArea mArea;
 
-    CodelTableModelScanerRecursive() {
+    CodelTableModelScannerRecursive() {
         mArea = new CodelArea();
     }
 

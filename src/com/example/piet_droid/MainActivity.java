@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -17,6 +18,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,8 +34,11 @@ import com.actionbarsherlock.view.MenuInflater;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import android.view.Display;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -53,10 +59,20 @@ import com.example.jpiet.Logger;
 import com.example.jpiet.InOutSystem;
 
 import com.example.jpiet.Piet;
+import com.example.piet_droid.fragment.DialogFragmentNewFileSettings;
+import com.example.piet_droid.fragment.DialogFragmentSaveChanges;
+import com.example.piet_droid.fragment.FragmentCommandLog;
+import com.example.piet_droid.fragment.FragmentPaletteSimple;
+import com.example.piet_droid.fragment.FragmentStateInfo;
+import com.example.piet_droid.widget.ColorFieldView;
+import com.example.piet_droid.widget.ControlToolboxView;
+import com.example.piet_droid.widget.DrawableFilledCircle;
+import com.example.piet_droid.widget.HelperTabHost;
+import com.example.piet_droid.widget.HorizontalScrollViewLockable;
+import com.example.piet_droid.widget.ScrollViewLockable;
 
 //TODO CONTEXT MENU
 public class MainActivity extends SherlockFragmentActivity implements
-        ControlToolboxView.InteractionListener,
         FragmentPaletteSimple.OnChooseColorListener, PietProvider {
 
     private class RunListener implements PietFileRunner.RunEventListener {
@@ -113,16 +129,50 @@ public class MainActivity extends SherlockFragmentActivity implements
         public void onRunComplete() {
             getCurrentPietFile().getActor().setCellDrawable(mPreviousCodel.x,
                     mPreviousCodel.y, mPreviousCellDrawable);
-            if (mFragmentControlToolBox == null) {
-                int bdsm = 1;
-                int k = bdsm;
-                ;
-            }
-            mFragmentControlToolBox.setControlsToDefaultState();
+            
+            mControlToolBoxView.setControlsToDefaultState();
         }
 
-    };
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    private ControlToolboxView.InteractionListener mInteractionListener = 
+            new ControlToolboxView.InteractionListener() {
 
+        @Override
+        public void onInteractionRun() {
+            getCurrentPietFile().getRunner().run(mSleepBetweenStep);
+            // hideFileMenu();
+        }
+
+        @Override
+        public void onInteractionStep() {
+            getCurrentPietFile().getRunner().step(mSleepBetweenStep);
+
+            // hideFileMenu();
+        }
+
+        @Override
+        public void onInteractionPause() {
+            if (isOnRunMode() == false) {
+                return;
+            }
+
+            ///showFileMenu();
+            stopRun();
+        }
+
+        @Override
+        public void onInteractionStop() {
+            if (isOnRunMode() == false) {
+                return;
+            }
+
+            //showFileMenu();
+            stopRun();
+        } 
+    };
+    
+    
     // ////////////////////////////////////////////////////////////////////////
 
     private static final int REQUEST_SAVE = 0;
@@ -141,9 +191,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     RunListener mRunListener;
     long mSleepBetweenStep;
 
-    // FragmentControlToolBox mFragmentControlToolBox;
     FragmentStateInfo mFragmentStateInfo;
-    ControlToolboxView mFragmentControlToolBox;
+    ControlToolboxView mControlToolBoxView;
     FragmentCommandLog mFragmentCommandLog;
 
     boolean mOnScrollMode;
@@ -185,12 +234,10 @@ public class MainActivity extends SherlockFragmentActivity implements
         actionBar.setCustomView(R.layout.action_bar_custom);
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
                 | ActionBar.DISPLAY_SHOW_HOME);
-        mFragmentControlToolBox = (ControlToolboxView) actionBar
+        mControlToolBoxView = (ControlToolboxView) actionBar
                 .getCustomView().findViewById(R.id.fragment_control_toolbox);
         
-        mFragmentControlToolBox.setInteractionListener(this);
-        // EditText search = (EditText)
-        // actionBar.getCustomView().findViewById(R.id.searchfield);
+        mControlToolBoxView.setInteractionListener(mInteractionListener);
     }
 
     private void initFragments() {
@@ -277,7 +324,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
         });
         // manual click call to disable swap scroll
-        buttonScroll.callOnClick();
+        buttonScroll.performClick();
     }
 
     private void setScrollMode() {
@@ -313,16 +360,17 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void initHelpersTabHost() {
+        
         Resources resources = getResources();
         // final View tabsInclude = findViewById(R.id.tablayout);
         final TabHost tabs = (TabHost) findViewById(android.R.id.tabhost);
 
         HelperTabHost
                 .create(tabs)
-                .setActiveTabColor(Color.parseColor("#9a0000"))
-                .setPassiveTabColor(Color.parseColor("#555555"))
+                .setActiveTabColor(resources.getColor(R.color.tabhost_active_tab_color))
+                .setPassiveTabColor(resources.getColor(R.color.tabhost_passive_tab_color))
                 .setTabHeight(50)
-                .setTextColor(Color.parseColor("#ffffff"))
+                .setTextColor(resources.getColor(R.color.tabhost_tab_text_color))
                 .setTextSize(
                         resources.getDimensionPixelSize(R.dimen.tab_text_size))
                 .addTab(R.id.tabInput, "input",
@@ -365,7 +413,6 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onStart() {
         super.onStart();
-        // mCommandHelperFragment.invalidate();
     }
 
     // Called to save UI state changes at the
@@ -389,7 +436,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onPause() {
         if (isOnRunMode()) {
-            getCurrentPietFile().getRunner().stop();
+            stopRun();
         }
 
         // Suspend UI updates, threads, or CPU intensive processes
@@ -402,7 +449,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onStop() {
         if (isOnRunMode()) {
-            getCurrentPietFile().getRunner().stop();
+            stopRun();
         }
 
         // Suspend remaining UI updates, threads, or processing
@@ -443,6 +490,10 @@ public class MainActivity extends SherlockFragmentActivity implements
         super.onOptionsItemSelected(item);
 
         switch (item.getItemId()) {
+        case (R.id.action_clear_log):
+            onActionClearLog();
+            return true;
+            
         case (R.id.action_load):
             doActionIfUserDontWantToSaveChanges(new Callable<Void>() {
                 @Override
@@ -495,7 +546,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             return false;
         }
     }
-
+    
     public void doActionIfUserDontWantToSaveChanges(
             final Callable<Void> callable) {
         if (mCurrentFile.isTouched() == false) {
@@ -523,9 +574,12 @@ public class MainActivity extends SherlockFragmentActivity implements
                     "DialogFragmentSaveChanges");
         }
     }
-
+    
+    private void onActionClearLog() {
+        mFragmentCommandLog.clear();
+    }
+    
     private void onActionNew() {
-        // TODO DIALOG WITH width height!!
         DialogFragmentNewFileSettings dialog = new DialogFragmentNewFileSettings();
         if (hasPietFile() == true) {
             int width = getCurrentPietFile().getWidth();
@@ -537,13 +591,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
             @Override
             public void onCancelNewFileSettings() {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
             public boolean onAcceptNewFileSettings(int width, int height) {
-                // TODO Auto-generated method stub
                 if (width == 0 || height == 0) {
                     return false;
                 }
@@ -567,13 +618,14 @@ public class MainActivity extends SherlockFragmentActivity implements
             onActionSaveAs();
             return;
         }
-
-        getCurrentPietFile().getActor().save();
+        //LOCK
+        getCurrentPietFile().getActor().saveAsync();
     }
 
     private void onActionSaveAs() {
+        //LOCK
         if (isOnRunMode()) {
-            onInteractionStop();
+            mInteractionListener.onInteractionStop();
         }
 
         FileChooserDialog dialog = new FileChooserDialog(this);
@@ -587,13 +639,13 @@ public class MainActivity extends SherlockFragmentActivity implements
         dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
             public void onFileSelected(Dialog source, File file) {
                 source.hide();
-                getCurrentPietFile().getActor().save(file.getAbsolutePath());
+                getCurrentPietFile().getActor().saveAsync(file.getAbsolutePath());
             }
 
             public void onFileSelected(Dialog source, File folder, String name) {
                 source.hide();
                 String path = folder.getAbsolutePath() + "/" + name;
-                getCurrentPietFile().getActor().save(path);
+                getCurrentPietFile().getActor().saveAsync(path);
             }
         });
 
@@ -601,8 +653,9 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void onActionLoad() {
+        //LOCK
         if (isOnRunMode()) {
-            onInteractionStop();
+            mInteractionListener.onInteractionStop();
         }
 
         FileChooserDialog dialog = new FileChooserDialog(this);
@@ -628,10 +681,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     public void onActionClear() {
         if (isOnRunMode()) {
-            onInteractionStop();
+            mInteractionListener.onInteractionStop();
         }
 
-        mFragmentControlToolBox.setControlsToDefaultState();
+        mControlToolBoxView.setControlsToDefaultState();
         getCurrentPietFile().getActor().clear();
     }
 
@@ -645,15 +698,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         updateFromPreferences();
     }
-
-    // TODO CHECK REAL APPLICATION FOR PREFS EXAMPLE!
+    
     private void updateFromPreferences() {
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
         mSleepBetweenStep = Long.valueOf(preferences.getString(
                 "delay_before_step", "0"));
-
+        
         if (isOnRunMode() == false) {
             return;
         }
@@ -680,44 +732,40 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onChooseColor(int color) {
         mActiveColor = color;
-        // mCommandHelperFragment.setColor(color);
     }
-
-    @Override
-    public void onInteractionRun() {
-        getCurrentPietFile().getRunner().run(mSleepBetweenStep);
-        // hideFileMenu();
-    }
-
-    @Override
-    public void onInteractionStep() {
-        getCurrentPietFile().getRunner().step(mSleepBetweenStep);
-
-        // hideFileMenu();
-    }
-
-    @Override
-    public void onInteractionPause() {
-        if (isOnRunMode() == false) {
-            return;
-        }
-
-        showFileMenu();
-        getCurrentPietFile().getRunner().pause();
-    }
-
-    @Override
-    public void onInteractionStop() {
-        if (isOnRunMode() == false) {
-            return;
-        }
-
-        showFileMenu();
+    
+    public void stopRun() {
         getCurrentPietFile().getRunner().stop();
     }
-
+    
     @Override
     public Piet getPiet() {
         return mPiet;
+    }
+    
+    public  static  void lockOrientation(Activity activity) {
+        Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int rotation = display.getRotation();
+        int tempOrientation = activity.getResources().getConfiguration().orientation;
+        int orientation = 0;
+        switch(tempOrientation)
+        {
+        case Configuration.ORIENTATION_LANDSCAPE:
+            if(rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_90)
+                orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+            else
+                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+            break;
+        case Configuration.ORIENTATION_PORTRAIT:
+            if(rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_270)
+                orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+            else
+                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+        }
+        activity.setRequestedOrientation(orientation);
+    }
+    
+    public void unlockOrientation() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 }

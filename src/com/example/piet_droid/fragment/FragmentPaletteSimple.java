@@ -1,10 +1,18 @@
-package com.example.piet_droid;
+package com.example.piet_droid.fragment;
 
 import java.util.HashMap;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.example.jpiet.Piet;
 import com.example.jpiet.PietMachine;
+import com.example.piet_droid.PietProvider;
+import com.example.piet_droid.R;
+import com.example.piet_droid.R.array;
+import com.example.piet_droid.R.color;
+import com.example.piet_droid.R.id;
+import com.example.piet_droid.R.layout;
+import com.example.piet_droid.widget.ColorFieldView;
+import com.example.piet_droid.widget.ColorFieldView.CellClickListener;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -32,15 +40,15 @@ public class FragmentPaletteSimple extends SherlockFragment {
         private final String mText;
         private final Paint mPaint;
         private final Rect mTextBounds;
-        public TextDrawable(String text) {
+
+        public TextDrawable(String text, int textColor, int textSize) {
 
             mText = text;
             mTextBounds = new Rect();
             mPaint = new Paint();
             mPaint.getTextBounds(text, 0, mText.length(), mTextBounds);
-            //FIXME
-            mPaint.setColor(Color.BLACK);
-            mPaint.setTextSize(10f);
+            mPaint.setColor(textColor);
+            mPaint.setTextSize(textSize);
             mPaint.setAntiAlias(true);
             mPaint.setFakeBoldText(true);
             mPaint.setStyle(Paint.Style.FILL);
@@ -50,20 +58,21 @@ public class FragmentPaletteSimple extends SherlockFragment {
         @Override
         public void draw(Canvas canvas) {
             Rect bounds = getBounds();
-            
+
             int length = mText.length();
             float[] widths = new float[length];
-            
+
             mPaint.getTextWidths(mText, widths);
             int totalW = 0;
-            for(float w : widths){
+            for (float w : widths) {
                 totalW += w;
             }
 
             int textSize = (int) mPaint.getTextSize();
 
             int px = bounds.left + ((bounds.width() - totalW) / 2);
-            int py = bounds.top + ((bounds.height() - textSize) / 2) + mTextBounds.height();
+            int py = bounds.top + ((bounds.height() - textSize) / 2)
+                    + mTextBounds.height();
 
             canvas.drawText(mText, px, py, mPaint);
         }
@@ -87,24 +96,22 @@ public class FragmentPaletteSimple extends SherlockFragment {
     public class CurrentColorHighlightDrawable extends Drawable {
         private final Paint paint;
 
-        public CurrentColorHighlightDrawable() {
+        public CurrentColorHighlightDrawable(int color) {
             this.paint = new Paint();
-            paint.setColor(Color.LTGRAY);
+            paint.setColor(color);
             paint.setStrokeWidth(4);
             paint.setStyle(Style.STROKE);
         }
 
         @Override
         public void draw(Canvas canvas) {
-            
+
             Rect bounds = getBounds();
             int strokeWidth = (int) paint.getStrokeWidth() / 2;
 
             canvas.drawRect(bounds.left + strokeWidth,
-                    bounds.top + strokeWidth,
-                    bounds.right - strokeWidth,
-                    bounds.bottom - strokeWidth
-                    , paint);
+                    bounds.top + strokeWidth, bounds.right - strokeWidth,
+                    bounds.bottom - strokeWidth, paint);
         }
 
         @Override
@@ -128,10 +135,10 @@ public class FragmentPaletteSimple extends SherlockFragment {
 
     GradientDrawable mDrawable;
     CurrentColorHighlightDrawable mHighlightDrawable;
-    
+
     private int mActiveColor;
-    private final String SAVE_KEY_ACTIVE_COLOR = "PietPaletteActiveColor"; 
-    
+    private final String SAVE_KEY_ACTIVE_COLOR = "PietPaletteActiveColor";
+
     private HashMap<String, TextDrawable> mTagsAliasLink;
 
     public interface OnChooseColorListener {
@@ -146,28 +153,22 @@ public class FragmentPaletteSimple extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_palette_simple, container,
-                false);
+        View view = inflater.inflate(R.layout.fragment_palette_simple,
+                container, false);
 
         Resources resources = getResources();
-        
-        if(savedInstanceState == null) {
+
+        if (savedInstanceState == null) {
             mActiveColor = resources.getColor(R.color.default_draw_color);
-        }
-        else {
+        } else {
             mActiveColor = savedInstanceState.getInt(SAVE_KEY_ACTIVE_COLOR);
         }
-        
-        
-        mHighlightDrawable = new CurrentColorHighlightDrawable();
-        
-        mDrawable = new GradientDrawable();
-        
-        //View currentColor = view.findViewById(R.id.current_color_view);
-        //currentColor.setBackgroundDrawable(mDrawable);
 
-        // TODO CHECK CACHED INSTANCE(SEE DEVELOPER TUTORIAL ON ANDROID DOCS) OR
-        // IT IN ACTIVITY PERHAPS
+        int highlightColor = resources
+                .getColor(R.color.palette_highlight_color);
+        mHighlightDrawable = new CurrentColorHighlightDrawable(highlightColor);
+
+        mDrawable = new GradientDrawable();
 
         mPalette = (ColorFieldView) view.findViewById(R.id.colorPalette);
 
@@ -185,26 +186,7 @@ public class FragmentPaletteSimple extends SherlockFragment {
                 return true;
             }
         });
-        /*
-        //TODO black white cell highlight
-        View blackCell = view.findViewById(R.id.black_palette);
-        blackCell.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                chooseColor(Color.BLACK);
-            }
-        });
-
-        View whiteCell = view.findViewById(R.id.white_palette);
-        whiteCell.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                chooseColor(Color.WHITE);
-            }
-        });
-        */
         String[] command_tags = resources.getStringArray(R.array.command_tags);
         String[] command_alias = resources
                 .getStringArray(R.array.command_alias);
@@ -214,41 +196,37 @@ public class FragmentPaletteSimple extends SherlockFragment {
                     "tags and titles for commans has different length");
         }
 
+        int textSize = resources
+                .getDimensionPixelSize(R.dimen.palette_text_size);
+        int textColor = resources.getColor(R.color.palette_text_color);
+
         mTagsAliasLink = new HashMap<String, FragmentPaletteSimple.TextDrawable>();
         int size = command_tags.length;
         for (int i = 0; i < size; i++) {
             String alias = command_alias[i];
             String tag = command_tags[i];
-            TextDrawable drawable = new TextDrawable(alias);
+            TextDrawable drawable = new TextDrawable(alias, textColor, textSize);
 
             mTagsAliasLink.put(tag, drawable);
         }
-        
+
         return view;
     }
-    
+
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         mPalette.setDrawableForColor(mActiveColor, mHighlightDrawable);
         chooseColor(mActiveColor);
     }
-    
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save UI state changes to the savedInstanceState.
-        // This bundle will be passed to onCreate and
-        // onRestoreInstanceState if the process is
-        // killed and restarted by the run time.
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putInt(SAVE_KEY_ACTIVE_COLOR, mActiveColor);
     }
-    
-    
+
     public void chooseColor(int color) {
-        //GradientDrawable gd = (GradientDrawable) mDrawable.mutate();
-        //gd.setColor(color);
-        //gd.invalidateSelf();
         mActiveColor = color;
         mOnChooseColorListener.onChooseColor(color);
 
@@ -270,11 +248,11 @@ public class FragmentPaletteSimple extends SherlockFragment {
                     }
                 });
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
+
         Activity activity = getActivity();
         try {
             mOnChooseColorListener = (OnChooseColorListener) activity;
@@ -284,10 +262,5 @@ public class FragmentPaletteSimple extends SherlockFragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnChooseColorListener and PietProvider");
         }
-    }
-    
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
     }
 }

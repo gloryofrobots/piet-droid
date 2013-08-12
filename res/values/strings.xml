@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">piet-droid</string>
+    <string name="app_name">Piet-Droid</string>
     <string name="action_settings">Settings</string>
     <string name="main_button_load">Load</string>
     
@@ -9,11 +9,6 @@
     
     <string name="save_bitmap_process_dialog_title">Saving bitmap</string>
     <string name="save_bitmap_process_dialog_message">Please wait...</string>
-    
-    <string name="control_panel_button_run">Run</string>
-    <string name="control_panel_button_step">Step</string>
-    <string name="control_panel_button_pause">Pause</string>
-    <string name="control_panel_button_stop">Stop</string>
     
     <string name="edittext_new_file_width_hint">Width</string>
     <string name="edittext_new_file_height_hint">Height</string>
@@ -35,6 +30,7 @@
     <string name="action_load">Load</string>
     <string name="action_clear">Clear</string>
     <string name="action_quit">Quit</string>
+    <string name="action_clear_log">Clear Log</string>
     
     <string name="out_buffer_title">Program output</string>
     <string name="in_buffer_hint">Values must be separated by space</string>
@@ -49,6 +45,9 @@
     <string name="new_field_color_title">New picture default color</string>
     <string name="image_write_format_summary">Supported image output formats</string>
     <string name="image_write_format_title">Save image formats</string>
+    
+    <string name="cell_padding_title">Codel padding</string>
+    <string name="cell_padding_summary">Left and top padding between codels in edited bitmap</string>
     
     <string name="preferences_header_summary">PietDroid preferences</string>
     <string name="preferences_header_title">PietDroid preferences</string>

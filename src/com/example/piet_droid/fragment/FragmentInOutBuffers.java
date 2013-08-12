@@ -1,6 +1,10 @@
-package com.example.piet_droid;
+package com.example.piet_droid.fragment;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.example.piet_droid.InOutSystemEditText;
+import com.example.piet_droid.R;
+import com.example.piet_droid.R.id;
+import com.example.piet_droid.R.layout;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -14,9 +18,10 @@ import android.widget.TextView;
 public class FragmentInOutBuffers extends SherlockFragment {
     
     InOutSystemEditText mInOutSystem;
+    private final String SAVE_KEY_IN_BUFFER_TEXT = "SAVE_KEY_IN_BUFFER_TEXT";
+    private final String SAVE_KEY_OUT_BUFFER_TEXT = "SAVE_KEY_OUT_BUFFER_TEXT";
     
     public FragmentInOutBuffers() {
-        // TODO Auto-generated constructor stub
     }
     
     @Override
@@ -27,10 +32,24 @@ public class FragmentInOutBuffers extends SherlockFragment {
         
         final EditText inText = (EditText) view.findViewById(R.id.text_view_in);
         final TextView outText = (TextView) view.findViewById(R.id.text_view_out);
-
+        
+        if(savedInstanceState != null) {
+            final String input = savedInstanceState.getString(SAVE_KEY_IN_BUFFER_TEXT);
+            inText.setText(input);
+            final String output = savedInstanceState.getString(SAVE_KEY_OUT_BUFFER_TEXT);
+            outText.setText(output);
+        }
+        
         mInOutSystem = new InOutSystemEditText(inText, outText);
         
         return view;
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(SAVE_KEY_IN_BUFFER_TEXT, mInOutSystem.getInputString());
+        savedInstanceState.putString(SAVE_KEY_OUT_BUFFER_TEXT, mInOutSystem.getOutputString());
     }
     
     public com.example.jpiet.InOutSystem getInOutSystem() {

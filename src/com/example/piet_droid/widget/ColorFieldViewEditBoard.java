@@ -1,8 +1,9 @@
-package com.example.piet_droid;
+package com.example.piet_droid.widget;
+
+import com.example.piet_droid.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
@@ -11,10 +12,6 @@ public class ColorFieldViewEditBoard extends ColorFieldView {
     int mPreferredCellHeight;
     boolean mFitOnViewPort;
     boolean mAlignCellsToCenter;
-
-    public ColorFieldViewEditBoard(Context context) {
-        super(context);
-    }
 
     public ColorFieldViewEditBoard(Context context, AttributeSet attrs) {
         this(context, attrs, 0);

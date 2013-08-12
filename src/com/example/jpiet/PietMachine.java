@@ -428,7 +428,6 @@ public class PietMachine {
     }
 
     public Command getLastCommand() {
-        // TODO Auto-generated method stub
         return mLastCommand;
     }
 

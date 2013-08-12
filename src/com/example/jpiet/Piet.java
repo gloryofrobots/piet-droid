@@ -25,7 +25,7 @@ public class Piet {
         PolicyStorage policy = PolicyStorage.getInstance();
         policy.setLogger(logger);
         policy.setDebugMode(false);
-        policy.setModelScaner(CodelTableModelScanerRecursive.class);
+        policy.setModelScaner(CodelTableModelScannerRecursive.class);
         
         mInterpreter = new Interpreter(mMachine);
 	}

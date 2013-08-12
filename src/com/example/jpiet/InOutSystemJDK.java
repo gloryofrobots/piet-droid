@@ -28,14 +28,10 @@ public class InOutSystemJDK implements InOutSystem{
     }
 
     @Override
-    public void flush() {
-        // TODO Auto-generated method stub
-        
+    public void flush() {        
     }
 
     @Override
-    public void prepare() {
-        // TODO Auto-generated method stub
-        
+    public void prepare() {        
     }
 }

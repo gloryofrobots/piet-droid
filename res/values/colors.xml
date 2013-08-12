@@ -20,6 +20,15 @@
     <color name="button_stop_color">#FF00FF</color>
     <color name="default_draw_color">#FF0000</color>
     
+    <color name="palette_text_color">#000</color>
+    <color name="palette_highlight_color">#ccc</color>
+    
     <color name="white">#FFF</color>
     <color name="black">#000</color>
+    
+    <color name="tabhost_active_tab_color">#9a0000</color>
+    <color name="tabhost_passive_tab_color">#555555</color>
+    <color name="tabhost_tab_text_color">#ffffff</color>
+    
+    
 </resources>

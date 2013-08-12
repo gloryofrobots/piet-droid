@@ -1,4 +1,4 @@
-package com.example.piet_droid;
+package com.example.piet_droid.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +11,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.example.piet_droid.R;
+import com.example.piet_droid.R.id;
+import com.example.piet_droid.R.layout;
+import com.example.piet_droid.R.string;
 
 public class DialogFragmentNewFileSettings extends SherlockDialogFragment {
     public interface Listener {

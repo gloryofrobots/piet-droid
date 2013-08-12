@@ -55,14 +55,10 @@ public class InOutSystemTest implements InOutSystem {
 
     @Override
     public void flush() {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void prepare() {
-        // TODO Auto-generated method stub
-        
     }
 
 }

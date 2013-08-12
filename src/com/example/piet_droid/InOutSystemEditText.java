@@ -20,6 +20,14 @@ public class InOutSystemEditText implements InOutSystem {
 		mOut = out;
 	}
 	
+	public String getInputString() {
+	    return mIn.getText().toString();
+	}
+	
+	public String getOutputString() {
+        return mOut.getText().toString();
+    }
+	
 	public void prepare(){
 		mBuffer = "";
 		mCurrentData = new ArrayList<Integer>();
@@ -27,7 +35,7 @@ public class InOutSystemEditText implements InOutSystem {
 		mCurrentIndex = 0;
 		mOut.setText("");
 		
-		String data = mIn.getText().toString();
+		String data = getInputString();
         String [] tokens = data.split(" ");
         
         for(String token : tokens) {

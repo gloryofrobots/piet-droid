@@ -6,7 +6,7 @@ import java.util.List;
 
 ///import com.sun.xml.internal.bind.v2.runtime.reflect.ListIterator;
 
-public class CodelTableModelScanerIterative implements CodelTableModelScaner {
+public class CodelTableModelScannerIterative implements CodelTableModelScanner {
     
     private final int DELTA_DOWN = 1;
     private final int DELTA_UP = -1;
@@ -240,7 +240,7 @@ public class CodelTableModelScanerIterative implements CodelTableModelScaner {
         int height = model.getHeight();
         for (int y = 1; y < height; ++y) {
             segments = getSegmentsAtRow(model, y);
-            //TODO //CHECK
+            
             if (segments == null) {
                 continue;
             }
@@ -275,7 +275,7 @@ public class CodelTableModelScanerIterative implements CodelTableModelScaner {
     private CodelTableModel mModel;
     protected CodelArea mArea;
     List<Area> mAreas;
-    CodelTableModelScanerIterative() {
+    CodelTableModelScannerIterative() {
         mArea = new CodelArea();
     }
     
@@ -308,7 +308,6 @@ public class CodelTableModelScanerIterative implements CodelTableModelScaner {
         }
         
         if(result == null) {
-           //TODO LOGGING SINGLETON
            return;
         }
         

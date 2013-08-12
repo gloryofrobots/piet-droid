@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="command_titles">
-        <item>PUSH</item>
-        <item>POP</item>
-        <item>ADD</item>
-        <item>SUB</item>
-        <item>MUL</item>
-        <item>DIV</item>
-        <item>MOD</item>
-        <item>NOT</item>
-        <item>GREATER</item>
-        <item>POINTER</item>
-        <item>SWITCH</item>
-        <item>DUPLICATE</item>
-        <item>ROLL</item>
-        <item>IN_NUMBER</item>
-        <item>IN_CHAR</item>
-        <item>OUT_NUMBER</item>
-        <item>OUT_CHAR</item>
-    </array>
-
     <array name="command_tags">
         <item>PUSH</item>
         <item>POP</item>
@@ -60,5 +40,4 @@
         <item>OUTN</item>
         <item>OUTC</item>
     </array>
-    
 </resources>

@@ -6,7 +6,6 @@ public class PolicyStorage {
     boolean mDebugMode;
     
     private PolicyStorage() {
-        // TODO Auto-generated constructor stub
     }
     
     private static PolicyStorage instance;
@@ -19,13 +18,13 @@ public class PolicyStorage {
         return instance;
     }
     
-    public void setModelScaner(Class<? extends CodelTableModelScaner> scaner) {
+    public void setModelScaner(Class<? extends CodelTableModelScanner> scaner) {
         mScaner = scaner;
     }
     
-    public CodelTableModelScaner createModelScaner() {
+    public CodelTableModelScanner createModelScaner() {
         try {
-            return (CodelTableModelScaner) mScaner.newInstance();
+            return (CodelTableModelScanner) mScaner.newInstance();
         } catch (InstantiationException e) {
             return null;
         } catch (IllegalAccessException e) {

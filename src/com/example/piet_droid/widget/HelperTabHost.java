@@ -1,4 +1,4 @@
-package com.example.piet_droid;
+package com.example.piet_droid.widget;
 
 import java.util.ArrayList;
 

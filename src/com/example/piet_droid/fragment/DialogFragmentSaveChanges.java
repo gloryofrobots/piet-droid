@@ -1,4 +1,4 @@
-package com.example.piet_droid;
+package com.example.piet_droid.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.example.piet_droid.R;
+import com.example.piet_droid.R.string;
 
 public class DialogFragmentSaveChanges extends SherlockDialogFragment {
     public interface OnAcceptListener {

@@ -3,19 +3,17 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="#9c0303"
      >
 <!-- android:background="#9c0303" -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical" >
+ 
 
         <LinearLayout
-            android:layout_width="@dimen/palette_slide_panel_width"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <com.example.piet_droid.ColorFieldView
+            <com.example.piet_droid.widget.ColorFieldView
                 android:id="@+id/colorPalette"
                 android:layout_width="1dp"
                 android:layout_height="1dp"
@@ -28,6 +26,6 @@
 
          
         </LinearLayout>
-    </ScrollView>
+  
 
 </LinearLayout>

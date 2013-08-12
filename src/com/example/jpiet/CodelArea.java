@@ -40,13 +40,7 @@ class CodelArea {
      * Add codel to block and resize bounds if necessary
      */
     public void add(int x, int y) {
-        //System.out.printf("AREA %d,%d\n",x,y);
-        /*
-        if(x == 82 && y == 1) {
-            int bdsm = 1;
-        }*/
         //FIXME
-        
         if(mCheck != null) {
             if(mCheck[y][x] != false) {
                 System.out.printf("AREA DUBLICATED %d,%d\n",x,y);
@@ -161,7 +155,7 @@ class CodelArea {
         for(Codel codel : mCodels) {
             codel.set(x, y);
         }
-        //FIXME
+        
         color = codelColor;
         size = 0;
     }

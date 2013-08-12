@@ -1,4 +1,4 @@
-package com.example.piet_droid;
+package com.example.piet_droid.fragment;
 
 import java.util.Locale;
 
@@ -11,6 +11,10 @@ import com.example.jpiet.PietMachineStack;
 
 import com.example.jpiet.DirectionPointer;
 import com.example.jpiet.Piet;
+import com.example.piet_droid.PietProvider;
+import com.example.piet_droid.R;
+import com.example.piet_droid.R.id;
+import com.example.piet_droid.R.layout;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -22,12 +26,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class FragmentStateInfo extends SherlockFragment {
-
+    
+    private final String SAVE_KEY_TEXT_INFO = "SAVE_KEY_TEXT_INFO";
     private TextView mInfoText;
     Piet mPiet;
     private String mLastCommandState;
+    
     public FragmentStateInfo() {
-        // TODO Auto-generated constructor stub
     }
 
     @Override
@@ -37,9 +42,19 @@ public class FragmentStateInfo extends SherlockFragment {
                 container, false);
 
         mInfoText = (TextView) view.findViewById(R.id.text_view_info);
+        if(savedInstanceState != null ){
+            mInfoText.setText(savedInstanceState.getString(SAVE_KEY_TEXT_INFO));
+        }
+        
         return view;
     }
-
+    
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(SAVE_KEY_TEXT_INFO, mInfoText.getText().toString());
+    }
+    
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

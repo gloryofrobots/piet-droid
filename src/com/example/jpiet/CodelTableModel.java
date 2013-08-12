@@ -15,9 +15,8 @@ public class CodelTableModel {
     protected int mWidth;
     protected int mHeight;
      
-    //FIXME delete underscores
-    static public CodelTableModel createEmptyCodelTableModel(int _width, int _height, CodelColor defaultColor) {
-        CodelTableModel model = new CodelTableModel(_width, _height, defaultColor);
+    static public CodelTableModel createEmptyCodelTableModel(int width, int height, CodelColor defaultColor) {
+        CodelTableModel model = new CodelTableModel(width, height, defaultColor);
         return model;
     }
     
@@ -26,16 +25,15 @@ public class CodelTableModel {
         return model;
     }
     
-    private CodelTableModel(int _width, int _height, CodelColor defaultColor) {
-        mWidth = _width;
-        mHeight = _height;
+    private CodelTableModel(int width, int height, CodelColor defaultColor) {
+        mWidth = width;
+        mHeight = height;
         
         mData = new CodelColor[mWidth *  mHeight];
         fillWithColor(defaultColor);
     }
     
     private CodelTableModel(CodelTableModelSerializedData data) {
-        // TODO Auto-generated constructor stub
         mWidth = data.width;
         mHeight = data.height;
         
@@ -65,17 +63,17 @@ public class CodelTableModel {
         return mHeight;
     }
 
-    public void set(int _x, int _y, CodelColor _item) {
-        int index = getIndex(_x, _y);
-        set(index, _item);
+    public void set(int x, int y, CodelColor item) {
+        int index = getIndex(x, y);
+        set(index, item);
     }
 
-    public void set(int _index, CodelColor _item) {
-        if (_index >= mData.length) {
+    public void set(int index, CodelColor item) {
+        if (index >= mData.length) {
             throw new IndexOutOfBoundsException();
         }
 
-        mData[_index] = _item;
+        mData[index] = item;
     }
 
     public CodelColor getValue(int x, int y) {
@@ -92,8 +90,8 @@ public class CodelTableModel {
         return null;
     }
 
-    public CodelColor getValue(Codel _cursor) {
-        return getValue(_cursor.x, _cursor.y);
+    public CodelColor getValue(Codel cursor) {
+        return getValue(cursor.x, cursor.y);
         
     }
 
@@ -123,8 +121,6 @@ public class CodelTableModel {
 
     public List<CodelColor> getRow(int index) {
         ArrayList<CodelColor> row = new ArrayList<CodelColor>();
-        //int first = mWidth*index;
-        //int last = first + mWidth;
         for(int i = 0; i < mWidth; ++i) {
             CodelColor color = getValue(i, index);
             row.add(color);

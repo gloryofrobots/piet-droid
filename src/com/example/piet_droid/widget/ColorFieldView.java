@@ -1,4 +1,7 @@
-package com.example.piet_droid;
+package com.example.piet_droid.widget;
+
+import com.example.piet_droid.R;
+import com.example.piet_droid.R.styleable;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -84,7 +87,6 @@ public class ColorFieldView extends View {
         }
 
         public boolean contains(float x2, float y2) {
-            // TODO Auto-generated method stub
             return bounds.contains((int) x2, (int) y2);
         }
     }
@@ -94,7 +96,6 @@ public class ColorFieldView extends View {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            // TODO Auto-generated method stub
             if (mOnCellClickListener != null
                     && mOnCellClickListener.isProcessClickWanted()) {
                 processCellClick(event);
@@ -130,7 +131,6 @@ public class ColorFieldView extends View {
         }
 
         private Cell findClickedCell(float eventX, float eventY) {
-            // TODO Auto-generated method stub
             Cell[] findedRow = null;
 
             for (int y = 0; y < mCellCountY; y++) {
@@ -167,13 +167,13 @@ public class ColorFieldView extends View {
 
     };
 
-    private final int UNKNOWN_MEASURE = -1;
-
     private Paint mLinePaint;
     private Paint mCellPaint;
     private Paint mCellBoundsPaint;
+
     private Rect mCellPadding;
     private Rect mCellMargin;
+
     private int mCellMarginSide;
     private int mCellWidth = 1;
     private int mCellHeight = 1;
@@ -193,31 +193,28 @@ public class ColorFieldView extends View {
     private boolean mForceDraw;
     private Cell mCellToRedraw;
     protected final int CELL_SIDE_DEFAULT = 10;
-    /**
-     * @param mOnCellClickListener
-     *            the CellClickListener to set
-     */
+
     public void setOnCellClickListener(CellClickListener onCellClickListener) {
         mOnCellClickListener = onCellClickListener;
     }
 
     Cell[][] mCells;
 
-    public ColorFieldView(Context context) {
-        super(context);
-
-        mCellPadding = new Rect();
-        mNormaliseForLowestEdge = false;
-        mDefaultCellColor = Color.BLACK;
-
-        mCellCountX = 0;
-        mCellCountY = 0;
-
-        mLineColor = Color.BLACK;
-        mStrokeWidth = 0;
-
-        this.setOnTouchListener(mOnTouchListener);
-    }
+    // public ColorFieldView(Context context) {
+    // super(context);
+    //
+    // mCellPadding = new Rect();
+    // mNormaliseForLowestEdge = false;
+    // mDefaultCellColor = Color.BLACK;
+    //
+    // mCellCountX = 0;
+    // mCellCountY = 0;
+    //
+    // mLineColor = Color.BLACK;
+    // mStrokeWidth = 0;
+    //
+    // this.setOnTouchListener(mOnTouchListener);
+    // }
 
     public ColorFieldView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -236,12 +233,12 @@ public class ColorFieldView extends View {
 
         mCellCountX = a.getInt(R.styleable.ColorFieldView_countX, 0);
         mCellCountY = a.getInt(R.styleable.ColorFieldView_countY, 0);
-        
+
         mCellWidth = a.getDimensionPixelSize(
                 R.styleable.ColorFieldView_cellWidth, CELL_SIDE_DEFAULT);
         mCellHeight = a.getDimensionPixelSize(
                 R.styleable.ColorFieldView_cellHeight, CELL_SIDE_DEFAULT);
-        
+
         mLineColor = a.getColor(R.styleable.ColorFieldView_lineColor,
                 Color.BLACK);
 
@@ -263,7 +260,7 @@ public class ColorFieldView extends View {
         int colorsResourceId = a.getResourceId(
                 R.styleable.ColorFieldView_palette, -1);
         if (colorsResourceId != -1) {
-            loadCellColorsFromResources(colorsResourceId);
+            loadCellColorsFromResource(colorsResourceId);
         }
         a.recycle();
 
@@ -356,25 +353,37 @@ public class ColorFieldView extends View {
         mStrokeWidth = width;
     }
 
+    public int getCellCount() {
+        return mCellCountX * mCellCountY;
+    }
+    
+    public void setCellPadding(int paddingSide) {
+        if(mCellPadding.left == paddingSide && mCellPadding.top == paddingSide) {
+            return;
+        }
+        
+        mCellPadding.set(paddingSide, paddingSide, paddingSide, paddingSide);
+        invalidateSize();
+    }
+    
     // Load colors from array resource in order which it have in xml
-    private void loadCellColorsFromResources(int resourceId) {
+    private void loadCellColorsFromResource(int resourceId) {
         Resources resources = getResources();
         TypedArray colors = resources.obtainTypedArray(resourceId);
         int size = colors.length();
-        int y = 0;
-        int x = 0;
-        for (int i = 0; i < size; i++) {
-            int color = colors.getColor(i, 0);
-
-            setCellColor(x, y, color);
-            x++;
-            // FIXME
-            if (((i + 1) % mCellCountX) == 0) {
-                y++;
-                x = 0;
-            }
-
+        if (size < getCellCount()) {
+            throw new IllegalArgumentException("Array for fill to small");
         }
+
+        int index = 0;
+        for (int y = 0; y < mCellCountY; ++y) {
+            for (int x = 0; x < mCellCountX; ++x) {
+                int color = colors.getColor(index, 0);
+                setCellColor(x, y, color);
+                index++;
+            }
+        }
+
         colors.recycle();
     }
 
@@ -492,19 +501,19 @@ public class ColorFieldView extends View {
         return mCellPadding.top * mCellCountY;
     }
 
-//    protected int makeTotalCellWidth() {
-//        // Subtract stroke width for removing artifacts on canvas edge
-//        int width = getMeasuredWidth() - mStrokeWidth;
-//        int totalCellwidth = width - getTotalPaddingLeft();
-//        return totalCellwidth;
-//    }
-//
-//    protected int makeTotalCellHeight() {
-//        // Subtract stroke width for removing artifacts on canvas edge
-//        int height = getMeasuredHeight() - mStrokeWidth;
-//        int totalCellHeight = height - getTotalPaddingTop();
-//        return totalCellHeight;
-//    }
+    // protected int makeTotalCellWidth() {
+    // // Subtract stroke width for removing artifacts on canvas edge
+    // int width = getMeasuredWidth() - mStrokeWidth;
+    // int totalCellwidth = width - getTotalPaddingLeft();
+    // return totalCellwidth;
+    // }
+    //
+    // protected int makeTotalCellHeight() {
+    // // Subtract stroke width for removing artifacts on canvas edge
+    // int height = getMeasuredHeight() - mStrokeWidth;
+    // int totalCellHeight = height - getTotalPaddingTop();
+    // return totalCellHeight;
+    // }
 
     protected int makeMinimalCanvasWidth() {
         ViewGroup.MarginLayoutParams vlp = (ViewGroup.MarginLayoutParams) getLayoutParams();
@@ -529,27 +538,28 @@ public class ColorFieldView extends View {
         return minMeasureHeight;
     }
 
-//    protected void makeCellDimensions() {
-//        mCellWidth = Math.round(makeTotalCellWidth() / mCellCountX);
-//        mCellHeight = Math.round(makeTotalCellHeight() / mCellCountY);
-//
-//        if (mNormaliseForLowestEdge == true) {
-//            int lowestSide = Math.min(mCellWidth, mCellHeight);
-//            mCellWidth = lowestSide;
-//            mCellHeight = lowestSide;
-//        }
-//    }
+    // protected void makeCellDimensions() {
+    // mCellWidth = Math.round(makeTotalCellWidth() / mCellCountX);
+    // mCellHeight = Math.round(makeTotalCellHeight() / mCellCountY);
+    //
+    // if (mNormaliseForLowestEdge == true) {
+    // int lowestSide = Math.min(mCellWidth, mCellHeight);
+    // mCellWidth = lowestSide;
+    // mCellHeight = lowestSide;
+    // }
+    // }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        /*
-         * Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-         * paint.setStrokeWidth(mStrokeWidth);
-         * paint.setStyle(Paint.Style.FILL_AND_STROKE);
-         * paint.setColor(Color.LTGRAY); canvas.drawRect(0, 0,
-         * canvas.getWidth(), canvas.getHeight(), paint); canvas.save();
-         */
-        //makeCellDimensions();
+
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStrokeWidth(mStrokeWidth);
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setColor(Color.BLUE);
+        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
+        canvas.save();
+
+        // makeCellDimensions();
 
         if (mCellToRedraw == null) {
             drawFull(canvas);
@@ -564,74 +574,71 @@ public class ColorFieldView extends View {
         // drawGrid(canvas);
     }
 
-    // //////////////////////////////////////////////////////////////////////
-
     public void resize(int countX, int countY) {
         mCellCountX = countX;
         mCellCountY = countY;
 
         createCells();
-        // int widthMeasureSpec = MeasureSpec.makeMeasureSpec(1,
-        // MeasureSpec.EXACTLY);
-        // int heightMeasureSpec = MeasureSpec.makeMeasureSpec(1,
-        // MeasureSpec.EXACTLY);
+
+        invalidateSize();
+    }
+
+    protected void invalidateSize() {
         this.setMinimumWidth(makeMinimalCanvasWidth());
         this.setMinimumHeight(makeMinimalCanvasHeight());
-        /*this.setLayoutParams(new LinearLayout.LayoutParams(
-                makeMinimalCanvasWidth(), makeMinimalCanvasHeight()));*/
-        // measure(widthMeasureSpec, heightMeasureSpec);
         invalidate();
     }
 
-    // //////////////////////////////////////////////////////////////////
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        /*int measuredWidth = measureWidth(widthMeasureSpec);
-        int measuredHeight = measureHeight(heightMeasureSpec);
-        
-        setMeasuredDimension(measuredWidth, measuredHeight);*/
-        setMeasuredDimension(makeMinimalCanvasWidth(), makeMinimalCanvasHeight());
+        /*
+         * int measuredWidth = measureWidth(widthMeasureSpec); int
+         * measuredHeight = measureHeight(heightMeasureSpec);
+         * 
+         * setMeasuredDimension(measuredWidth, measuredHeight);
+         */
+        setMeasuredDimension(makeMinimalCanvasWidth(),
+                makeMinimalCanvasHeight());
     }
 
-//    protected int measureHeight(int measureSpec) {
-//        int result = getSpecifiedMeasure(measureSpec);
-//        if (result == UNKNOWN_MEASURE) {
-//            result = 0;
-//        }
-//        return result;
-//    }
-//
-//    protected int measureWidth(int measureSpec) {
-//        int result = getSpecifiedMeasure(measureSpec);
-//        if (result == UNKNOWN_MEASURE) {
-//            result = 0;
-//        }
-//        return result;
-//    }
-//
-//    protected int getSpecifiedMeasure(int measureSpec) {
-//        int specMode = MeasureSpec.getMode(measureSpec);
-//        int specSize = MeasureSpec.getSize(measureSpec);
-//
-//        // Default size if no limits are specified.
-//        int result;
-//
-//        if (specMode == MeasureSpec.AT_MOST) {
-//            // Calculate the ideal size of your
-//            // control within this maximum size.
-//            // If your control fills the available
-//            // space return the outer bound.
-//            result = specSize;
-//        } else if (specMode == MeasureSpec.EXACTLY) {
-//            // If your control can fit within these bounds return that value.
-//            result = specSize;
-//        } else {
-//            result = UNKNOWN_MEASURE;
-//        }
-//
-//        return result;
-//    }
+    // protected int measureHeight(int measureSpec) {
+    // int result = getSpecifiedMeasure(measureSpec);
+    // if (result == UNKNOWN_MEASURE) {
+    // result = 0;
+    // }
+    // return result;
+    // }
+    //
+    // protected int measureWidth(int measureSpec) {
+    // int result = getSpecifiedMeasure(measureSpec);
+    // if (result == UNKNOWN_MEASURE) {
+    // result = 0;
+    // }
+    // return result;
+    // }
+    //
+    // protected int getSpecifiedMeasure(int measureSpec) {
+    // int specMode = MeasureSpec.getMode(measureSpec);
+    // int specSize = MeasureSpec.getSize(measureSpec);
+    //
+    // // Default size if no limits are specified.
+    // int result;
+    //
+    // if (specMode == MeasureSpec.AT_MOST) {
+    // // Calculate the ideal size of your
+    // // control within this maximum size.
+    // // If your control fills the available
+    // // space return the outer bound.
+    // result = specSize;
+    // } else if (specMode == MeasureSpec.EXACTLY) {
+    // // If your control can fit within these bounds return that value.
+    // result = specSize;
+    // } else {
+    // result = UNKNOWN_MEASURE;
+    // }
+    //
+    // return result;
+    // }
 
     public void clearAll() {
         createCells();

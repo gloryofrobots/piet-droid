@@ -1,6 +1,6 @@
 <resources>
-    <integer name="field_count_codels_x">100</integer>
-    <integer name="field_count_codels_y">100</integer>
+    <integer name="field_count_codels_x">10</integer>
+    <integer name="field_count_codels_y">10</integer>
     
     <integer name="palette_count_codels_x">1</integer>
     <integer name="palette_count_codels_y">20</integer>

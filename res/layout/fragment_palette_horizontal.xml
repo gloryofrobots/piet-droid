@@ -6,10 +6,10 @@
     
     >
 
-    <com.example.piet_droid.ColorFieldView
+    <com.example.piet_droid.widget.ColorFieldView
         android:id="@+id/colorPalette"
-        android:layout_width="@dimen/palette_width"
-        android:layout_height="@dimen/palette_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         colorField:countX="@integer/palette_count_codels_x"
         colorField:countY="@integer/palette_count_codels_y"
         colorField:defaultCellColor="@color/codel_field_default_color"
@@ -23,19 +23,5 @@
         android:background="#000"
         >
 
-        <View
-            android:id="@+id/white_palette"
-            android:layout_width="@dimen/palette_white_cell_side"
-            android:layout_height="@dimen/palette_white_cell_side"
-            android:background="@color/white"
-            android:layout_margin="1dp"
-            />
-        
-         <View
-            android:id="@+id/black_palette"
-            android:layout_width="@dimen/palette_black_cell_side"
-            android:layout_height="@dimen/palette_black_cell_side"
-            android:background="@color/black"
-             />
     </LinearLayout>
 </LinearLayout>

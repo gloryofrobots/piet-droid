@@ -12,10 +12,14 @@
     <dimen name="log_list_text_size">12sp</dimen>
     <dimen name="log_list_padding">6dp</dimen>
     
+    <dimen name="tab_text_size">4sp</dimen>
+    <dimen name="palette_text_size">10dp</dimen>
     <dimen name="main_screen_padding">10dp</dimen>
     
-    <dimen name="palette_width">120dp</dimen>
-    <dimen name="palette_height">240dp</dimen>
-    <dimen name="palette_white_cell_side">58dp</dimen>
-    <dimen name="palette_black_cell_side">60dp</dimen>
+    <dimen name="control_widget_margin_top">0dp</dimen>
+    
+    <dimen name="codel_board_cell_margin">0dp</dimen>
+    <dimen name="button_scroll_toggle_side">30dp</dimen>
+    <dimen name="palette_cell_side">30dp</dimen>
+    <dimen name="palette_slide_panel_width">45dp</dimen>
 </resources>

@@ -1,17 +1,30 @@
 package com.example.piet_droid;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.example.jpiet.CodelColor;
 import com.example.jpiet.CodelTableModel;
 import com.example.jpiet.CodelTableModelSerializedData;
 import com.example.jpiet.Piet;
+import com.example.piet_droid.widget.ColorFieldView;
 
 public class PietFileActor {
     PietFile mPietFile;
@@ -52,6 +65,7 @@ public class PietFileActor {
     
     AsyncTaskLoadBitmap mLoadTask;
     
+    
     public void load(String path) {
         //TODO CHECK ERRORS!!!!!
         // TODO FADE OUT FADE IN
@@ -88,23 +102,90 @@ public class PietFileActor {
                 }, mContext);
         mLoadTask.execute(bitmap);
     }
-    
-    public void save(String path) {
-        doSave(path);
+    public  static  void lockOrientation(Activity activity) {
+        Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int rotation = display.getRotation();
+        int tempOrientation = activity.getResources().getConfiguration().orientation;
+        int orientation = 0;
+        switch(tempOrientation)
+        {
+        case Configuration.ORIENTATION_LANDSCAPE:
+            if(rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_90)
+                orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+            else
+                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+            break;
+        case Configuration.ORIENTATION_PORTRAIT:
+            if(rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_270)
+                orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+            else
+                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
+        }
+        activity.setRequestedOrientation(orientation);
     }
     
-    public void save() {
+    public void unlockOrientation(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+//    public void save() {
+//        String fileName = params[0];
+//        
+//        int width = mModel.getWidth();
+//        int height = mModel.getHeight();
+//
+//        int size = width * height;
+//        int[] colors = new int[size];
+//
+//        Bitmap bitmap = null;
+//        FileOutputStream fileOStream = null;
+//
+//        try {
+//            mModel.fillArray(colors);
+//            bitmap = Bitmap.createBitmap(colors, width, height,
+//                    Bitmap.Config.ARGB_8888);
+//
+//            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//            
+//            Bitmap.CompressFormat format = getBitmapDecodeFormat();
+//            bitmap.compress(format, 100, bytes);
+//
+//            File file = new File(fileName);
+//
+//            fileOStream = new FileOutputStream(file);
+//            fileOStream.write(bytes.toByteArray());
+//            fileOStream.close();
+//            
+//        } catch (IndexOutOfBoundsException e) {
+//            Log.e("LOAD_IMAGE", "IndexOutOfBoundsException while saving "
+//                    + fileName);
+//            mListener.onSaveBitmapError();
+//        } catch (IOException e) {
+//            Log.e("LOAD_IMAGE", "IOException while saving " + fileName);
+//            mListener.onSaveBitmapError();
+//        } finally {
+//            if (bitmap != null && bitmap.isRecycled() == false) {
+//                bitmap.recycle();
+//            }
+//        }
+//    }
+    
+    
+    public void saveAsync(String path) {
+        doSaveAsync(path);
+    }
+    
+    public void saveAsync() {
         if(mPietFile.hasPath() == false) {
             //TODO THROW!!!!!
         }
         
         String path = mPietFile.getPath();
-        save(path);
+        saveAsync(path);
     }
     
     AsyncTaskWriteBitmap mSaveTask;
     
-    private void doSave(String path) {
+    private void doSaveAsync(String path) {
         final String filePath = path;
         
         mSaveTask = new AsyncTaskWriteBitmap(mPiet,
@@ -112,7 +193,6 @@ public class PietFileActor {
 
                     @Override
                     public void onSaveBitmapError() {
-                        // TODO Auto-generated method stub
                         showMessage("Error occurred during saving bitmap");
                     }
 
@@ -171,7 +251,6 @@ public class PietFileActor {
     }
     
     public void restoreFromSavedState(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         CodelTableModelSerializedData data = (CodelTableModelSerializedData) savedInstanceState
                 .getSerializable(SAVE_KEY_MODEL);
         
@@ -218,7 +297,6 @@ public class PietFileActor {
     }
 
     public void resize(int countX, int countY) {
-        // TODO Auto-generated method stub
         mView.resize(countX, countY);
         
         mPiet.createModel(countX, countY);
