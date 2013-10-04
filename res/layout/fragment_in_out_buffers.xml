@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="1"
+        android:textSize="@dimen/info_widget_panel_content_text_size"
         android:hint="@string/in_buffer_hint" />
 
     <ScrollView
@@ -21,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scrollHorizontally="true"
+            android:textSize="@dimen/info_widget_panel_content_text_size"
             android:scrollbars="vertical" />
     </ScrollView>
 
@@ -28,6 +30,7 @@
         android:id="@+id/text_view_out"
         android:layout_width="match_parent"
         android:layout_height="0dip"
+        android:textSize="@dimen/info_widget_panel_content_text_size"
         android:layout_weight="1" />
 
 </LinearLayout>

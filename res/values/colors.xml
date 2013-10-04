@@ -26,9 +26,9 @@
     <color name="white">#FFF</color>
     <color name="black">#000</color>
     
-    <color name="tabhost_active_tab_color">#9a0000</color>
-    <color name="tabhost_passive_tab_color">#555555</color>
-    <color name="tabhost_tab_text_color">#ffffff</color>
-    
+    <color name="info_widget_tabhost_active_tab_color">#9a0000</color>
+    <color name="info_widget_tabhost_passive_tab_color">#555555</color>
+    <color name="info_widget_tabhost_tab_text_color">#ffffff</color>
+    <color name="info_widget_panel_content_text_color">#000</color>
     
 </resources>

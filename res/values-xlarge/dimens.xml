@@ -7,7 +7,7 @@
     <dimen name="medium_vertical_margin">10dp</dimen>
     <dimen name="small_vertical_margin">5dp</dimen>
     
-    <dimen name="control_toolbox_padding">5dp</dimen>
+    <dimen name="control_toolbox_padding">10dp</dimen>
     
     <dimen name="main_screen_padding">10dp</dimen>
     

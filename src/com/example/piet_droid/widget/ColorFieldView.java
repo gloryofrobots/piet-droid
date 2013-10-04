@@ -190,8 +190,10 @@ public class ColorFieldView extends View {
 
     private boolean mForceDraw;
     private Cell mCellToRedraw;
-    protected final int CELL_SIDE_DEFAULT = 10;
-
+    
+    public final static int MIN_CELL_SIDE = 10;
+    public final static int MAX_CELL_SIDE = 100;
+    
     public void setOnCellClickListener(CellClickListener onCellClickListener) {
         mOnCellClickListener = onCellClickListener;
     }
@@ -217,9 +219,9 @@ public class ColorFieldView extends View {
         mCellCountY = a.getInt(R.styleable.ColorFieldView_countY, 0);
 
         mCellWidth = a.getDimensionPixelSize(
-                R.styleable.ColorFieldView_cellWidth, CELL_SIDE_DEFAULT);
+                R.styleable.ColorFieldView_cellWidth, MIN_CELL_SIDE);
         mCellHeight = a.getDimensionPixelSize(
-                R.styleable.ColorFieldView_cellHeight, CELL_SIDE_DEFAULT);
+                R.styleable.ColorFieldView_cellHeight, MIN_CELL_SIDE);
 
         mLineColor = a.getColor(R.styleable.ColorFieldView_lineColor,
                 Color.BLACK);
@@ -272,7 +274,7 @@ public class ColorFieldView extends View {
     public int getCellHeight() {
         return mCellHeight;
     }
-
+    
     public void setCellSide(int side) {
         if(mCellWidth == side && mCellHeight == side) {
             return;
@@ -509,12 +511,12 @@ public class ColorFieldView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStrokeWidth(mStrokeWidth);
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(Color.BLUE);
-        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
-        canvas.save();
+//        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//        paint.setStrokeWidth(mStrokeWidth);
+//        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+//        paint.setColor(Color.BLUE);
+//        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
+//        canvas.save();
 
         if (mCellToRedraw == null) {
             drawFull(canvas);

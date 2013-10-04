@@ -11,7 +11,7 @@
     <string name="content_description_toolbox_button_step">Step button</string>
     <string name="content_description_toolbox_button_pause">Pause button</string>
     <string name="content_description_toolbox_button_stop">Stop button</string>
-    <string name="content_description_button_scroll_toggle">Scroll toggle button</string>
+    <string name="content_description_button_scroll_toggle">Toggle scroll button</string>
 
     <!-- ACTIONS -->
     <string name="action_bitmap">Bitmap</string>
@@ -27,18 +27,19 @@
     
     <!-- PREFERENCES -->
     <string name="delay_before_step_title">Step delay</string>
-    <string name="delay_before_step_summary">Delay in ms between each step of program interpretation</string>
+    <string name="delay_before_step_summary">Delay in ms between each step of interpretation</string>
     <string name="delay_before_step_dialog_title">Step delay</string>
-    <string name="unknow_color_interpretation_summary">Unknown color interpretation</string>
-    <string name="unknow_color_interpretation_title">Color used for non piet colors in loaded images</string>
-    <string name="new_field_color_summary">Color which fill new empty picture</string>
-    <string name="new_field_color_title">New picture default color</string>
+    <string name="unknow_color_interpretation_summary">Non piet colors value</string>
+    <string name="unknow_color_interpretation_title">Color that will replace non piet colors</string>
+    <string name="new_field_color_title">Default color</string>
+    <string name="new_field_color_summary">Color that will fill empty bitmap</string>
+    
     <string name="image_write_format_summary">Supported image output formats</string>
     <string name="image_write_format_title">Save image formats</string>
     <string name="cell_padding_title">Codel padding</string>
-    <string name="cell_padding_summary">Padding between codels in pixels</string>
+    <string name="cell_padding_summary">Padding between codels in bitmap</string>
     <string name="cell_size_title">Codel size</string>
-    <string name="cell_size_summary">Side size of each codel in pixels</string>
+    <string name="cell_size_summary">Side size of each codel in bitmap</string>
     <string name="preferences_header_summary">Piet Droid preferences</string>
     <string name="preferences_header_title">Piet Droid preferences</string>
     
@@ -51,7 +52,7 @@
     <string name="tab_state">State</string>
     <string name="tab_log">Log</string>
     <string name="out_buffer_title">Program output</string>
-    <string name="in_buffer_hint">Values must be separated by space</string>
+    <string name="in_buffer_hint">Write space separated values here.</string>
     <string name="state_info_title">Program state</string>
 
     <!-- DIALOGS -->

@@ -25,7 +25,11 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -57,6 +61,8 @@ public class FragmentCommandLog extends SherlockFragment {
         }
         
         mListView = (ListView) view.findViewById(R.id.list_view_log);
+        
+        registerForContextMenu(mListView);
         return view;
     }
     
@@ -70,11 +76,29 @@ public class FragmentCommandLog extends SherlockFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
     }
-
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.context_menu_log, menu);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear_log:
+                clear();
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+    
     public void onActivityCreated(Bundle savedInstanceState) {
-        Activity activity = getActivity();
         super.onActivityCreated(savedInstanceState);
         
+        Activity activity = getActivity();
         mAdapter = new  ArrayAdapter<String>(activity, R.layout.log_list_item, mItems);
    
         mListView.setAdapter(mAdapter);

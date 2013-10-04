@@ -196,6 +196,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     ControlToolboxView mControlToolBoxView;
     FragmentCommandLog mFragmentCommandLog;
 
+    private int mZoomChangeValue = 10;
+    
     boolean mOnScrollMode;
 
     @Override
@@ -243,11 +245,65 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         final ImageButton buttonScroll = (ImageButton) actionBar
                 .getCustomView().findViewById(R.id.button_scroll_toggle);
+        
+        final ImageButton buttonZoomInrease = (ImageButton) actionBar
+                .getCustomView().findViewById(R.id.button_zoom_increase);
+        
+        final ImageButton buttonZoomDecrease = (ImageButton) actionBar
+                .getCustomView().findViewById(R.id.button_zoom_decrease);
 
         initScrollLock(buttonScroll);
+        initZoomButtons(buttonZoomInrease, buttonZoomDecrease);
+    }
+    
+    private void initZoomButtons(final ImageButton buttonZoomIncrease, final ImageButton buttonZoomDecrease) {
+        
+        buttonZoomIncrease.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                int width = mColorField.getCellWidth();
+                int newSide = width + mZoomChangeValue;
+                
+                if(newSide > ColorFieldView.MIN_CELL_SIDE) {
+                    buttonZoomDecrease.setEnabled(true);
+                }
+                
+                if(newSide > ColorFieldView.MAX_CELL_SIDE) {
+                    buttonZoomIncrease.setEnabled(false);
+                    return;
+                }
+                
+                mColorField.setCellSide(newSide);
+            }
+        });
+        
+        buttonZoomDecrease.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                int width = mColorField.getCellWidth();
+                int newSide = width - mZoomChangeValue;
+                
+                if(newSide < ColorFieldView.MAX_CELL_SIDE) {
+                    buttonZoomIncrease.setEnabled(true);
+                }
+                
+                if(newSide < ColorFieldView.MIN_CELL_SIDE) {
+                    buttonZoomDecrease.setEnabled(false);
+                    return;
+                }
+                
+                mColorField.setCellSide(newSide);
+            }
+        });
+        
+        int width = mColorField.getCellWidth();
+        if((width - mZoomChangeValue) <= ColorFieldView.MIN_CELL_SIDE) {
+            buttonZoomDecrease.setEnabled(false);
+        } else if((width + mZoomChangeValue) >= ColorFieldView.MAX_CELL_SIDE) {
+            buttonZoomIncrease.setEnabled(false);
+        }
     }
 
     private void initScrollLock(final ImageButton buttonScroll) {
+        // Only for avoid code duplication
         // set to true because we swap it in manual click call
         mOnScrollMode = true;
 
@@ -255,16 +311,17 @@ public class MainActivity extends SherlockFragmentActivity implements
             public void onClick(View v) {
 
                 mOnScrollMode = mOnScrollMode == false ? true : false;
-                setScrollMode();
+                updateScrollViews();
                 buttonScroll.setSelected(!mOnScrollMode);
                 // buttonScroll.setEnabled(!mOnScrollMode);
             }
         });
+        
         // manual click call to disable swap scroll
         buttonScroll.performClick();
     }
 
-    private void setScrollMode() {
+    private void updateScrollViews() {
         final ScrollViewLockable scrollVertical = (ScrollViewLockable) findViewById(R.id.scrollview_codelField_vertical);
         final HorizontalScrollViewLockable scrollHorizontal = (HorizontalScrollViewLockable) findViewById(R.id.scrollview_codelField_horizontal);
         scrollVertical.setScrollingEnabled(mOnScrollMode);
@@ -272,13 +329,6 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void initFragments() {
-
-        /*
-         * mFragmentControlToolBox = (FragmentControlToolBox)
-         * getSupportFragmentManager()
-         * .findFragmentById(R.id.fragment_control_toolbox);
-         */
-
         mFragmentStateInfo = (FragmentStateInfo) getSupportFragmentManager()
                 .findFragmentById(R.id.fragment_state_info);
 
@@ -307,7 +357,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         mPiet = new Piet(logger, inOutSystem);
     }
-
+    
+    public boolean isOnScrollMode() {
+        return mOnScrollMode;
+    }
+    
     private void initColorField() {
         mColorField = (ColorFieldView) findViewById(R.id.codelField);
 
@@ -323,13 +377,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 
                     @Override
                     public boolean isProcessClickWanted() {
+                        if (isOnScrollMode()) {
+                            return false;
+                        }
+                        
                         if (MainActivity.this.isOnRunMode() == true) {
                             getCurrentPietFile()
                                     .getActor()
                                     .showMessage(
                                             "Edit mode disabled until program executed.");
-                            return false;
-                        } else if (mOnScrollMode == true) {
                             return false;
                         }
 
@@ -369,20 +425,20 @@ public class MainActivity extends SherlockFragmentActivity implements
         Resources resources = getResources();
         // final View tabsInclude = findViewById(R.id.tablayout);
         final TabHost tabs = (TabHost) findViewById(android.R.id.tabhost);
-
+       
         HelperTabHost
                 .create(tabs)
                 .setActiveTabColor(
-                        resources.getColor(R.color.tabhost_active_tab_color))
+                        resources.getColor(R.color.info_widget_tabhost_active_tab_color))
                 .setPassiveTabColor(
-                        resources.getColor(R.color.tabhost_passive_tab_color))
+                        resources.getColor(R.color.info_widget_tabhost_passive_tab_color))
                 .setTabHeight(
                         resources
-                                .getDimensionPixelSize(R.dimen.tabhost_tab_height))
+                                .getDimensionPixelSize(R.dimen.info_widget_tabhost_tab_height))
                 .setTextColor(
-                        resources.getColor(R.color.tabhost_tab_text_color))
+                        resources.getColor(R.color.info_widget_tabhost_tab_text_color))
                 .setTextSize(
-                        resources.getDimensionPixelSize(R.dimen.tab_text_size))
+                        resources.getDimensionPixelSize(R.dimen.info_widget_tab_text_size))
                 .addTab(R.id.tabInput, "input",
                         resources.getString(R.string.tab_in))
                 .addTab(R.id.tabOutput, "output",
@@ -461,7 +517,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (isOnRunMode()) {
             stopRun();
         }
-
+        
+        saveToSharedPreferences();
         // Suspend remaining UI updates, threads, or processing
         // that aren’t required when the Activity isn’t visible.
         // Persist all edits or state changes
@@ -483,6 +540,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getSupportMenuInflater().inflate(R.menu.main, menu);
         mMenu = menu;
+        
+        updateOptionsMenu();
         return true;
     }
 
@@ -593,18 +652,21 @@ public class MainActivity extends SherlockFragmentActivity implements
     private void onActionClearLog() {
         mFragmentCommandLog.clear();
     }
-
+    
+    //toggle info widget visibility 
     private void onActionHideTabHost(boolean checked) {
+        updateInfoWidgetVisibility(!checked);
+    }
+    
+    private void updateInfoWidgetVisibility(boolean isVisible) {
         final TabHost tabs = (TabHost) findViewById(android.R.id.tabhost);
-
-        if (checked) {
+        if (isVisible) {
             tabs.setVisibility(View.VISIBLE);
-
         } else {
             tabs.setVisibility(View.GONE);
         }
     }
-
+    
     private void onActionNew() {
         DialogFragmentNewFileSettings dialog = new DialogFragmentNewFileSettings();
         if (hasPietFile() == true) {
@@ -724,8 +786,30 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         updateFromPreferences();
     }
-
+    
+    private void saveToSharedPreferences() {
+        Context context = getApplicationContext();
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        
+        int width = mColorField.getCellWidth();
+        editor.putInt("cell_side", width);
+        
+        final TabHost tabs = (TabHost) findViewById(android.R.id.tabhost);
+        boolean visibility = tabs.getVisibility() == View.VISIBLE;
+        editor.putBoolean("info_widget_visibility", visibility);
+        
+        editor.commit();
+    }
+    private void updateOptionsMenu() {
+        MenuItem infoWidgetVisibilityItem = mMenu.findItem(R.id.action_hide_tabhost);
+        final TabHost tabs = (TabHost) findViewById(android.R.id.tabhost);
+        boolean infoWidgetVisibility = tabs.getVisibility() == View.VISIBLE;
+        infoWidgetVisibilityItem.setChecked(infoWidgetVisibility);
+    }
     private void updateFromPreferences() {
+        
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
@@ -737,14 +821,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         getCurrentPietFile().getView().setCellPadding(cellPadding);
 
-        int cellSide = Integer
-                .valueOf(preferences.getString("cell_size", "10"));
+        int cellSide = preferences.getInt("cell_side", ColorFieldView.MIN_CELL_SIDE);
         getCurrentPietFile().getView().setCellSide(cellSide);
-        if (isOnRunMode() == false) {
-            return;
+        
+       
+        boolean infoWidgetVisibility = preferences.getBoolean("info_widget_visibility", true);
+        updateInfoWidgetVisibility(infoWidgetVisibility);
+        
+        
+        if (isOnRunMode() == true) {
+            getCurrentPietFile().getRunner().setStepDelay(mSleepBetweenStep);
         }
-
-        getCurrentPietFile().getRunner().setStepDelay(mSleepBetweenStep);
     }
 
     protected int getActiveColor() {

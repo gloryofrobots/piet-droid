@@ -12,12 +12,6 @@
         android:summary="@string/cell_padding_summary"
         android:title="@string/cell_padding_title"/>
     
-    <EditTextPreference
-        android:dialogTitle="@string/cell_size_title"
-        android:key="cell_size"
-        android:summary="@string/cell_size_summary"
-        android:title="@string/cell_size_title"/>
-    
     <ListPreference
         android:entries="@array/unknown_color_interpretation_entries"
         android:entryValues="@array/unknown_color_interpretation_values"

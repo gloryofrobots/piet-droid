@@ -44,7 +44,8 @@
         android:layout_weight="1"
         android:background="@color/editboard_background"
         android:orientation="vertical"
-        android:weightSum="4" >
+        android:layout_gravity="bottom"
+         >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,6 +94,7 @@
         <TabHost
             android:id="@android:id/tabhost"
             android:layout_width="match_parent"
+            
             android:layout_height="@dimen/info_widget_size"
             android:layout_marginTop="@dimen/info_widget_margin_top" >
 
@@ -110,7 +112,8 @@
                 <FrameLayout
                     android:id="@android:id/tabcontent"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
+                    android:layout_height="match_parent" 
+                   >
 
                     <LinearLayout
                         android:id="@+id/tabInput"
@@ -125,9 +128,11 @@
                             android:layout_marginTop="@dimen/info_widget_margin_top"
                             android:layout_weight="1"
                             android:background="@drawable/border"
+                            android:gravity="top"
                             android:hint="@string/in_buffer_hint"
-                            android:padding="@dimen/main_screen_padding"
-                            android:textStyle="bold" />
+                            android:padding="@dimen/info_widget_panel_content_padding"
+                            android:textColor="@color/info_widget_panel_content_text_color"
+                            android:textSize="@dimen/info_widget_panel_content_text_size" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -147,8 +152,10 @@
                                 android:id="@+id/text_view_out"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:padding="@dimen/main_screen_padding"
-                                android:textStyle="bold" />
+                                android:gravity="top"
+                                android:padding="@dimen/info_widget_panel_content_padding"
+                                android:textColor="@color/info_widget_panel_content_text_color"
+                                android:textSize="@dimen/info_widget_panel_content_text_size" />
                         </ScrollView>
                     </LinearLayout>
 

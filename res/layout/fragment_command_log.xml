@@ -1,24 +1,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-     >
+    android:orientation="vertical" >
 
-     <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <ListView
         android:id="@+id/list_view_log"
-        android:padding="@dimen/medium_vertical_margin"
-        android:background="@drawable/border"/>
-    
-    <!--  <TextView
-        android:id="@+id/text_view_log"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="5dp"
-        android:padding="20dp"
-        android:background="@color/fragment_background"
-        android:textStyle="bold"
-        android:scrollbars = "vertical" />-->
-    
+        android:background="@drawable/border"
+        android:gravity="top"
+        
+        android:padding="@dimen/info_widget_panel_content_padding"
+        android:textColor="@color/info_widget_panel_content_text_color"
+        android:textSize="@dimen/info_widget_panel_content_text_size" />
+
 </LinearLayout>

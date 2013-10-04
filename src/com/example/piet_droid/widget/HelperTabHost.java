@@ -114,10 +114,10 @@ public class HelperTabHost {
         tv.setTextSize(mTextSize);
         
         if(mTabHeight != DEFAULT_DIMENSION) {
-            tab.getLayoutParams().height = 50;
+            tab.getLayoutParams().height = mTabHeight;
         }
         if(mTabWidth != DEFAULT_DIMENSION) {
-            tab.getLayoutParams().width = 50;
+            tab.getLayoutParams().width = mTabHeight;
         }
     }
     
