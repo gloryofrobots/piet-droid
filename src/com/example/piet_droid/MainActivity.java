@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 import android.app.Activity;
@@ -63,6 +64,7 @@ import com.example.piet_droid.fragment.DialogFragmentSaveChanges;
 import com.example.piet_droid.fragment.FragmentCommandLog;
 import com.example.piet_droid.fragment.FragmentPaletteSimple;
 import com.example.piet_droid.fragment.FragmentStateInfo;
+import com.example.piet_droid.fragment.PietPreferenceFragment;
 import com.example.piet_droid.widget.ColorFieldView;
 import com.example.piet_droid.widget.ControlToolboxView;
 import com.example.piet_droid.widget.DrawableFilledCircle;
@@ -564,10 +566,6 @@ public class MainActivity extends SherlockFragmentActivity implements
             item.setChecked(!item.isChecked());
             return true;
 
-        case (R.id.action_clear_log):
-            onActionClearLog();
-            return true;
-
         case (R.id.action_load):
             doActionIfUserDontWantToSaveChanges(new Callable<Void>() {
                 @Override
@@ -649,10 +647,6 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     }
 
-    private void onActionClearLog() {
-        mFragmentCommandLog.clear();
-    }
-    
     //toggle info widget visibility 
     private void onActionHideTabHost(boolean checked) {
         updateInfoWidgetVisibility(!checked);
@@ -697,8 +691,10 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void onActionSettings() {
-        startActivityForResult(new Intent(this, Preferences.class),
-                SHOW_PREFERENCES);
+        Intent intent = new Intent( this, Preferences.class );
+        //intent.putExtra( PreferenceActivity.EXTRA_SHOW_FRAGMENT, PietPreferenceFragment.class.getName() );
+        intent.putExtra( PreferenceActivity.EXTRA_NO_HEADERS, true );
+        startActivityForResult(intent, SHOW_PREFERENCES);
     }
 
     private void onActionSave() {
@@ -774,6 +770,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         mControlToolBoxView.setControlsToDefaultState();
         getCurrentPietFile().getActor().clear();
+        if(getCurrentPietFile().hasPath() == false) {
+            getCurrentPietFile().untouch();
+        }
     }
 
     public synchronized void onActivityResult(final int requestCode,

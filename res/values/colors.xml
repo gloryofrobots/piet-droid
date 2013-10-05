@@ -6,7 +6,7 @@
     <color name="text_color">#AFFF</color>
     <color name="codel_field_default_color">#fff</color>
     
-    <color name="main_background">#ccc</color>
+    <color name="main_background">#FFF</color>
     <color name="editboard_background">#fff</color>
     
     <color name="debug_cell_highlight">#000</color>

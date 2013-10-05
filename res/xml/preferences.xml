@@ -5,14 +5,14 @@
         android:summary="@string/delay_before_step_summary"
         android:title="@string/delay_before_step_title"/>
     
-    
     <EditTextPreference
         android:dialogTitle="@string/cell_padding_title"
         android:key="cell_padding"
         android:summary="@string/cell_padding_summary"
         android:title="@string/cell_padding_title"/>
     
-    <ListPreference
+    <!--  
+        <ListPreference
         android:entries="@array/unknown_color_interpretation_entries"
         android:entryValues="@array/unknown_color_interpretation_values"
         android:defaultValue="0"
@@ -27,7 +27,6 @@
         android:defaultValue="0"
         android:summary="@string/new_field_color_summary"
         android:title="@string/new_field_color_title"/>
-    <!--  
     <ListPreference
         android:entries="@array/image_write_format_entries"
         android:entryValues="@array/image_write_format_values"
