@@ -30,9 +30,10 @@ public class FragmentStateInfo extends SherlockFragment {
     private final String SAVE_KEY_TEXT_INFO = "SAVE_KEY_TEXT_INFO";
     private TextView mInfoText;
     Piet mPiet;
-    private String mLastCommandState;
+    private StringBuilder mLastCommandState;
     
     public FragmentStateInfo() {
+        mLastCommandState = new StringBuilder();
     }
 
     @Override
@@ -70,8 +71,14 @@ public class FragmentStateInfo extends SherlockFragment {
             mPiet.addCommandRunListener(new CommandRunListener() {
                 @Override
                 public void onRunCommand(Command command, PietMachineStack stack) {
-                    mLastCommandState = String.format("%s : %s \n",
-                            command.toString(), stack.toString());
+                    mLastCommandState.delete(0, mLastCommandState.length());
+                    mLastCommandState.append(command.toString());
+                    
+                    String stackRepr =  stack.toString();
+                    if(stackRepr.length() > 0) {
+                        mLastCommandState.append(stackRepr);
+                    }
+                    mLastCommandState.append("\n");
                 }
             });
         } catch (ClassCastException e) {

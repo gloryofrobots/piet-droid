@@ -45,7 +45,7 @@ public class ControlToolboxView extends LinearLayout {
         
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.control_toolbox_view, this);
-        
+
         mButtonRun = (ImageButton) getChildAt(0);
         mButtonStep = (ImageButton) getChildAt(1);
         mButtonPause = (ImageButton) getChildAt(2);

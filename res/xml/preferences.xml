@@ -3,13 +3,15 @@
         android:dialogTitle="@string/delay_before_step_dialog_title"
         android:key="delay_before_step"
         android:summary="@string/delay_before_step_summary"
-        android:title="@string/delay_before_step_title"/>
+        android:title="@string/delay_before_step_title"
+        android:defaultValue="100"/>
     
     <EditTextPreference
         android:dialogTitle="@string/cell_padding_title"
         android:key="cell_padding"
         android:summary="@string/cell_padding_summary"
-        android:title="@string/cell_padding_title"/>
+        android:title="@string/cell_padding_title"
+        android:defaultValue="0"/>
     
     <!--  
         <ListPreference

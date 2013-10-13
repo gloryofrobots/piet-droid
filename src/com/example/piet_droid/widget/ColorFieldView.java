@@ -191,8 +191,11 @@ public class ColorFieldView extends View {
     private boolean mForceDraw;
     private Cell mCellToRedraw;
     
-    public final static int MIN_CELL_SIDE = 10;
-    public final static int MAX_CELL_SIDE = 100;
+    private final static int DEFAULT_MIN_CELL_SIDE = 10;
+    private final static int DEFAULT_MAX_CELL_SIDE = 100;
+    
+    private int mMinCellSide;
+    private int mMaxCellSide;
     
     public void setOnCellClickListener(CellClickListener onCellClickListener) {
         mOnCellClickListener = onCellClickListener;
@@ -217,11 +220,17 @@ public class ColorFieldView extends View {
 
         mCellCountX = a.getInt(R.styleable.ColorFieldView_countX, 0);
         mCellCountY = a.getInt(R.styleable.ColorFieldView_countY, 0);
-
+        
+        mMinCellSide =  a.getDimensionPixelSize(
+                R.styleable.ColorFieldView_minCellSide, DEFAULT_MIN_CELL_SIDE);
+        
+        mMaxCellSide =  a.getDimensionPixelSize(
+                R.styleable.ColorFieldView_maxCellSide, DEFAULT_MAX_CELL_SIDE);
+        
         mCellWidth = a.getDimensionPixelSize(
-                R.styleable.ColorFieldView_cellWidth, MIN_CELL_SIDE);
+                R.styleable.ColorFieldView_cellWidth, mMinCellSide);
         mCellHeight = a.getDimensionPixelSize(
-                R.styleable.ColorFieldView_cellHeight, MIN_CELL_SIDE);
+                R.styleable.ColorFieldView_cellHeight, mCellWidth);
 
         mLineColor = a.getColor(R.styleable.ColorFieldView_lineColor,
                 Color.BLACK);
@@ -539,8 +548,16 @@ public class ColorFieldView extends View {
     }
 
     protected void invalidateSize() {
-        this.setMinimumWidth(makeMinimalCanvasWidth());
-        this.setMinimumHeight(makeMinimalCanvasHeight());
+        //this.setMinimumWidth(500);
+        //this.setMinimumHeight(500);
+        //this.setMinimumWidth(width);
+        //this.setMinimumHeight(height);
+        int width = makeMinimalCanvasWidth();
+        int height = makeMinimalCanvasHeight();
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) this.getLayoutParams();
+        params.width = width;
+        params.height = height;
+        this.setLayoutParams(params);
         invalidate();
     }
 
@@ -553,5 +570,13 @@ public class ColorFieldView extends View {
     public void clearAll() {
         createCells();
         invalidate();
+    }
+
+    public int getMinCellSide() {
+        return mMinCellSide;
+    }
+
+    public int getMaxCellSide() {
+        return mMaxCellSide;
     }
 }

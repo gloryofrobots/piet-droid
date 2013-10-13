@@ -62,5 +62,5 @@
     <string name="load_bitmap_process_dialog_message">Please wait...</string>
     <string name="save_bitmap_process_dialog_title">Saving bitmap</string>
     <string name="save_bitmap_process_dialog_message">Please wait...</string>
-
+    <string name="dialog_save_file_label_new_file">Enter the name of the file (*.png)</string>
 </resources>

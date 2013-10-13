@@ -7,38 +7,29 @@
         android:layout_height="wrap_content"
         android:background="@null"
         android:contentDescription="@string/content_description_toolbox_button_run"
-        android:padding="@dimen/control_toolbox_padding"
         android:src="@drawable/toolbox_button_run" />
 
     <ImageButton
         android:id="@+id/button_step"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:background="@null"
         android:contentDescription="@string/content_description_toolbox_button_step"
-        android:padding="@dimen/control_toolbox_padding"
         android:src="@drawable/toolbox_button_step" />
 
     <ImageButton
         android:id="@+id/button_pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:background="@null"
         android:contentDescription="@string/content_description_toolbox_button_pause"
-        android:padding="@dimen/control_toolbox_padding"
         android:src="@drawable/toolbox_button_pause" />
 
     <ImageButton
         android:id="@+id/button_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
         android:background="@null"
         android:contentDescription="@string/content_description_toolbox_button_stop"
-        android:padding="@dimen/control_toolbox_padding"
         android:src="@drawable/toolbox_button_stop" />
-
-
 </merge>

@@ -106,12 +106,12 @@ public class FragmentPaletteSimple extends SherlockFragment {
         @Override
         public void draw(Canvas canvas) {
 
-            Rect bounds = getBounds();
+            /*Rect bounds = getBounds();
             int strokeWidth = (int) paint.getStrokeWidth() / 2;
 
             canvas.drawRect(bounds.left + strokeWidth,
                     bounds.top + strokeWidth, bounds.right - strokeWidth,
-                    bounds.bottom - strokeWidth, paint);
+                    bounds.bottom - strokeWidth, paint);*/
         }
 
         @Override

@@ -38,20 +38,18 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_gravity="bottom"
         android:layout_marginBottom="@dimen/medium_horizontal_margin"
         android:layout_marginRight="@dimen/medium_horizontal_margin"
         android:layout_marginTop="@dimen/small_horizontal_margin"
         android:layout_weight="1"
-        android:background="@color/editboard_background"
-        android:orientation="vertical"
-        android:layout_gravity="bottom"
-         >
+        android:background="@drawable/border"
+        android:orientation="vertical" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@drawable/border"
             android:orientation="vertical"
             android:padding="2dp" >
 
@@ -84,7 +82,9 @@
                             colorField:cellWidth="30dp"
                             colorField:countX="@integer/field_count_codels_x"
                             colorField:countY="@integer/field_count_codels_y"
-                            colorField:defaultCellColor="@color/codel_field_default_color"
+							colorField:minCellSide="@integer/codel_board_min_cell_side"
+							colorField:maxCellSide="@integer/codel_board_max_cell_side"
+							colorField:defaultCellColor="@color/codel_field_default_color"
                             colorField:normaliseForLowestEdge="true" />
                     </LinearLayout>
                 </com.example.piet_droid.widget.HorizontalScrollViewLockable>
@@ -94,7 +94,6 @@
         <TabHost
             android:id="@android:id/tabhost"
             android:layout_width="match_parent"
-            
             android:layout_height="@dimen/info_widget_size"
             android:layout_marginTop="@dimen/info_widget_margin_top" >
 
@@ -106,14 +105,14 @@
                 <TabWidget
                     android:id="@android:id/tabs"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/border" >
                 </TabWidget>
 
                 <FrameLayout
                     android:id="@android:id/tabcontent"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" 
-                   >
+                    android:layout_height="match_parent" >
 
                     <LinearLayout
                         android:id="@+id/tabInput"
@@ -127,7 +126,6 @@
                             android:layout_height="0dip"
                             android:layout_marginTop="@dimen/info_widget_margin_top"
                             android:layout_weight="1"
-                            android:background="@drawable/border"
                             android:gravity="top"
                             android:hint="@string/in_buffer_hint"
                             android:padding="@dimen/info_widget_panel_content_padding"
@@ -145,16 +143,16 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginTop="@dimen/info_widget_margin_top"
-                            android:background="@drawable/border"
                             android:scrollbars="vertical" >
 
                             <TextView
                                 android:id="@+id/text_view_out"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="wrap_content"
                                 android:gravity="top"
                                 android:padding="@dimen/info_widget_panel_content_padding"
                                 android:textColor="@color/info_widget_panel_content_text_color"
+                                android:textIsSelectable="true"
                                 android:textSize="@dimen/info_widget_panel_content_text_size" />
                         </ScrollView>
                     </LinearLayout>

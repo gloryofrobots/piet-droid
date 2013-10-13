@@ -9,7 +9,7 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
-public class HelperTabHost {
+public class TabHostBuilder {
     
    
     int mActiveTabColor;
@@ -22,7 +22,7 @@ public class HelperTabHost {
     public final int DEFAULT_DIMENSION = -1;
     ArrayList<TabHost.TabSpec> mTabs;
     TabHost mTabHost; 
-    private HelperTabHost(TabHost tabs) {
+    private TabHostBuilder(TabHost tabs) {
         // TODO Auto-generated constructor stub
         mTabHost = tabs;
         mTabHost.setup();
@@ -31,44 +31,44 @@ public class HelperTabHost {
         mTextSize = 12;
     }
     
-    public static HelperTabHost  create(TabHost tabs) {
-        HelperTabHost helper = new HelperTabHost(tabs);
+    public static TabHostBuilder  create(TabHost tabs) {
+        TabHostBuilder helper = new TabHostBuilder(tabs);
         return helper;
     }
  
-    public HelperTabHost setActiveTabColor(int activeTabColor) {
+    public TabHostBuilder setActiveTabColor(int activeTabColor) {
         this.mActiveTabColor = activeTabColor;
         return this;
     }
     
-    public HelperTabHost setTextSize(float size) {
+    public TabHostBuilder setTextSize(float size) {
         this.mTextSize = size;
         return this;
     }
 
-    public HelperTabHost setPassiveTabColor(int passiveTabColor) {
+    public TabHostBuilder setPassiveTabColor(int passiveTabColor) {
         this.mPassiveTabColor = passiveTabColor;
         return this;
     }
     
 
-    public HelperTabHost setTabWidth(int width) {
+    public TabHostBuilder setTabWidth(int width) {
         mTabWidth = width;
         return this;
     }
     
 
-    public HelperTabHost setTabHeight(int height) {
+    public TabHostBuilder setTabHeight(int height) {
         mTabHeight = height;
         return this;
     }
     
-    public HelperTabHost setTextColor(int color) {
+    public TabHostBuilder setTextColor(int color) {
         mTextColor = color;
         return this;
     }
     
-    public HelperTabHost addTab(int id, String tag, String indicator) {
+    public TabHostBuilder addTab(int id, String tag, String indicator) {
         TabHost.TabSpec spec = mTabHost.newTabSpec(tag);
         spec.setContent(id);
         spec.setIndicator(indicator);
@@ -117,7 +117,7 @@ public class HelperTabHost {
             tab.getLayoutParams().height = mTabHeight;
         }
         if(mTabWidth != DEFAULT_DIMENSION) {
-            tab.getLayoutParams().width = mTabHeight;
+            tab.getLayoutParams().width = mTabWidth;
         }
     }
     

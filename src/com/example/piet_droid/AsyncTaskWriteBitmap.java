@@ -120,7 +120,7 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
                     + fileName);
             mListener.onSaveBitmapError();
         } catch (IOException e) {
-            Log.e("LOAD_IMAGE", "IOException while saving " + fileName);
+            Log.e("LOAD_IMAGE", "IOException while saving " + fileName + "->" + e.toString());
             mListener.onSaveBitmapError();
         } finally {
             if (bitmap != null && bitmap.isRecycled() == false) {

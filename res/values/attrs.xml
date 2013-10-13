@@ -13,6 +13,8 @@
         <attr name="cellMargin" format="dimension" />
         <attr name="cellWidth" format="dimension"/>
         <attr name="cellHeight" format="dimension"/>
+        <attr name="minCellSide" format="dimension"/>
+        <attr name="maxCellSide" format="dimension"/>
     </declare-styleable>
     
     <declare-styleable name="ColorFieldViewEditBoard">

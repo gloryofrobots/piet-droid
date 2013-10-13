@@ -59,6 +59,12 @@ public class PietFileActor {
         // TODO CHECK ERRORS!!!!!
         // TODO FADE OUT FADE IN
         Bitmap bitmap = BitmapFactory.decodeFile(path);
+        if(bitmap == null) {
+            showMessage("Error decoding file %s", path);
+            return;
+        }
+        
+        
         // TODO CODEL SIZE HERE
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -165,11 +171,16 @@ public class PietFileActor {
         mSaveTask.execute(path);
     }
 
+    public void showMessage(String format, Object... args) {
+        String  msg = String.format(format, args);
+        showMessage(msg);
+    }
+    
     public void showMessage(String msg) {
         Toast toast = Toast.makeText(mActivity, msg, Toast.LENGTH_SHORT);
         toast.show();
     }
-
+    
     public void finalise() {
         mPietFile = null;
         if (mSaveTask != null) {
