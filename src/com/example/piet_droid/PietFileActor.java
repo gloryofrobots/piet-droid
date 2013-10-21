@@ -1,6 +1,8 @@
 package com.example.piet_droid;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;

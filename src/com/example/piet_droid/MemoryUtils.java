@@ -4,9 +4,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
+
 public class MemoryUtils {
 
     public static long getFreeMemory() {
+        // ActivityManager activityManager = (ActivityManager) mActivity
+        // .getSystemService(Activity.ACTIVITY_SERVICE);
+        // MemoryInfo mi = new MemoryInfo();
+        // activityManager.getMemoryInfo(mi);
+
         Runtime info = Runtime.getRuntime();
         long freeSize = info.freeMemory();
         return freeSize;
