@@ -28,8 +28,11 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
         public void onSaveBitmapError();
     }
 
-    int[] mColors;
+    private static final String LOG_TAG = "ASYNC_TASK_WRITE_BITMAP";
 
+    int[] mColors;
+    
+    boolean mErrorDectected;
     private Context mContext;
     private SaveProcessListener mListener;
     private CodelTableModel mModel;
@@ -41,6 +44,7 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
         mListener = listener;
         mModel = piet.getModel();
         mContext = context;
+        mErrorDectected = false;
         //mFormatTag = format;
     }
     
@@ -82,14 +86,19 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
     @Override
     protected void onPostExecute(Void result) {
         super.onPostExecute(result);
-        mListener.onSaveBitmapComplete();
         mProgressDialog.dismiss();
+        
+        if(mErrorDectected) {
+            mListener.onSaveBitmapError();
+        } else {
+            mListener.onSaveBitmapComplete();
+        }
     }
 
     @Override
     protected Void doInBackground(String... params) {
         String fileName = params[0];
-
+        
         int width = mModel.getWidth();
         int height = mModel.getHeight();
 
@@ -116,18 +125,18 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
             fileOStream.close();
             
         } catch (IndexOutOfBoundsException e) {
-            Log.e("LOAD_IMAGE", "IndexOutOfBoundsException while saving "
-                    + fileName);
-            mListener.onSaveBitmapError();
+            Log.e(LOG_TAG, "IndexOutOfBoundsException while saving "
+                    + fileName + "->" + e.toString() );
+            mErrorDectected = true;
         } catch (IOException e) {
-            Log.e("LOAD_IMAGE", "IOException while saving " + fileName + "->" + e.toString());
-            mListener.onSaveBitmapError();
+            Log.e(LOG_TAG , "IOException while saving " + fileName + "->" + e.toString());
+            mErrorDectected = true;
         } finally {
             if (bitmap != null && bitmap.isRecycled() == false) {
                 bitmap.recycle();
             }
         }
-
+        
         return null;
     }
 

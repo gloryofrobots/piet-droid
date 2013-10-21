@@ -1,19 +1,21 @@
 package com.example.piet_droid;
 
 
+import java.io.IOException;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
     public interface LoadProcessListener {
-        //public void onLoadBitmapStart();
         public void onLoadBitmapCancel();
-        //public void onLoadBitmapUpdate(List<Pixel> pixels);
         public void onLoadBitmapComplete();
+        public void onLoadBitmapError();
         public void onLoadBitmapPixel(int x, int y, int color);
     }
     
@@ -28,18 +30,18 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
         public int y;
         public int color;
     }
+
+    private static final String LOG_TAG = "ASYNC_TASK_LOAD_BITMAP";
     
     private Context mContext;
     private LoadProcessListener mListener;
-    //private List<Pixel> mQueue;
-    //private String mFilename;
     private ProgressDialog mProgressDialog;
+    boolean mErrorDetected;
     
     public AsyncTaskLoadBitmap(LoadProcessListener listener, Context context) {
         mListener = listener;
         mContext = context;
     }
-    
     
     @Override
     protected void  onCancelled(){
@@ -49,7 +51,6 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
     
     @Override
     protected void onPreExecute() {
-        //mQueue = Collections.synchronizedList(new ArrayList<Pixel>());
         mProgressDialog = new ProgressDialog(mContext);
         Resources resources = mContext.getResources();
         
@@ -59,51 +60,45 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
         mProgressDialog.setTitle(title);
         mProgressDialog.setMessage(message);
         
-        //mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        //mProgressDialog.setMax(100);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.show();
-        
-        //mListener.onLoadBitmapStart();
     }
 
     @Override
     protected void onPostExecute(Void result) {
         super.onPostExecute(result);
-        mListener.onLoadBitmapComplete();
+        
         mProgressDialog.dismiss();
+        
+        if(mErrorDetected) {
+            mListener.onLoadBitmapError();
+        } else {
+            mListener.onLoadBitmapComplete();
+        }
     }
 
     @Override
     protected Void doInBackground(Bitmap... params) {
-        Bitmap bitmap = params[0];
-        
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        
-        // TODO CODEL SIZE HERE
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int pixel = bitmap.getPixel(x, y);
-                
-                mListener.onLoadBitmapPixel(x, y, pixel);
-                
-                //publishProgress((count * 100) / size);
+        try {
+            Bitmap bitmap = params[0];
+            
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            
+            // TODO CODEL SIZE HERE
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int pixel = bitmap.getPixel(x, y);
+                    mListener.onLoadBitmapPixel(x, y, pixel);
+                }
             }
+            
+            bitmap.recycle();
+        } catch(Exception e) {
+            Log.e(LOG_TAG,e.toString());
+            mErrorDetected = true;
         }
         
-        bitmap.recycle();
         return null;
-    }
-
-    protected void onProgressUpdate(Integer... progress) {
-        //int percentage = progress[0];
-        //mProgressDialog.setProgress(percentage);
-        /*
-        mListener.onLoadBitmapUpdate(mQueue);
-        synchronized (mQueue) {
-            mQueue.clear();
-        }*/
-        
     }
 }

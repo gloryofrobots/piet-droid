@@ -1,6 +1,5 @@
 package com.example.piet_droid;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -56,19 +55,31 @@ public class PietFileActor {
     AsyncTaskLoadBitmap mLoadTask;
 
     public void load(String path) {
-        // TODO CHECK ERRORS!!!!!
-        // TODO FADE OUT FADE IN
-        Bitmap bitmap = BitmapFactory.decodeFile(path);
-        if(bitmap == null) {
+        Bitmap bitmap = null;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        bitmap = BitmapFactory.decodeFile(path, options);
+
+        if (bitmap == null) {
             showMessage("Error decoding file %s", path);
             return;
         }
-        
-        
+
         // TODO CODEL SIZE HERE
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-
+        
+        long amountOfMemory = mView.getAmountOfMemory(width, height);
+        //if amountOfMemory == -1, view can`t determine memory size we just try to load program. 
+        //if it would fall it would fall
+        if(amountOfMemory != -1) {
+            long freeMemory = MemoryUtils.getFreeMemory();
+            if(freeMemory < (amountOfMemory + 1024)) {
+                showMessage("Error! image to large to create piet program in your device");
+                return;
+            }
+        }
+       
         mPiet.createModel(width, height);
 
         mView.setVisibility(View.INVISIBLE);
@@ -94,8 +105,18 @@ public class PietFileActor {
                         mPietFile.untouch();
                         mLoadTask = null;
                     }
+
+                    @Override
+                    public void onLoadBitmapError() {
+                        mView.setVisibility(View.VISIBLE);
+                        mView.invalidate();
+
+                        String message = mActivity.getResources().getString(
+                                R.string.runtime_load_bitmap_error);
+                        showMessage(message);
+                    }
                 }, mActivity);
-         mLoadTask.execute(bitmap);
+        mLoadTask.execute(bitmap);
     }
 
     public void lockOrientation() {
@@ -125,7 +146,8 @@ public class PietFileActor {
     }
 
     public void unlockOrientation() {
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        mActivity
+                .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     public void saveAsync(String path) {
@@ -148,17 +170,21 @@ public class PietFileActor {
 
         mSaveTask = new AsyncTaskWriteBitmap(mPiet,
                 new AsyncTaskWriteBitmap.SaveProcessListener() {
-
                     @Override
                     public void onSaveBitmapError() {
-                        showMessage("Error occurred during saving bitmap");
+                        String message = mActivity.getResources().getString(
+                                R.string.runtime_save_bitmap_error);
+                        showMessage(message);
+                        mSaveTask = null;
                     }
 
                     @Override
                     public void onSaveBitmapComplete() {
                         mPietFile.setPath(filePath);
                         mPietFile.untouch();
-                        showMessage("Bitmap saved");
+                        String message = mActivity.getResources().getString(
+                                R.string.runtime_bitmap_saved);
+                        showMessage(message);
                         mSaveTask = null;
                     }
 
@@ -167,20 +193,20 @@ public class PietFileActor {
                         mSaveTask = null;
                     }
                 }, mActivity);
-        
+
         mSaveTask.execute(path);
     }
 
     public void showMessage(String format, Object... args) {
-        String  msg = String.format(format, args);
+        String msg = String.format(format, args);
         showMessage(msg);
     }
-    
+
     public void showMessage(String msg) {
         Toast toast = Toast.makeText(mActivity, msg, Toast.LENGTH_SHORT);
         toast.show();
     }
-    
+
     public void finalise() {
         mPietFile = null;
         if (mSaveTask != null) {
@@ -265,5 +291,4 @@ public class PietFileActor {
         mPiet.createModel(countX, countY);
         mPietFile.untouch();
     }
-
 }

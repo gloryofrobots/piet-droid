@@ -24,6 +24,8 @@
     
     <dimen name="codel_board_cell_margin">0dp</dimen>
     <dimen name="button_scroll_toggle_side">30dp</dimen>
-    <dimen name="palette_cell_side">30dp</dimen>
+    <dimen name="palette_cell_side">35dp</dimen>
     <dimen name="palette_slide_panel_width">45dp</dimen>
+    <dimen name="codel_board_min_cell_side">1dp</dimen>
+    <dimen name="codel_board_max_cell_side">100dp</dimen>
 </resources>

@@ -4,14 +4,16 @@
         android:key="delay_before_step"
         android:summary="@string/delay_before_step_summary"
         android:title="@string/delay_before_step_title"
-        android:defaultValue="100"/>
+        android:defaultValue="100"
+        android:inputType="number"/>
     
     <EditTextPreference
         android:dialogTitle="@string/cell_padding_title"
         android:key="cell_padding"
         android:summary="@string/cell_padding_summary"
         android:title="@string/cell_padding_title"
-        android:defaultValue="0"/>
+        android:defaultValue="0"
+        android:inputType="number"/>
     
     <!--  
         <ListPreference

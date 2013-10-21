@@ -23,6 +23,8 @@
     <color name="palette_text_color">#000</color>
     <color name="palette_highlight_color">#ccc</color>
     
+    <color name="action_bar_background">#879f38</color>
+    
     <color name="white">#FFF</color>
     <color name="black">#000</color>
     <!-- c9ccdf -->

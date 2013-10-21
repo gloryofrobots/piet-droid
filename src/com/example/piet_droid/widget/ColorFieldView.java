@@ -1,5 +1,10 @@
 package com.example.piet_droid.widget;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+import com.example.piet_droid.MemoryUtils;
 import com.example.piet_droid.R;
 import com.example.piet_droid.R.styleable;
 
@@ -40,7 +45,10 @@ public class ColorFieldView extends View {
         public boolean isProcessClickWanted();
     }
 
-    private class Cell {
+    private class Cell implements Serializable{
+       
+        private static final long serialVersionUID = 1L;
+        
         public int x;
         public int y;
         int color;
@@ -59,7 +67,7 @@ public class ColorFieldView extends View {
             this.margin = margin;
             drawable = null;
         }
-
+        
         public Rect createBounds(int width, int height) {
             bounds.left = x * (width + padding.left) + margin.left;
             bounds.top = y * (height + padding.top) + margin.top;
@@ -133,15 +141,13 @@ public class ColorFieldView extends View {
             Cell[] findedRow = null;
 
             for (int y = 0; y < mCellCountY; y++) {
-                Cell[] row = mCells[y];
-
                 float boundTop = y * (mCellHeight + mCellPadding.top)
                         + mCellMargin.top;
 
                 float boundBottom = boundTop + mCellHeight;
 
                 if (eventY >= boundTop && eventY < boundBottom) {
-                    findedRow = row;
+                    findedRow = mCells[y];
                     break;
                 }
             }
@@ -191,11 +197,12 @@ public class ColorFieldView extends View {
     private boolean mForceDraw;
     private Cell mCellToRedraw;
     
-    private final static int DEFAULT_MIN_CELL_SIDE = 10;
-    private final static int DEFAULT_MAX_CELL_SIDE = 100;
-    
     private int mMinCellSide;
     private int mMaxCellSide;
+    private int mCellMemorySize;
+    
+    private final static int DEFAULT_MIN_CELL_SIDE = 10;
+    private final static int DEFAULT_MAX_CELL_SIDE = 100;
     
     public void setOnCellClickListener(CellClickListener onCellClickListener) {
         mOnCellClickListener = onCellClickListener;
@@ -209,7 +216,7 @@ public class ColorFieldView extends View {
 
     public ColorFieldView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs);
-
+        
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.ColorFieldView);
 
@@ -250,7 +257,9 @@ public class ColorFieldView extends View {
         mStrokeWidth = a.getInt(R.styleable.ColorFieldView_strokeWidth, 1);
 
         createCells();
-
+        
+        makeCellMemorySize();
+        
         int colorsResourceId = a.getResourceId(
                 R.styleable.ColorFieldView_palette, -1);
         if (colorsResourceId != -1) {
@@ -320,7 +329,7 @@ public class ColorFieldView extends View {
     }
 
     protected void init() {
-
+        int x = 1/0;
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         mLinePaint.setColor(mLineColor);
@@ -367,7 +376,6 @@ public class ColorFieldView extends View {
     }
     
 
-    
     // Load colors from array resource in order which it have in xml
     private void loadCellColorsFromResource(int resourceId) {
         Resources resources = getResources();
@@ -390,16 +398,22 @@ public class ColorFieldView extends View {
     }
 
     private void createCells() {
-        mCells = new Cell[mCellCountY][mCellCountX];
-
-        for (int y = 0; y < mCellCountY; y++) {
-            for (int x = 0; x < mCellCountX; x++) {
-                mCells[y][x] = new Cell(x, y, mDefaultCellColor, mCellPadding,
+        mCells = createCells(mCellCountX, mCellCountY);
+    }
+    
+    private Cell[][]  createCells(int cellCountX, int cellCountY) {
+        Cell[][] cells = new Cell[cellCountY][cellCountX];
+         
+        for (int y = 0; y < cellCountY; y++) {
+            for (int x = 0; x < cellCountX; x++) {
+                cells[y][x] = new Cell(x, y, mDefaultCellColor, mCellPadding,
                         mCellMargin);
             }
         }
+        
+       return cells;
     }
-
+    
     public void setCellColor(int x, int y, int color) {
         mCells[y][x].color = color;
     }
@@ -539,11 +553,12 @@ public class ColorFieldView extends View {
     }
 
     public void resize(int countX, int countY) {
+        //If exception occurred old cells will stay alive
+        Cell[][] cells = createCells(countX, countY);
+        
+        mCells = cells;
         mCellCountX = countX;
         mCellCountY = countY;
-
-        createCells();
-
         invalidateSize();
     }
 
@@ -578,5 +593,23 @@ public class ColorFieldView extends View {
 
     public int getMaxCellSide() {
         return mMaxCellSide;
+    }
+    
+    //Brutal way to determine memory for one cell
+    private void makeCellMemorySize() {
+        long freeMemoryBefore = MemoryUtils.getFreeMemory();
+        new Cell(0, 0, mDefaultCellColor, mCellPadding,
+                mCellMargin);
+        long freeMemoryAfter = MemoryUtils.getFreeMemory();
+        mCellMemorySize = (int) (freeMemoryBefore - freeMemoryAfter);
+
+    }
+    
+    public long getAmountOfMemory(int width, int height) {
+        if(mCellMemorySize == 0) {
+            return -1;
+        }
+        
+        return width * height * mCellMemorySize;
     }
 }

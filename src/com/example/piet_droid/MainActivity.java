@@ -75,7 +75,6 @@ import com.example.piet_droid.widget.TabHostBuilder;
 import com.example.piet_droid.widget.HorizontalScrollViewLockable;
 import com.example.piet_droid.widget.ScrollViewLockable;
 
-//TODO CONTEXT MENU
 public class MainActivity extends SherlockFragmentActivity implements
         FragmentPaletteSimple.OnChooseColorListener, PietProvider {
 
@@ -115,7 +114,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         public void onRunCancel() {
             PietFileActor actor = getCurrentPietFile().getActor();
             actor.clearViewDrawables();
-            mFragmentStateInfo.init();
+            // mFragmentStateInfo.init();
         }
 
         @Override
@@ -140,6 +139,15 @@ public class MainActivity extends SherlockFragmentActivity implements
             mControlToolBoxView.setControlsToDefaultState();
         }
 
+        @Override
+        public void onRunError() {
+            PietFileActor actor = getCurrentPietFile().getActor();
+            actor.clearViewDrawables();
+            mControlToolBoxView.setControlsToDefaultState();
+            String message = getResources().getString(
+                    R.string.runtime_internal_error);
+            getCurrentPietFile().getActor().showMessage(message);
+        }
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -148,14 +156,11 @@ public class MainActivity extends SherlockFragmentActivity implements
         @Override
         public void onInteractionRun() {
             getCurrentPietFile().getRunner().run(mSleepBetweenStep);
-            // hideFileMenu();
         }
 
         @Override
         public void onInteractionStep() {
             getCurrentPietFile().getRunner().step(mSleepBetweenStep);
-
-            // hideFileMenu();
         }
 
         @Override
@@ -163,8 +168,6 @@ public class MainActivity extends SherlockFragmentActivity implements
             if (isOnRunMode() == false) {
                 return;
             }
-
-            // /showFileMenu();
             stopRun();
         }
 
@@ -173,8 +176,6 @@ public class MainActivity extends SherlockFragmentActivity implements
             if (isOnRunMode() == false) {
                 return;
             }
-
-            // showFileMenu();
             stopRun();
         }
     };
@@ -201,7 +202,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     ControlToolboxView mControlToolBoxView;
     FragmentCommandLog mFragmentCommandLog;
 
-    private int mZoomChangeValue = 10;
+    private int mZoomChangeValue = 2;
 
     boolean mOnScrollMode;
 
@@ -215,11 +216,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         Resources resources = getResources();
 
-        if (initSdCardDirectory() == false) {
-            //TODO MOVE INNER
-            abortApplication("Can`t initialise application directory %s",
-                    mDataFolderName);
-        }
+        initSdCardDirectory();
 
         initRunListener(resources);
         initFragments();
@@ -244,47 +241,50 @@ public class MainActivity extends SherlockFragmentActivity implements
     private void abortApplication(String format, Object... args) {
         String msg = String.format(format, args);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setPositiveButton("OK", null)
-                .setTitle("Error")
-                .setMessage(msg)
+        builder.setPositiveButton("OK", null).setTitle("Error").setMessage(msg)
                 .setCancelable(false)
-                .setPositiveButton("Ok",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                finish();
-                            }
-                        }).show();
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                }).show();
         return;
 
     }
 
-    private boolean initSdCardDirectory() {
+    private void initSdCardDirectory() {
         if (android.os.Environment.getExternalStorageState().equals(
                 android.os.Environment.MEDIA_MOUNTED) == false) {
 
-            return false;
+            abortApplication(
+                    getStringFromResource(R.string.abort_application_not_mounted),
+                    mDataFolderName);
         }
 
         mDataFolderName = Environment.getExternalStorageDirectory()
                 + File.separator + "." + getString(R.string.app_name);
 
         File folder = new File(mDataFolderName);
-
+        
         if (folder.exists() == false) {
             if (folder.mkdir() == false) {
-                return false;
+                abortApplication(
+                        getStringFromResource(R.string.abort_application_cant_create_dir),
+                        mDataFolderName);
             }
         }
 
         if (folder.isDirectory() == false) {
-            return false;
+            abortApplication(
+                    getStringFromResource(R.string.abort_application_is_not_dir),
+                    mDataFolderName);
         }
 
         if (folder.canWrite() == false || folder.canRead() == false) {
-            return false;
+            abortApplication(
+                    getStringFromResource(R.string.abort_application_is_not_writable),
+                    mDataFolderName);
         }
-
-        return true;
     }
 
     private void initRunListener(Resources resources) {
@@ -296,8 +296,11 @@ public class MainActivity extends SherlockFragmentActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setCustomView(R.layout.action_bar_custom);
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color
-                .parseColor("#879f38")));
+
+        // FORCE SET COLOR BACKGROUND
+        actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
+                .getColor(R.color.action_bar_background)));
+
         mControlToolBoxView = (ControlToolboxView) actionBar.getCustomView()
                 .findViewById(R.id.fragment_control_toolbox);
 
@@ -320,7 +323,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             final ImageButton buttonZoomDecrease) {
         final int minCellSide = mColorField.getMinCellSide();
         final int maxCellSide = mColorField.getMaxCellSide();
-        
+
         buttonZoomIncrease.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 int width = mColorField.getCellWidth();
@@ -448,7 +451,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                             getCurrentPietFile()
                                     .getActor()
                                     .showMessage(
-                                            "Edit mode disabled until program executed.");
+                                            getStringFromResource(R.string.runtime_edit_mode_lock_warning));
                             return false;
                         }
 
@@ -516,7 +519,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 .addTab(R.id.tabState, "state",
                         resources.getString(R.string.tab_state))
                 .addTab(R.id.tabLog, "log",
-                        resources.getString(R.string.tab_log)).build(3);
+                        resources.getString(R.string.tab_log)).build(2);
     }
 
     // Called after onCreate has finished, use to restore UI state
@@ -631,6 +634,11 @@ public class MainActivity extends SherlockFragmentActivity implements
         switch (item.getItemId()) {
         case (R.id.action_hide_tabhost):
             onActionHideTabHost(item.isChecked());
+            if(item.isChecked()) {
+                item.setTitle(R.string.action_show_tabhost);
+            } else {
+               item.setTitle(R.string.action_hide_tabhost);
+            }
             item.setChecked(!item.isChecked());
             return true;
 
@@ -688,7 +696,9 @@ public class MainActivity extends SherlockFragmentActivity implements
             return false;
         }
     }
+
     final private String LOG_LABEL_ACTION = "ACTION";
+
     public void doActionIfUserDontWantToSaveChanges(
             final Callable<Void> callable) {
         if (mCurrentFile.isTouched() == false) {
@@ -696,7 +706,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 callable.call();
             } catch (Exception e) {
                 Log.e(LOG_LABEL_ACTION, e.toString());
-                abortApplication("Fatal application error!");
+                abortApplication(getStringFromResource(R.string.abort_application_fatal_error));
             }
         } else {
             DialogFragmentSaveChanges dialog = new DialogFragmentSaveChanges();
@@ -708,7 +718,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                         callable.call();
                     } catch (Exception e) {
                         Log.e(LOG_LABEL_ACTION, e.toString());
-                        abortApplication("Fatal application error!");
+                        abortApplication(getStringFromResource(R.string.abort_application_fatal_error));
                     }
 
                 }
@@ -775,16 +785,15 @@ public class MainActivity extends SherlockFragmentActivity implements
             onActionSaveAs();
             return;
         }
-        
+
         getCurrentPietFile().getActor().saveAsync();
     }
-    
-    
+
     private void emulateInteractionStopIfOnRun() {
         if (isOnRunMode() == false) {
             return;
         }
-        
+
         mInteractionListener.onInteractionStop();
     }
 
@@ -797,7 +806,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 R.string.dialog_save_file_label_new_file);
 
         dialog.setLabels(labels);
-        
+
         dialog.loadFolder(mDataFolderName);
         // dialog.setFilter(".*jpg|.*jpeg|.*png|.*gif|.*JPG|.*JPEG|.*PNG|.*GIF|");
         dialog.setCanCreateFiles(true);
@@ -890,12 +899,24 @@ public class MainActivity extends SherlockFragmentActivity implements
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
-        mSleepBetweenStep = Long.valueOf(preferences.getString(
-                "delay_before_step", "0"));
-
-        int cellPadding = Integer.valueOf(preferences.getString("cell_padding",
-                "0"));
-
+       
+        try {
+            mSleepBetweenStep = Long.valueOf(preferences.getString("delay_before_step",
+                    "0"));
+        } catch(NumberFormatException e) {
+            mSleepBetweenStep = 0;
+            showMessage("Error parsing delay before step");
+        }
+        
+        int cellPadding = 0;
+        try {
+            cellPadding = Integer.valueOf(preferences.getString("cell_padding",
+                    "0"));
+        } catch(NumberFormatException e) {
+            cellPadding = 0;
+            showMessage("Error parsing cell padding");
+        }
+        
         getCurrentPietFile().getView().setCellPadding(cellPadding);
 
         int cellSide = preferences.getInt("cell_side",
@@ -909,6 +930,10 @@ public class MainActivity extends SherlockFragmentActivity implements
         if (isOnRunMode() == true) {
             getCurrentPietFile().getRunner().setStepDelay(mSleepBetweenStep);
         }
+    }
+
+    private void showMessage(String msg) {
+        getCurrentPietFile().getActor().showMessage(msg);
     }
 
     protected int getActiveColor() {
@@ -939,5 +964,9 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public Piet getPiet() {
         return mPiet;
+    }
+
+    public String getStringFromResource(int id) {
+        return getResources().getString(id);
     }
 }

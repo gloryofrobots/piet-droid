@@ -82,8 +82,8 @@
                             colorField:cellWidth="30dp"
                             colorField:countX="@integer/field_count_codels_x"
                             colorField:countY="@integer/field_count_codels_y"
-							colorField:minCellSide="@integer/codel_board_min_cell_side"
-							colorField:maxCellSide="@integer/codel_board_max_cell_side"
+							colorField:minCellSide="@dimen/codel_board_min_cell_side"
+							colorField:maxCellSide="@dimen/codel_board_max_cell_side"
 							colorField:defaultCellColor="@color/codel_field_default_color"
                             colorField:normaliseForLowestEdge="true" />
                     </LinearLayout>
