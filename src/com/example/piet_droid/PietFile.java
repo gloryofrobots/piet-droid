@@ -14,7 +14,8 @@ public class PietFile {
     private PietFileRunner mRunner;
     private Activity mActivity;
     private ColorFieldView mView;
-    boolean mTouched;
+    boolean mTouched = false;
+    boolean mIsTemporary = false;
     Piet mPiet;
     
     public PietFile(ColorFieldView view, Piet piet, Activity activity) {
@@ -52,6 +53,14 @@ public class PietFile {
     
     public String getPath() {
         return mPath;
+    }
+    
+    public void setTemporary(boolean value) {
+        mIsTemporary = value;
+    }
+    
+    public boolean isTemporary() {
+        return mIsTemporary;
     }
     
     public PietFileActor getActor() {

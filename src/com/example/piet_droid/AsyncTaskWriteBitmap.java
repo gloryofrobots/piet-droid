@@ -1,23 +1,11 @@
 package com.example.piet_droid;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import com.example.jpiet.CodelTableModel;
-import com.example.jpiet.Piet;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-
 import android.os.AsyncTask;
-import android.util.Log;
+
+import com.example.jpiet.Piet;
 
 class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
     public interface SaveProcessListener {
@@ -28,35 +16,19 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
         public void onSaveBitmapError();
     }
 
-    private static final String LOG_TAG = "ASYNC_TASK_WRITE_BITMAP";
-
-    int[] mColors;
-    
     boolean mErrorDectected;
     private Context mContext;
     private SaveProcessListener mListener;
-    private CodelTableModel mModel;
     private ProgressDialog mProgressDialog;
     //String mFormatTag;
-    
+    private BitmapWriter mWriter;
     public AsyncTaskWriteBitmap(Piet piet,
             SaveProcessListener listener, Context context) {
         mListener = listener;
-        mModel = piet.getModel();
+        mWriter = new BitmapWriter(piet.getModel());
         mContext = context;
         mErrorDectected = false;
         //mFormatTag = format;
-    }
-    
-    private Bitmap.CompressFormat getBitmapDecodeFormat() {
-        Bitmap.CompressFormat format = Bitmap.CompressFormat.PNG;
-        /*if(mFormatTag.equals("PNG")) {
-            format = Bitmap.CompressFormat.PNG;
-        } else if (mFormatTag.equals("JPEG")) {
-            format = Bitmap.CompressFormat.JPEG;
-        }*/
-        
-        return format;
     }
     
     @Override
@@ -64,7 +36,6 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
         mListener.onSaveBitmapCancel();
         mProgressDialog.dismiss();
     }
-    
     
     @Override
     protected void onPreExecute() {
@@ -94,50 +65,11 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
             mListener.onSaveBitmapComplete();
         }
     }
-
+    
     @Override
     protected Void doInBackground(String... params) {
         String fileName = params[0];
-        
-        int width = mModel.getWidth();
-        int height = mModel.getHeight();
-
-        int size = width * height;
-        int[] colors = new int[size];
-
-        Bitmap bitmap = null;
-        FileOutputStream fileOStream = null;
-
-        try {
-            mModel.fillArray(colors);
-            bitmap = Bitmap.createBitmap(colors, width, height,
-                    Bitmap.Config.ARGB_8888);
-
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            
-            Bitmap.CompressFormat format = getBitmapDecodeFormat();
-            bitmap.compress(format, 100, bytes);
-
-            File file = new File(fileName);
-
-            fileOStream = new FileOutputStream(file);
-            fileOStream.write(bytes.toByteArray());
-            fileOStream.close();
-            
-        } catch (IndexOutOfBoundsException e) {
-            Log.e(LOG_TAG, "IndexOutOfBoundsException while saving "
-                    + fileName + "->" + e.toString() );
-            mErrorDectected = true;
-        } catch (IOException e) {
-            Log.e(LOG_TAG , "IOException while saving " + fileName + "->" + e.toString());
-            mErrorDectected = true;
-        } finally {
-            if (bitmap != null && bitmap.isRecycled() == false) {
-                bitmap.recycle();
-            }
-        }
-        
+        mErrorDectected = mWriter.write(fileName);
         return null;
     }
-
 }

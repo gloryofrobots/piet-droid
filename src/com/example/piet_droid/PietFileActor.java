@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -56,12 +57,12 @@ public class PietFileActor {
 
     AsyncTaskLoadBitmap mLoadTask;
 
-    public void load(String path) {
+    public void loadAsync(String path) {
         Bitmap bitmap = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         bitmap = BitmapFactory.decodeFile(path, options);
-
+        
         if (bitmap == null) {
             showMessage("Error decoding file %s", path);
             return;
@@ -70,18 +71,19 @@ public class PietFileActor {
         // TODO CODEL SIZE HERE
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-        
+
         long amountOfMemory = mView.getAmountOfMemory(width, height);
-        //if amountOfMemory == -1, view can`t determine memory size we just try to load program. 
-        //if it would fall it would fall
-        if(amountOfMemory != -1) {
+        // if amountOfMemory == -1, view can`t determine memory size we just try
+        // to load program.
+        // if it would fall it would fall
+        if (amountOfMemory != -1) {
             long freeMemory = MemoryUtils.getFreeMemory();
-            if(freeMemory < (amountOfMemory + 1024)) {
+            if (freeMemory < (amountOfMemory + 1024)) {
                 showMessage("Error! image to large to create piet program in your device");
                 return;
             }
         }
-       
+
         mPiet.createModel(width, height);
 
         mView.setVisibility(View.INVISIBLE);
@@ -102,7 +104,7 @@ public class PietFileActor {
                     @Override
                     public void onLoadBitmapComplete() {
                         mView.setVisibility(View.VISIBLE);
-                        mView.invalidate();
+                        invalidateView();
                         mPietFile.setPath(filePath);
                         mPietFile.untouch();
                         mLoadTask = null;
@@ -111,7 +113,7 @@ public class PietFileActor {
                     @Override
                     public void onLoadBitmapError() {
                         mView.setVisibility(View.VISIBLE);
-                        mView.invalidate();
+                        invalidateView();
 
                         String message = mActivity.getResources().getString(
                                 R.string.runtime_load_bitmap_error);
@@ -150,6 +152,18 @@ public class PietFileActor {
     public void unlockOrientation() {
         mActivity
                 .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }
+
+    public boolean save(String fileName) {
+        BitmapWriter writer = new BitmapWriter(mPiet.getModel());
+
+        if (writer.write(fileName) == true) {
+            mPietFile.setPath(fileName);
+            mPietFile.untouch();
+            return true;
+        }
+
+        return false;
     }
 
     public void saveAsync(String path) {
@@ -225,25 +239,25 @@ public class PietFileActor {
         mView.setCellDrawable(x, y, drawable);
     }
 
-    private final String SAVE_KEY_MODEL = "PietCodelTableModel";
-    private final String SAVE_KEY_CURRENT_FILENAME = "PietCurrentFileName";
+    private final String SAVE_KEY_MODEL_INSTANCE_STATE = "PietCodelTableModelInstanceState";
+    private final String SAVE_KEY_CURRENT_FILENAME_INSTANCE_STATE = "PietCurrentFileNameInstanceState";
 
     public void saveInstanceState(Bundle savedInstanceState) {
         CodelTableModel model = mPiet.getModel();
         CodelTableModelSerializedData data = model.getSerializeData();
-        savedInstanceState.putSerializable(SAVE_KEY_MODEL, data);
+        savedInstanceState.putSerializable(SAVE_KEY_MODEL_INSTANCE_STATE, data);
 
         if (mPietFile.hasPath() == false) {
             return;
         }
 
-        savedInstanceState.putString(SAVE_KEY_CURRENT_FILENAME,
+        savedInstanceState.putString(SAVE_KEY_CURRENT_FILENAME_INSTANCE_STATE,
                 mPietFile.getPath());
     }
 
     public void restoreFromSavedState(Bundle savedInstanceState) {
         CodelTableModelSerializedData data = (CodelTableModelSerializedData) savedInstanceState
-                .getSerializable(SAVE_KEY_MODEL);
+                .getSerializable(SAVE_KEY_MODEL_INSTANCE_STATE);
 
         CodelTableModel model = CodelTableModel
                 .createCodelTableModelFromSerializedData(data);
@@ -252,7 +266,7 @@ public class PietFileActor {
         invalidateView();
 
         String fileName = savedInstanceState
-                .getString(SAVE_KEY_CURRENT_FILENAME);
+                .getString(SAVE_KEY_CURRENT_FILENAME_INSTANCE_STATE);
 
         if (fileName == null) {
             return;
@@ -284,7 +298,7 @@ public class PietFileActor {
     }
 
     public void invalidateView() {
-        mView.invalidate();
+        // mView.invalidate();
     }
 
     public void resize(int countX, int countY) {

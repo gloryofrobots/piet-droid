@@ -1,7 +1,5 @@
 package com.example.piet_droid;
 
-import java.io.IOException;
-
 import android.os.AsyncTask;
 import android.util.Log;
 

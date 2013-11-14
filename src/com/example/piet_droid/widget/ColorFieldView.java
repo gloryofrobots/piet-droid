@@ -47,7 +47,8 @@ public class ColorFieldView extends View {
         Cell() {
             this.bounds = new Rect();
         }
-        //clear all cell state
+
+        // clear all cell state
         public void init(int x, int y, int color) {
             this.x = x;
             this.y = y;
@@ -87,39 +88,42 @@ public class ColorFieldView extends View {
         }
     }
 
-    private class Cells implements Iterable<Cell>{
-        public class CellIterator implements Iterator<Cell>{
+    private class Cells implements Iterable<Cell> {
+        public class CellIterator implements Iterator<Cell> {
             private int mLastIndex;
             private int mCurrentIndex;
-            
+
             CellIterator(int first, int last) {
                 mLastIndex = last;
                 mCurrentIndex = first;
             }
-            
+
             @Override
             public boolean hasNext() {
                 return mCurrentIndex < mLastIndex;
             }
+
             @Override
             public Cell next() {
                 Cell cell = mCells[mCurrentIndex];
                 mCurrentIndex++;
                 return cell;
             }
+
             @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }
         }
-        
+
         Cell[] mCells;
         private int mWidth;
         private int mHeight;
         private int mCellMemorySize;
         private int mLastIndex;
+
         Cells(int width, int height) {
-            
+
             mWidth = width;
             mHeight = height;
             int size = mWidth * mHeight;
@@ -143,44 +147,45 @@ public class ColorFieldView extends View {
             for (int i = first; i < last; i++) {
                 mCells[i] = new Cell();
             }
-            
+
             invalidateCellCoords();
         }
-        
+
         public void resize(int width, int height) {
             int oldSize = mCells.length;
             int newSize = width * height;
             int delta = newSize - oldSize;
-            
+
             if (delta <= 0) {
                 mWidth = width;
                 mHeight = height;
-                
+
                 invalidateCellCoords();
             } else {
                 int first = oldSize - 1;
                 Cell[] newCells = new Cell[newSize];
                 System.arraycopy(mCells, 0, newCells, 0, mCells.length);
-                
+
                 mCells = newCells;
                 mWidth = width;
                 mHeight = height;
-                
+
                 createCells(first, newSize);
             }
         }
-        
+
         public void invalidateCellCoords() {
-            //create last index for iterator
+            // create last index for iterator
             mLastIndex = 0;
             for (int y = 0; y < mHeight; y++) {
                 for (int x = 0; x < mWidth; x++) {
-                        Cell cell = mCells[mLastIndex];
-                        cell.init(x, y, mDefaultCellColor);
-                        mLastIndex++;
+                    Cell cell = mCells[mLastIndex];
+                    cell.init(x, y, mDefaultCellColor);
+                    mLastIndex++;
                 }
             }
         }
+
         // Brutal way to determine memory for one cell
         private void makeCellMemorySize() {
             long freeMemoryBefore = MemoryUtils.getFreeMemory();
@@ -193,14 +198,14 @@ public class ColorFieldView extends View {
             if (mCellMemorySize == 0) {
                 return -1;
             }
-            
+
             int oldSize = mCells.length;
             int newSize = width * height;
             int delta = newSize - oldSize;
-            if(delta <= 0) {
+            if (delta <= 0) {
                 return -1;
             }
-            
+
             return delta * mCellMemorySize;
         }
 
@@ -240,7 +245,7 @@ public class ColorFieldView extends View {
                 if (cell == null) {
                     return;
                 }
-                
+
                 mPreviousCell = cell;
                 mOnCellClickListener.onCellClick(cell.x, cell.y);
                 break;
@@ -308,7 +313,7 @@ public class ColorFieldView extends View {
 
     private int mMinCellSide;
     private int mMaxCellSide;
-  
+
     private final static int DEFAULT_MIN_CELL_SIDE = 10;
     private final static int DEFAULT_MAX_CELL_SIDE = 100;
 
@@ -509,13 +514,19 @@ public class ColorFieldView extends View {
     public int getCellColor(int x, int y) {
         return mCells.getCell(x, y).color;
     }
-
+    
+    boolean mRedrawFlag = false;
     public void setCellToRedraw(int x, int y) {
         mCellToRedraw = mCells.getCell(x, y);
+        if(mRedrawFlag == true) {
+            return;
+        }
+        
         Rect bounds = mCellToRedraw.createBounds(mCellWidth, mCellHeight,
                 mCellPadding, mCellMargin);
 
         invalidate(bounds);
+        mRedrawFlag = true;
         // invalidate();
     }
 
@@ -543,25 +554,33 @@ public class ColorFieldView extends View {
 
         invalidate();
     }
-    
+
     private void drawFull(Canvas canvas) {
-        for(Cell cell : mCells) {
-            cell.createBounds(mCellWidth, mCellHeight,
-                    mCellPadding, mCellMargin);
+        Rect boundsToRedraw = canvas.getClipBounds();
+        for (Cell cell : mCells) {
+
+            cell.createBounds(mCellWidth, mCellHeight, mCellPadding,
+                    mCellMargin);
+            
             cell.draw(canvas, mCellPaint, mCellBoundsPaint);
         }
-       
+
+    }
+
+    public void invalidate() {
+        super.invalidate();
     }
 
     private void drawDirty(Canvas canvas) {
         Rect boundsToRedraw = canvas.getClipBounds();
-        Rect boundsCell = mCellToRedraw.createBounds(mCellWidth, mCellHeight, mCellPadding, mCellMargin);
-
+        Rect boundsCell = mCellToRedraw.createBounds(mCellWidth, mCellHeight,
+                mCellPadding, mCellMargin);
+        mRedrawFlag = false;
         if (boundsCell.contains(boundsToRedraw) == false) {
             drawFull(canvas);
             return;
         }
-
+        
         mCellToRedraw.draw(canvas, mCellPaint, mCellBoundsPaint);
         canvas.save();
     }
