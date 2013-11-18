@@ -1,19 +1,14 @@
 package com.example.piet_droid;
 
+
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.Surface;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -29,6 +24,9 @@ public class PietFileActor {
     ColorFieldView mView;
     Activity mActivity;
 
+    private final String SAVE_KEY_MODEL_INSTANCE_STATE = "PietCodelTableModelInstanceState";
+    private final String SAVE_KEY_CURRENT_FILENAME_INSTANCE_STATE = "PietCurrentFileNameInstanceState";
+    
     public PietFileActor(PietFile pietFile) {
         mPietFile = pietFile;
         mPiet = mPietFile.getPiet();
@@ -55,192 +53,13 @@ public class PietFileActor {
         mPietFile.touch();
     }
 
-    AsyncTaskLoadBitmap mLoadTask;
-
-    public void loadAsync(String path) {
-        Bitmap bitmap = null;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        bitmap = BitmapFactory.decodeFile(path, options);
-        
-        if (bitmap == null) {
-            showMessage("Error decoding file %s", path);
-            return;
-        }
-
-        // TODO CODEL SIZE HERE
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-
-        long amountOfMemory = mView.getAmountOfMemory(width, height);
-        // if amountOfMemory == -1, view can`t determine memory size we just try
-        // to load program.
-        // if it would fall it would fall
-        if (amountOfMemory != -1) {
-            long freeMemory = MemoryUtils.getFreeMemory();
-            if (freeMemory < (amountOfMemory + 1024)) {
-                showMessage("Error! image to large to create piet program in your device");
-                return;
-            }
-        }
-
-        mPiet.createModel(width, height);
-
-        mView.setVisibility(View.INVISIBLE);
-        mView.resize(width, height);
-
-        final String filePath = path;
-        mLoadTask = new AsyncTaskLoadBitmap(
-                new AsyncTaskLoadBitmap.LoadProcessListener() {
-                    @Override
-                    public void onLoadBitmapCancel() {
-                        mLoadTask = null;
-                    }
-
-                    public void onLoadBitmapPixel(int x, int y, int color) {
-                        setCell(x, y, color);
-                    }
-
-                    @Override
-                    public void onLoadBitmapComplete() {
-                        mView.setVisibility(View.VISIBLE);
-                        invalidateView();
-                        mPietFile.setPath(filePath);
-                        mPietFile.untouch();
-                        mLoadTask = null;
-                    }
-
-                    @Override
-                    public void onLoadBitmapError() {
-                        mView.setVisibility(View.VISIBLE);
-                        invalidateView();
-
-                        String message = mActivity.getResources().getString(
-                                R.string.runtime_load_bitmap_error);
-                        showMessage(message);
-                    }
-                }, mActivity);
-        mLoadTask.execute(bitmap);
-    }
-
-    public void lockOrientation() {
-        Display display = ((WindowManager) mActivity
-                .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        int rotation = display.getRotation();
-        int tempOrientation = mActivity.getResources().getConfiguration().orientation;
-        int orientation = 0;
-        switch (tempOrientation) {
-        case Configuration.ORIENTATION_LANDSCAPE:
-            if (rotation == Surface.ROTATION_0
-                    || rotation == Surface.ROTATION_90) {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-            } else {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-            }
-            break;
-        case Configuration.ORIENTATION_PORTRAIT:
-            if (rotation == Surface.ROTATION_0
-                    || rotation == Surface.ROTATION_270) {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-            } else {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-            }
-        }
-        mActivity.setRequestedOrientation(orientation);
-    }
-
-    public void unlockOrientation() {
-        mActivity
-                .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-    }
-
-    public boolean save(String fileName) {
-        BitmapWriter writer = new BitmapWriter(mPiet.getModel());
-
-        if (writer.write(fileName) == true) {
-            mPietFile.setPath(fileName);
-            mPietFile.untouch();
-            return true;
-        }
-
-        return false;
-    }
-
-    public void saveAsync(String path) {
-        doSaveAsync(path);
-    }
-
-    public void saveAsync() {
-        if (mPietFile.hasPath() == false) {
-            // TODO THROW!!!!!
-        }
-
-        String path = mPietFile.getPath();
-        saveAsync(path);
-    }
-
-    AsyncTaskWriteBitmap mSaveTask;
-
-    private void doSaveAsync(String path) {
-        final String filePath = path;
-
-        mSaveTask = new AsyncTaskWriteBitmap(mPiet,
-                new AsyncTaskWriteBitmap.SaveProcessListener() {
-                    @Override
-                    public void onSaveBitmapError() {
-                        String message = mActivity.getResources().getString(
-                                R.string.runtime_save_bitmap_error);
-                        showMessage(message);
-                        mSaveTask = null;
-                    }
-
-                    @Override
-                    public void onSaveBitmapComplete() {
-                        mPietFile.setPath(filePath);
-                        mPietFile.untouch();
-                        String message = mActivity.getResources().getString(
-                                R.string.runtime_bitmap_saved);
-                        showMessage(message);
-                        mSaveTask = null;
-                    }
-
-                    @Override
-                    public void onSaveBitmapCancel() {
-                        mSaveTask = null;
-                    }
-                }, mActivity);
-
-        mSaveTask.execute(path);
-    }
-
-    public void showMessage(String format, Object... args) {
-        String msg = String.format(format, args);
-        showMessage(msg);
-    }
-
-    public void showMessage(String msg) {
-        Toast toast = Toast.makeText(mActivity, msg, Toast.LENGTH_SHORT);
-        toast.show();
-    }
-
     public void finalise() {
         mPietFile = null;
-        if (mSaveTask != null) {
-            mSaveTask.cancel(true);
-            mSaveTask = null;
-        }
-        if (mLoadTask != null) {
-            mLoadTask.cancel(true);
-            mLoadTask = null;
-        }
     }
 
     public void setCellDrawable(int x, int y, Drawable drawable) {
         mView.setCellDrawable(x, y, drawable);
     }
-
-    private final String SAVE_KEY_MODEL_INSTANCE_STATE = "PietCodelTableModelInstanceState";
-    private final String SAVE_KEY_CURRENT_FILENAME_INSTANCE_STATE = "PietCurrentFileNameInstanceState";
 
     public void saveInstanceState(Bundle savedInstanceState) {
         CodelTableModel model = mPiet.getModel();
@@ -298,13 +117,14 @@ public class PietFileActor {
     }
 
     public void invalidateView() {
-        // mView.invalidate();
+        mView.invalidate();
     }
 
     public void resize(int countX, int countY) {
         mView.resize(countX, countY);
 
         mPiet.createModel(countX, countY);
+        //TODO MOVE AWAY
         mPietFile.untouch();
     }
 }

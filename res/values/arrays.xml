@@ -26,4 +26,21 @@
         <item>JPEG</item>
         <item>PNG</item>
     </string-array>
+    
+    <string-array name="zoom_step_entries">
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
+        <item>32</item>
+        <item>64</item>
+    </string-array>
+    <string-array name="zoom_step_values">
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
+        <item>32</item>
+        <item>64</item>
+    </string-array>
 </resources>

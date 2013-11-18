@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+	    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	    <meta http-equiv="Content-Style-Type" content="text/css"/>
+	    <title>
+	        PietDroid commands
+	    </title>
+	    <link rel="stylesheet" href="css/index.css" type="text/css" media="screen"/>
+	</head>
+	<body>
+		<div id="page_header">Commands</div>
+		<div id="main_content">
+			
+			<div class="index_link"> <a href = "index.html">Index</a></div>
+			<h4>Symbolic notation</h4>
+			<div class="shortcuts">TOS{0...n} - top value of the stack with index n from end.
+			For example: if stack looks like [4,2,42] then TOS0=42,TOS1=2,TOS2=4.
+			<br/>
+			DP - Directional pointer.<br/>
+			CC - Codel choser.
+			</div>
+			<h4>Command short description</h4>
+		  <table class="unit_table">
+		  <tr>
+		    <td>
+		      Push
+		    </td>
+		    <td>
+		      <div class="unit_description">Push the value of last color block to stack</div>
+		    <td/>
+		  </tr>
+		   <tr>
+		    <td>
+		      Pop
+		    </td>
+		    <td>
+		      <div class="unit_description">Pops the top value off the stack.</div>
+		    <td/>
+		  </tr>
+		<tr>
+		    <td>
+		      Add
+		    </td>
+		    <td>
+		      <div class="unit_description">POP: TOS0. POP: TOS1. PUSH: TOS1+TOS0.</div>
+		    <td/>
+		  </tr>
+		  <tr>
+		    <td>
+		      Subtract
+		    </td>
+		    <td>
+		      <div class="unit_description">POP: TOS0. POP: TOS1. PUSH: TOS1-TOS0.</div>
+		    <td/>
+		  </tr>
+		  <tr>
+		    <td>
+		      Multiply
+		    </td>
+		    <td>
+		      <div class="unit_description">POP: TOS0. POP: TOS1. PUSH: TOS1*TOS0.</div>
+		    <td/>
+		  </tr>
+		  <tr>
+		    <td>
+		      Divide
+		    </td>
+		    <td>
+		      <div class="unit_description">POP: TOS0. POP: TOS1. PUSH: TOS1/TOS0.</div>
+		    <td/>
+		  </tr>
+		  <tr>
+		    <td>
+		      Mod
+		    </td>
+		    <td>
+		      <div class="unit_description">POP: TOS0. POP: TOS1. PUSH: TOS1%TOS0.</div>
+		    <td/>
+		  </tr>
+		   <tr>
+		    <td>
+		      Not
+		    </td>
+		    <td>
+		      <div class="unit_description">POP: TOS0; if TOS0 == 0 then PUSH: 1 else PUSH: 0</div>
+		    <td/>
+		  </tr>
+		   <tr>
+		    <td>
+		      Greater
+		    </td>
+		    <td>
+		      <div class="unit_description">POP: TOS0. POP: TOS1. if TOS1 > TOS0 then PUSH: 1 else PUSH: 0</div>
+		    <td/>
+		  </tr>
+		   <tr>
+		    <td>
+		      Pointer
+		    </td>
+		    <td>
+		      <div class="unit_description">Pops TOS0 and rotates the DP clockwise(anticlockwise if TOS0 negative) TOS0 times</div>
+		    <td/>
+		  </tr>
+		   <tr>
+		    <td>
+		      Switch
+		    </td>
+		    <td>
+		      <div class="unit_description">Pops TOS0 and toggles the CC TOS0 times</div>
+		    <td/>
+		  </tr>
+		  <tr>
+		    <td>
+		      Duplicate
+		    </td>
+		    <td>
+		      <div class="unit_description">POP: TOS0. PUSH: TOS0. PUSH TOS0.</div>
+		    <td/>
+		  </tr>
+		  <tr>
+		    <td>
+		      Roll
+		    </td>
+		    <td>
+		      <div class="unit_description">Pops TOS0 and TOS1 and "rolls" 
+		      the remaining stack entries to a depth equal to TOS1,
+		      by a number of rolls equal to TOS0. 
+		      A single roll to depth n is defined as burying the top value on the stack n deep 
+		      and bringing all values above it up by 1 place. 
+		      A negative number of rolls rolls in the opposite direction.
+		      A negative depth is an error and the command is ignored.</div>
+		    <td/>
+		  </tr>
+		  <tr>
+		    <td>
+		      In
+		    </td>
+		    <td>
+		      <div class="unit_description">Read number from STDIN and push it to stack. You can use numbers for represent characters too</div>
+		    <td/>
+		  </tr>
+		   <tr>
+		    <td>
+		      Out
+		    </td>
+		    <td>
+		      <div class="unit_description">Pops TOS0 and write it to STDOUT</div>
+		    <td/>
+		  </tr>
+		  </table>
+		</div>
+	</body>
+</html>

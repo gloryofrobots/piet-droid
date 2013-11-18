@@ -53,5 +53,10 @@
         android:orderInCategory="300"
         android:showAsAction="never"
         android:title="@string/action_hide_tabhost"/>
+    
+     <item
+        android:id="@+id/action_show_help"
+        android:showAsAction="never"
+        android:title="@string/action_show_help"/>
 
 </menu>

@@ -15,6 +15,16 @@
         android:defaultValue="0"
         android:inputType="number"/>
     
+    <ListPreference
+        android:dialogTitle="@string/prefs_zoom_step"
+        android:key="zoom_step"
+        android:summary="@string/prefs_zoom_step_summary"
+        android:title="@string/prefs_zoom_step_title"
+        android:entries="@array/zoom_step_entries"
+        android:entryValues="@array/zoom_step_values"
+        android:defaultValue="2"
+       />
+    
     <!--  
         <ListPreference
         android:entries="@array/unknown_color_interpretation_entries"

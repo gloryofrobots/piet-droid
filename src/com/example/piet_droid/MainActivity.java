@@ -1,6 +1,10 @@
 package com.example.piet_droid;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import java.util.List;
@@ -75,6 +79,7 @@ import com.example.piet_droid.widget.DrawableFilledCircle;
 import com.example.piet_droid.widget.TabHostBuilder;
 import com.example.piet_droid.widget.HorizontalScrollViewLockable;
 import com.example.piet_droid.widget.ScrollViewLockable;
+import com.example.piet_droid.widget.ZoomView;
 
 public class MainActivity extends SherlockFragmentActivity implements
         FragmentPaletteSimple.OnChooseColorListener, PietProvider {
@@ -101,7 +106,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public void onRunStart() {
-
+           
             mPreviousCodel = new Codel(0, 0);
             getPiet().init();
             mFragmentStateInfo.init();
@@ -110,10 +115,21 @@ public class MainActivity extends SherlockFragmentActivity implements
             actor.setCellDrawable(0, 0, mCurrentCellDrawable);
             getPiet().getInOutSystem().prepare();
         }
-
+        
+        private boolean check() {
+            if(getPietFile() == null || getPietFile().isValid() == false) {
+                return false;
+            }
+            return true;
+        }
+        
         @Override
         public void onRunCancel() {
-            PietFileActor actor = getActor();
+            if(!check()) {
+                return;
+            }
+            
+            PietFileActor actor = getPietFile().getActor();
             actor.clearViewDrawables();
             mControlToolBoxView.setControlsToDefaultState();
             // mFragmentStateInfo.init();
@@ -135,6 +151,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public void onRunComplete() {
+            if(!check()) {
+                return;
+            }
             PietFileActor actor = getActor();
             actor.setCellDrawable(mPreviousCodel.x, mPreviousCodel.y,
                     mPreviousCellDrawable);
@@ -148,13 +167,50 @@ public class MainActivity extends SherlockFragmentActivity implements
             mControlToolBoxView.setControlsToDefaultState();
             String message = getResources().getString(
                     R.string.runtime_internal_error);
-            getActor().showMessage(message);
+            showMessage(message);
         }
     }
 
     // //////////////////////////////////////////////////////////////////////////
-    private ControlToolboxView.InteractionListener mInteractionListener = new ControlToolboxView.InteractionListener() {
+    public class LoadListener implements PietFileLoader.LoadListener {
 
+        private boolean mIsTemporary;
+
+        LoadListener(boolean isTemporary) {
+            mIsTemporary = isTemporary;
+        }
+
+        @Override
+        public void onComplete() {
+            getPietFile().setTemporary(mIsTemporary);
+        }
+
+        @Override
+        public void onError(int errorStringId) {
+            String message = getStringFromResource(errorStringId);
+            showMessage(message);
+        }
+    }
+
+    // //////////////////////////////////////////////////////////////////////////
+    public class SaveListener implements PietFileSaver.SaveListener {
+
+        SaveListener() {
+        }
+
+        @Override
+        public void onComplete() {
+        }
+
+        @Override
+        public void onError(int errorStringId) {
+            String message = getStringFromResource(errorStringId);
+            showMessage(message);
+        }
+    }
+
+    // //////////////////////////////////////////////////////////////////////////
+    class InteractionListener implements ControlToolboxView.InteractionListener {
         @Override
         public void onInteractionRun() {
             getRunner().run(mSleepBetweenStep);
@@ -193,40 +249,48 @@ public class MainActivity extends SherlockFragmentActivity implements
     private final String SHARED_PREFERENCES_DELAY_BEFORE_STEP = "delay_before_step";
     private final String TEMPORARY_FILENAME = ".pietdroid_tmp.png";
     private final String SHARED_PREFERENCES_KEY_IS_TEMPORARY = "is_temporary";
+    private final String SHARED_PREFERENCES_ZOOM_STEP = "zoom_step";
+
+    private final String LOG_TAG = "PietDroidMainActivity";
 
     private PietFile mCurrentFile;
     private Piet mPiet;
     private ColorFieldView mColorField;
     private int mActiveColor;
-    private RunListener mRunListener;
+
     private long mSleepBetweenStep;
 
     private FragmentStateInfo mFragmentStateInfo;
     private ControlToolboxView mControlToolBoxView;
     private FragmentCommandLog mFragmentCommandLog;
 
-    // TODO Move to Settings
-    private int mZoomChangeValue = 2;
+    private int mZoomChangeValue;
 
     private boolean mOnScrollMode;
 
     private String mDataFolderName;
 
+    private SaveListener mSaveListener;
+    private InteractionListener mInteractionListener;
+    private RunListener mRunListener;
+    
+    //Toasts
+    Handler mToastDelayHandler = new Handler();
+    Toast mMessageToast = null;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mActiveColor = 0;
+        mCurrentFile = null;
 
         Resources resources = getResources();
 
         initSdCardDirectory();
-
-        initRunListener(resources);
         initFragments();
 
         initPiet(resources);
-        mCurrentFile = null;
         initColorField();
 
         if (savedInstanceState != null) {
@@ -235,25 +299,23 @@ public class MainActivity extends SherlockFragmentActivity implements
             initStartState(resources);
         }
 
+        initListeners(resources);
         initTabHost();
         initActionBarAndScrollLock();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         updateFromPreferences();
-        // getActor().lockOrientation();
     }
 
     private void abortApplication(String format, Object... args) {
         String msg = String.format(format, args);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setPositiveButton("OK", null).setTitle("Error").setMessage(msg)
+        builder.setPositiveButton(R.string.button_text_ok, null).setTitle(R.string.title_error).setMessage(msg)
                 .setCancelable(false)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.button_text_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         finish();
                     }
                 }).show();
-        return;
-
     }
 
     private void initSdCardDirectory() {
@@ -291,9 +353,13 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     }
 
-    private void initRunListener(Resources resources) {
+    private void initListeners(Resources resources) {
         mRunListener = new RunListener();
         mRunListener.initDebugDrawables(resources);
+        getRunner().addExecutionListener(mRunListener);
+
+        mSaveListener = new SaveListener();
+        mInteractionListener = new InteractionListener();
     }
 
     private void initActionBarAndScrollLock() {
@@ -307,7 +373,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         mControlToolBoxView = (ControlToolboxView) actionBar.getCustomView()
                 .findViewById(R.id.fragment_control_toolbox);
-
+        
         mControlToolBoxView.setInteractionListener(mInteractionListener);
 
         final ImageButton buttonScroll = (ImageButton) actionBar
@@ -320,19 +386,29 @@ public class MainActivity extends SherlockFragmentActivity implements
                 .getCustomView().findViewById(R.id.button_zoom_decrease);
 
         initScrollLock(buttonScroll);
+        ZoomView zoomView = (ZoomView) actionBar.getCustomView()
+                .findViewById(R.id.zoom_view);
+        
+        initZoomView(zoomView);
         initZoomButtons(buttonZoomInrease, buttonZoomDecrease);
+    }
+
+    private void initZoomView(ZoomView mZoomView) {
+        final int minCellSide = mColorField.getMinCellSide();
+        final int maxCellSide = mColorField.getMaxCellSide();
+        int width = mColorField.getCellWidth();
+        
     }
 
     private void initZoomButtons(final ImageButton buttonZoomIncrease,
             final ImageButton buttonZoomDecrease) {
         final int minCellSide = mColorField.getMinCellSide();
         final int maxCellSide = mColorField.getMaxCellSide();
-
+        
         buttonZoomIncrease.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 int width = mColorField.getCellWidth();
                 int newSide = width + mZoomChangeValue;
-
                 if (newSide > minCellSide) {
                     buttonZoomDecrease.setEnabled(true);
                 }
@@ -417,7 +493,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         boolean isTemporary = preferences.getBoolean(
                 SHARED_PREFERENCES_KEY_IS_TEMPORARY, false);
         if (isTemporary == true) {
-            initNewPietFileFromTemporary();
+            initNewPietFileFromTemporary(resources);
             return;
         }
 
@@ -425,15 +501,12 @@ public class MainActivity extends SherlockFragmentActivity implements
                 SHARED_PREFERENCES_KEY_LAST_FILENAME, null);
         // Load default empty board
         if (lastFile == null) {
-            int countX = resources.getInteger(R.integer.field_count_codels_x);
-            int countY = resources.getInteger(R.integer.field_count_codels_y);
-            initNewPietFile(countX, countY);
+            initNewEmptyPietFile(resources);
         } else {
             // Load last edited file
             initNewPietFile(lastFile);
         }
     }
-
 
     private void initRestoredState(Bundle savedInstanceState) {
         createNewPietFile();
@@ -474,17 +547,13 @@ public class MainActivity extends SherlockFragmentActivity implements
                         }
 
                         if (MainActivity.this.isOnRunMode() == true) {
-                            getPietFile()
-                                    .getActor()
-                                    .showMessage(
-                                            getStringFromResource(R.string.runtime_edit_mode_lock_warning));
+                            showMessage(getStringFromResource(R.string.runtime_edit_mode_lock_warning));
                             return false;
                         }
 
                         return true;
                     }
                 });
-
     }
 
     private void createNewPietFile() {
@@ -494,29 +563,44 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         mCurrentFile = new PietFile(mColorField, mPiet, this);
     }
-    
-  private void initNewPietFileFromTemporary() {
-        
-      getPietFile().setTemporary(true);
-    }
-  
-    private void initNewPietFile(String fileName) {
-        getActor().loadAsync(fileName);
-        getRunner().addExecutionListener(mRunListener);
+
+    private void initNewPietFileFromTemporary(Resources resources) {
+        FileInputStream input = null;
+        try {
+            input = openFileInput(TEMPORARY_FILENAME);
+            getPietFile().getLoader().loadAsync(input, new LoadListener(true));
+            // we can close file stream because it have decoded already
+            input.close();
+
+        } catch (FileNotFoundException e) {
+            initNewEmptyPietFile(resources);
+        } catch (IOException e) {
+            initNewEmptyPietFile(resources);
+        }
     }
 
-    private void initNewPietFile(int countX, int countY) {
+    private void initNewPietFile(String fileName) {
+        loadPietFileAsyncWithPath(fileName);
+    }
+
+    private void initNewEmptyPietFile(Resources resources) {
+        int countX = resources.getInteger(R.integer.field_count_codels_x);
+        int countY = resources.getInteger(R.integer.field_count_codels_y);
+
+        initNewPietFile(countX, countY);
+    }
+
+    private void initNewPietFile(int width, int height) {
         PietFileActor actor = getActor();
-        actor.resize(countX, countY);
+        actor.resize(width, height);
         actor.invalidateView();
+
         getPietFile().setTemporary(true);
-        getRunner().addExecutionListener(mRunListener);
     }
 
     private void initNewPietFile(Bundle savedInstanceState) {
         PietFileActor actor = mCurrentFile.getActor();
         actor.restoreFromSavedState(savedInstanceState);
-        getRunner().addExecutionListener(mRunListener);
     }
 
     private void initTabHost() {
@@ -634,8 +718,12 @@ public class MainActivity extends SherlockFragmentActivity implements
     // Sometimes called at the end of the full lifetime.
     @Override
     public void onDestroy() {
+        if (isOnRunMode()) {
+            stopRun();
+        }
         // Clean up any resources including ending threads,
         // closing database connections etc.
+        getPietFile().finalise();
         super.onDestroy();
     }
 
@@ -645,21 +733,28 @@ public class MainActivity extends SherlockFragmentActivity implements
             finish();
             return;
         }
+        if (getPietFile().isTemporary() == true) {
+            MainActivity.this.saveTemporaryFile();
+            MainActivity.this.finish();
+            return;
+        }
 
         showSaveChangesDialog(new DialogFragmentSaveChanges.OnAcceptListener() {
             @Override
             public void onAccept() {
-                if (getPietFile().isTemporary()) {
-                    MainActivity.this.saveTemporaryFile();
-                }
-
                 MainActivity.this.finish();
             }
         });
     }
 
     private void saveTemporaryFile() {
-        getActor().save(mTemporaryFileName);
+        FileOutputStream out;
+        try {
+            out = openFileOutput(TEMPORARY_FILENAME, MODE_PRIVATE);
+            getPietFile().getSaver().save(out);
+        } catch (FileNotFoundException e) {
+            Log.e(LOG_TAG, e.toString());
+        }
     }
 
     private Menu mMenu = null;
@@ -701,7 +796,9 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
             item.setChecked(!item.isChecked());
             return true;
-
+        case (R.id.action_show_help):
+            onActionShowHelp();
+            return true;
         case (R.id.action_load):
             doActionIfUserDontWantToSaveChanges(new Callable<Void>() {
                 @Override
@@ -757,7 +854,10 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     }
 
-    final private String LOG_LABEL_ACTION = "ACTION";
+    private void onActionShowHelp() {
+        Intent intent = new Intent(this, HelpActivity.class);
+        startActivity(intent);
+    }
 
     public void doActionIfUserDontWantToSaveChanges(
             final Callable<Void> callable) {
@@ -765,7 +865,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             try {
                 callable.call();
             } catch (Exception e) {
-                Log.e(LOG_LABEL_ACTION, e.toString());
+                Log.e(LOG_TAG, e.toString());
                 abortApplication(getStringFromResource(R.string.abort_application_fatal_error));
             }
         } else {
@@ -775,7 +875,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                     try {
                         callable.call();
                     } catch (Exception e) {
-                        Log.e(LOG_LABEL_ACTION, e.toString());
+                        Log.e(LOG_TAG, e.toString());
                         abortApplication(getStringFromResource(R.string.abort_application_fatal_error));
                     }
 
@@ -838,21 +938,18 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private void onActionSettings() {
         Intent intent = new Intent(this, Preferences.class);
-        // intent.putExtra( PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-        // PietPreferenceFragment.class.getName() );
         intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
         startActivityForResult(intent, SHOW_PREFERENCES);
     }
 
     private void onActionSave() {
-        //save temporary flag and reset it
+        // save temporary flag and reset it
         if (getPietFile().isTemporary()) {
             onActionSaveAs();
-            getPietFile().setTemporary(false);
             return;
         }
-
-        getActor().saveAsync();
+        // R.string.runtime_bitmap_saved
+        getPietFile().getSaver().saveAsync(mSaveListener);
     }
 
     private void emulateInteractionStopIfOnRun() {
@@ -880,13 +977,13 @@ public class MainActivity extends SherlockFragmentActivity implements
         dialog.setShowConfirmation(true, false);
         dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
             public void onFileSelected(Dialog source, File file) {
-                getActor().saveAsync(file.getAbsolutePath());
+                savePietFileAsyncWithPath(file.getAbsolutePath());
                 source.dismiss();
             }
 
             public void onFileSelected(Dialog source, File folder, String name) {
                 String path = folder.getAbsolutePath() + "/" + name;
-                getActor().saveAsync(path);
+                savePietFileAsyncWithPath(path);
                 source.dismiss();
             }
         });
@@ -903,9 +1000,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         dialog.addListener(new FileChooserDialog.OnFileSelectedListener() {
             public void onFileSelected(Dialog source, File file) {
-                // TODO CHECK ERROR!!!!!
                 source.dismiss();
-                getActor().loadAsync(file.getAbsolutePath());
+                loadPietFileAsyncWithPath(file.getAbsolutePath());
             }
 
             public void onFileSelected(Dialog source, File folder, String name) {
@@ -948,17 +1044,16 @@ public class MainActivity extends SherlockFragmentActivity implements
         boolean visibility = tabs.getVisibility() == View.VISIBLE;
         editor.putBoolean(SHARED_PREFERENCES_KEY_INFO_WIDGET_VISIBILITY,
                 visibility);
-        
-        //write path to current file if it not temporary
+
+        // write path to current file if it not temporary
         boolean isTemporaryFile = getPietFile().isTemporary();
         if (isTemporaryFile == false && getPietFile().hasPath() == true) {
             editor.putString(SHARED_PREFERENCES_KEY_LAST_FILENAME,
                     getPietFile().getPath());
-        } 
-        
-        editor.putBoolean(SHARED_PREFERENCES_KEY_IS_TEMPORARY,
-                isTemporaryFile);
-        
+        }
+
+        editor.putBoolean(SHARED_PREFERENCES_KEY_IS_TEMPORARY, isTemporaryFile);
+
         editor.commit();
     }
 
@@ -971,17 +1066,23 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void updateFromPreferences() {
-
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
 
         try {
+            mZoomChangeValue = Integer.parseInt(preferences.getString(
+                    SHARED_PREFERENCES_ZOOM_STEP, "2"));
+        } catch (NumberFormatException e) {
+            mZoomChangeValue = 2;
+            showMessageFromResource(R.string.warning_parsing_zoom_step);
+        }
+        try {
             mSleepBetweenStep = Long.valueOf(preferences.getString(
                     SHARED_PREFERENCES_DELAY_BEFORE_STEP, "0"));
         } catch (NumberFormatException e) {
             mSleepBetweenStep = 0;
-            showMessage("Error parsing delay before step");
+            showMessageFromResource(R.string.warning_parsing_step_delay);
         }
 
         int cellPadding = 0;
@@ -990,7 +1091,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                     SHARED_PREFERENCES_CELL_PADDING, "0"));
         } catch (NumberFormatException e) {
             cellPadding = 0;
-            showMessage("Error parsing cell padding");
+            showMessageFromResource(R.string.warning_parsing_cell_padding);
         }
 
         getPietFile().getView().setCellPadding(cellPadding);
@@ -1007,12 +1108,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             getRunner().setStepDelay(mSleepBetweenStep);
         }
     }
-
-    private void showMessage(String msg) {
-        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
-        toast.show();
-    }
-
+    
     private int getActiveColor() {
         return mActiveColor;
     }
@@ -1048,5 +1144,35 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     public String getStringFromResource(int id) {
         return getResources().getString(id);
+    }
+
+    private void showMessage(String msg) {
+        if (mMessageToast != null) {
+            return;
+        }
+
+        mMessageToast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+        mMessageToast.show();
+
+        mToastDelayHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mMessageToast = null;
+            }
+        },  2000);
+       
+    }
+    
+    private void showMessageFromResource(int id) {
+        String msg = getStringFromResource(id);
+        showMessage(msg);
+    }
+    
+    private void loadPietFileAsyncWithPath(String path) {
+        getPietFile().getLoader().loadAsync(path, new LoadListener(false));
+    }
+
+    private void savePietFileAsyncWithPath(String path) {
+        getPietFile().getSaver().saveAsync(path, mSaveListener);
     }
 }

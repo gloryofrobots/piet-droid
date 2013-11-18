@@ -253,6 +253,7 @@ public class ColorFieldView extends View {
         }
 
         private Cell findClickedCell(float eventX, float eventY) {
+            ColorFieldView p = ColorFieldView.this;
             int rowY = -1;
             for (int y = 0; y < mCellCountY; y++) {
                 float boundTop = y * (mCellHeight + mCellPadding.top)
@@ -270,18 +271,17 @@ public class ColorFieldView extends View {
                 return null;
             }
 
-            Cell findedCell = null;
             for (int x = 0; x < mCellCountX; x++) {
                 float boundLeft = x * (mCellWidth + mCellPadding.left)
                         + mCellMargin.left;
                 float boundRight = boundLeft + mCellWidth;
 
                 if (eventX >= boundLeft && eventX < boundRight) {
-                    findedCell = mCells.getCell(x, rowY);
+                    return mCells.getCell(x, rowY);
                 }
             }
 
-            return findedCell;
+            return null;
         }
     };
 
@@ -515,18 +515,13 @@ public class ColorFieldView extends View {
         return mCells.getCell(x, y).color;
     }
     
-    boolean mRedrawFlag = false;
     public void setCellToRedraw(int x, int y) {
         mCellToRedraw = mCells.getCell(x, y);
-        if(mRedrawFlag == true) {
-            return;
-        }
         
         Rect bounds = mCellToRedraw.createBounds(mCellWidth, mCellHeight,
                 mCellPadding, mCellMargin);
 
         invalidate(bounds);
-        mRedrawFlag = true;
         // invalidate();
     }
 
@@ -575,7 +570,7 @@ public class ColorFieldView extends View {
         Rect boundsToRedraw = canvas.getClipBounds();
         Rect boundsCell = mCellToRedraw.createBounds(mCellWidth, mCellHeight,
                 mCellPadding, mCellMargin);
-        mRedrawFlag = false;
+        
         if (boundsCell.contains(boundsToRedraw) == false) {
             drawFull(canvas);
             return;

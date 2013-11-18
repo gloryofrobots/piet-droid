@@ -92,7 +92,6 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
                     mListener.onLoadBitmapPixel(x, y, pixel);
                 }
             }
-            
             bitmap.recycle();
         } catch(Exception e) {
             Log.e(LOG_TAG,e.toString());

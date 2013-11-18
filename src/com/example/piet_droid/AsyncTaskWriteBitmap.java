@@ -69,7 +69,7 @@ class AsyncTaskWriteBitmap extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... params) {
         String fileName = params[0];
-        mErrorDectected = mWriter.write(fileName);
+        mErrorDectected = !(mWriter.write(fileName));
         return null;
     }
 }

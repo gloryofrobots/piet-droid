@@ -12,18 +12,25 @@ public class PietFile {
     private String mPath;
     private PietFileActor mActor;
     private PietFileRunner mRunner;
+    private PietFileSaver mSaver;
+    private PietFileLoader mLoader;
+    
     private Activity mActivity;
     private ColorFieldView mView;
     boolean mTouched = false;
     boolean mIsTemporary = false;
     Piet mPiet;
+    boolean mIsValid;
     
     public PietFile(ColorFieldView view, Piet piet, Activity activity) {
         mActivity = activity;
         mView = view;
         mPiet = piet;
+        mIsValid = true;
         mActor = new PietFileActor(this);
         mRunner = new PietFileRunner(this);
+        mLoader = new PietFileLoader(this);
+        mSaver = new PietFileSaver(this);
     }
     
     public Activity getActivity() {
@@ -41,6 +48,21 @@ public class PietFile {
     public void finalise() {
         mActor.finalise();
         mActor = null;
+        
+        mRunner.finalise();
+        mRunner = null;
+        
+        mLoader.finalise();
+        mLoader = null;
+       
+        mSaver.finalise();
+        mSaver = null;
+        
+        mIsValid = false;
+    }
+    
+    public boolean isValid() {
+        return mIsValid;
     }
     
     public void setPath(String path) {
@@ -71,6 +93,14 @@ public class PietFile {
         return mRunner;
     }
     
+    public PietFileLoader getLoader() {
+        return mLoader;
+    }
+    
+    public PietFileSaver getSaver() {
+        return mSaver;
+    }
+    
     public void touch() {
         mTouched = true;
     }
@@ -90,4 +120,6 @@ public class PietFile {
     public int getHeight() {
         return mPiet.getModel().getHeight();
     }
+    
+    
 }

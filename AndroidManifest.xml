@@ -30,6 +30,7 @@
         </activity>
         <activity android:name="ar.com.daidalos.afiledialog.FileChooserActivity" />
         <activity android:name="com.example.piet_droid.Preferences" />
+        <activity android:name="com.example.piet_droid.HelpActivity" />
     </application>
 
 </manifest>
