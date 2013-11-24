@@ -43,4 +43,16 @@
         <item>32</item>
         <item>64</item>
     </string-array>
+    
+     <string-array name="gui_trace_mode_entries">
+        <item>None</item>
+        <item>Current codel</item>
+        <item>All codels</item>
+     
+    </string-array>
+    <string-array name="gui_trace_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

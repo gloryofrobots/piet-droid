@@ -91,10 +91,10 @@
             </com.example.piet_droid.widget.ScrollViewLockable>
         </LinearLayout>
 
-        <TabHost
+        <com.example.piet_droid.widget.AccordeonTabHost
             android:id="@android:id/tabhost"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/info_widget_size"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/info_widget_margin_top" >
 
             <LinearLayout
@@ -102,22 +102,17 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical" >
 
-                <TabWidget
-                    android:id="@android:id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/border" >
-                </TabWidget>
-
                 <FrameLayout
                     android:id="@android:id/tabcontent"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
+                    android:layout_height="match_parent" 
+                    android:layout_weight="1"
+                    >
 
                     <LinearLayout
                         android:id="@+id/tabInput"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="@dimen/info_widget_size"
                         android:orientation="vertical" >
 
                         <EditText
@@ -136,7 +131,7 @@
                     <LinearLayout
                         android:id="@+id/tabOutput"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="@dimen/info_widget_size"
                         android:orientation="vertical" >
 
                         <ScrollView
@@ -160,7 +155,7 @@
                     <LinearLayout
                         android:id="@+id/tabState"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="@dimen/info_widget_size"
                         android:orientation="vertical" >
 
                         <fragment
@@ -175,7 +170,7 @@
                     <LinearLayout
                         android:id="@+id/tabLog"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="@dimen/info_widget_log_height"
                         android:orientation="vertical" >
 
                         <fragment
@@ -186,8 +181,17 @@
                             android:layout_marginTop="@dimen/info_widget_margin_top" />
                     </LinearLayout>
                 </FrameLayout>
+                 <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/border" 
+                    android:layout_weight="0"
+                    
+                    >
+                </TabWidget>
             </LinearLayout>
-        </TabHost>
+        </com.example.piet_droid.widget.AccordeonTabHost>
     </LinearLayout>
 
 </LinearLayout>

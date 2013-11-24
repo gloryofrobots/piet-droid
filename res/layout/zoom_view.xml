@@ -1,23 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android" >
-    
-      <ImageButton
-            android:id="@+id/button_zoom_dec"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/small_horizontal_margin"
-            android:background="@null"
-            android:contentDescription="@string/content_description_button_zoom_decrease"
-            android:src="@drawable/button_zoom_decrease" />
-        
-     <ImageButton
+     <com.example.piet_droid.widget.LongPressImageButton
             android:id="@+id/button_zoom_inc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/small_horizontal_margin"
             android:background="@null"
+            android:hapticFeedbackEnabled="false"
             android:contentDescription="@string/content_description_button_zoom_increase"
             
             android:src="@drawable/button_zoom_increase" />
-
+     
+      <com.example.piet_droid.widget.LongPressImageButton
+            android:id="@+id/button_zoom_dec"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+           
+            android:background="@null"
+            android:hapticFeedbackEnabled="false"
+            android:contentDescription="@string/content_description_button_zoom_decrease"
+            android:src="@drawable/button_zoom_decrease" />
+<!--       <ZoomButton -->
+<!--             android:id="@+id/button_zoom_inc" -->
+<!--             android:layout_width="wrap_content" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_marginRight="@dimen/small_horizontal_margin" -->
+<!--             android:background="@null" -->
+<!--             android:hapticFeedbackEnabled="false" -->
+<!--             android:contentDescription="@string/content_description_button_zoom_increase" -->
+            
+<!--             android:src="@drawable/button_zoom_increase" /> -->
+     
+<!--       <ZoomButton -->
+<!--             android:id="@+id/button_zoom_dec" -->
+<!--             android:layout_width="wrap_content" -->
+<!--             android:layout_height="wrap_content" -->
+<!--             android:layout_marginRight="@dimen/small_horizontal_margin" -->
+<!--             android:background="@null" -->
+<!--             android:hapticFeedbackEnabled="false" -->
+<!--             android:contentDescription="@string/content_description_button_zoom_decrease" -->
+<!--             android:src="@drawable/button_zoom_decrease" /> -->
 </merge>

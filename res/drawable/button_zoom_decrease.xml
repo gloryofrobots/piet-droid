@@ -4,6 +4,6 @@
     <item android:drawable="@drawable/button_zoom_decrease_disable" android:state_enabled="false"/>
     <item android:drawable="@drawable/button_zoom_decrease_focus" android:state_pressed="true"/>
     <item android:drawable="@drawable/button_zoom_decrease_focus" android:state_focused="true"/>
-    <item android:drawable="@drawable/button_zoom_decrease_enable"/>
+    <item android:drawable="@drawable/button_zoom_decrease_enable" android:state_enabled="true"/>
 
 </selector>

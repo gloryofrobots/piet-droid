@@ -47,6 +47,11 @@
     <string name="preferences_header_summary">Piet Droid preferences</string>
     <string name="preferences_header_title">Piet Droid preferences</string>
     
+    <string name="gui_trace_mode_summary">Graphical program step trace mode</string>
+    <string name="gui_trace_mode_title">Trace mode</string>
+    
+    
+    
     <string name="edittext_new_file_width_hint">Width</string>
     <string name="edittext_new_file_height_hint">Height</string>
     

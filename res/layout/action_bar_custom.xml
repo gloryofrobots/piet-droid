@@ -19,8 +19,6 @@
         android:layout_alignParentRight="true" 
         android:orientation="horizontal"
         android:paddingTop="@dimen/control_toolbox_padding">
-        
-        
          
     <com.example.piet_droid.widget.ZoomView
             android:id="@+id/zoom_view"
@@ -31,25 +29,6 @@
             android:contentDescription="@string/content_description_button_scroll_toggle"
        />
     
-        <ImageButton
-            android:id="@+id/button_zoom_increase"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/small_horizontal_margin"
-            android:background="@null"
-            android:contentDescription="@string/content_description_button_scroll_toggle"
-            
-            android:src="@drawable/button_zoom_increase" />
-
-        <ImageButton
-            android:id="@+id/button_zoom_decrease"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/small_horizontal_margin"
-            android:background="@null"
-            android:contentDescription="@string/content_description_button_scroll_toggle"
-            android:src="@drawable/button_zoom_decrease" />
-
         <ImageButton
             android:id="@+id/button_scroll_toggle"
             android:layout_width="wrap_content"

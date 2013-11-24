@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- File created by the Android Action Bar Style Generator
+<!--
+     File created by the Android Action Bar Style Generator
 
      Copyright (C) 2011 The Android Open Source Project
      Copyright (C) 2012 readyState Software Ltd
@@ -29,8 +30,8 @@
         <item name="actionModeBackground">@drawable/cab_background_top_piet_droid_gray</item>
         <item name="actionModeSplitBackground">@drawable/cab_background_bottom_piet_droid_gray</item>
         <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Piet_droid_gray</item>
-
-        
+        <item name="android:actionBarSize">@dimen/action_bar_size</item>
+        <item name="actionBarSize">@dimen/action_bar_size</item>
     </style>
 
     <style name="ActionBar.Solid.Piet_droid_gray" parent="@style/Widget.Sherlock.ActionBar.Solid">
@@ -44,11 +45,11 @@
         <item name="background">@drawable/ab_transparent_piet_droid_gray</item>
         <item name="progressBarStyle">@style/ProgressBar.Piet_droid_gray</item>
     </style>
-	
-    <style name="PopupMenu.Piet_droid_gray" parent="@style/Widget.Sherlock.ListPopupWindow">	
-        <item name="android:popupBackground">@drawable/menu_dropdown_panel_piet_droid_gray</item>	
+
+    <style name="PopupMenu.Piet_droid_gray" parent="@style/Widget.Sherlock.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_piet_droid_gray</item>
     </style>
-	
+
     <style name="DropDownListView.Piet_droid_gray" parent="@style/Widget.Sherlock.ListView.DropDown">
         <item name="android:listSelector">@drawable/selectable_background_piet_droid_gray</item>
     </style>
@@ -56,21 +57,21 @@
     <style name="ActionBarTabStyle.Piet_droid_gray" parent="@style/Widget.Sherlock.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator_ab_piet_droid_gray</item>
     </style>
-	
+
     <style name="DropDownNav.Piet_droid_gray" parent="@style/Widget.Sherlock.Spinner.DropDown.ActionBar">
         <item name="android:background">@drawable/spinner_background_ab_piet_droid_gray</item>
         <item name="android:popupBackground">@drawable/menu_dropdown_panel_piet_droid_gray</item>
         <item name="android:dropDownSelector">@drawable/selectable_background_piet_droid_gray</item>
     </style>
-    
+
     <style name="ProgressBar.Piet_droid_gray" parent="@style/Widget.Sherlock.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_horizontal_piet_droid_gray</item>
     </style>
-    
+
     <style name="ActionButton.CloseMode.Piet_droid_gray" parent="@style/Widget.Sherlock.ActionButton.CloseMode">
         <item name="android:background">@drawable/btn_cab_done_piet_droid_gray</item>
     </style>
-    
+
     <!-- this style is only referenced in a Light.DarkActionBar based theme -->
     <style name="Theme.Piet_droid_gray.Widget" parent="@style/Theme.Sherlock">
         <item name="popupMenuStyle">@style/PopupMenu.Piet_droid_gray</item>

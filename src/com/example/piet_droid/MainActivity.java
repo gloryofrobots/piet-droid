@@ -86,7 +86,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     // //////////////////////////////////////////////////////////////////////////
     private class RunListener implements PietFileRunner.RunEventListener {
-
         private Codel mPreviousCodel;
         private DrawableFilledCircle mCurrentCellDrawable;
         private DrawableFilledCircle mPreviousCellDrawable;
@@ -106,7 +105,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public void onRunStart() {
-           
+            
             mPreviousCodel = new Codel(0, 0);
             getPiet().init();
             mFragmentStateInfo.init();
@@ -115,20 +114,20 @@ public class MainActivity extends SherlockFragmentActivity implements
             actor.setCellDrawable(0, 0, mCurrentCellDrawable);
             getPiet().getInOutSystem().prepare();
         }
-        
+
         private boolean check() {
-            if(getPietFile() == null || getPietFile().isValid() == false) {
+            if (getPietFile() == null || getPietFile().isValid() == false) {
                 return false;
             }
             return true;
         }
-        
+
         @Override
         public void onRunCancel() {
-            if(!check()) {
+            if (!check()) {
                 return;
             }
-            
+
             PietFileActor actor = getPietFile().getActor();
             actor.clearViewDrawables();
             mControlToolBoxView.setControlsToDefaultState();
@@ -151,7 +150,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         @Override
         public void onRunComplete() {
-            if(!check()) {
+            if (!check()) {
                 return;
             }
             PietFileActor actor = getActor();
@@ -238,18 +237,23 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     };
 
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     private static final int SHOW_PREFERENCES = 1;
 
-    private final String SHARED_PREFERENCES_KEY_CELL_SIDE = "cell_side";
-    private final String SHARED_PREFERENCES_KEY_INFO_WIDGET_VISIBILITY = "info_widget_visibility";
-    private final String SHARED_PREFERENCES_KEY_LAST_FILENAME = "last_filename";
-    private final String SHARED_PREFERENCES_CELL_PADDING = "cell_padding";
-    private final String SHARED_PREFERENCES_DELAY_BEFORE_STEP = "delay_before_step";
-    private final String TEMPORARY_FILENAME = ".pietdroid_tmp.png";
-    private final String SHARED_PREFERENCES_KEY_IS_TEMPORARY = "is_temporary";
-    private final String SHARED_PREFERENCES_ZOOM_STEP = "zoom_step";
+    private static final String SHARED_PREFERENCES_GUI_TRACE_MODE = "gui_trace_mode";
+    private static final String SHARED_PREFERENCES_KEY_CELL_SIDE = "cell_side";
+    private static final String SHARED_PREFERENCES_KEY_INFO_WIDGET_VISIBILITY = "info_widget_visibility";
+    private static final String SHARED_PREFERENCES_KEY_LAST_FILENAME = "last_filename";
+    private static final String SHARED_PREFERENCES_CELL_PADDING = "cell_padding";
+    private static final String SHARED_PREFERENCES_DELAY_BEFORE_STEP = "delay_before_step";
+    private static final String TEMPORARY_FILENAME = ".pietdroid_tmp.png";
+    private static final String SHARED_PREFERENCES_KEY_IS_TEMPORARY = "is_temporary";
+    private static final String SHARED_PREFERENCES_ZOOM_STEP = "zoom_step";
+
+    public enum GuiTraceMode {
+        None, Current, All;
+    }
 
     private final String LOG_TAG = "PietDroidMainActivity";
 
@@ -270,14 +274,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private String mDataFolderName;
 
+    private GuiTraceMode mGuiTraceMode;
+
     private SaveListener mSaveListener;
     private InteractionListener mInteractionListener;
     private RunListener mRunListener;
-    
-    //Toasts
+
+    // Toasts
     Handler mToastDelayHandler = new Handler();
     Toast mMessageToast = null;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -300,22 +306,25 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
 
         initListeners(resources);
-        initTabHost();
-        initActionBarAndScrollLock();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         updateFromPreferences();
+        initActionBarAndScrollLock();
+        initTabHost();
     }
 
     private void abortApplication(String format, Object... args) {
         String msg = String.format(format, args);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setPositiveButton(R.string.button_text_ok, null).setTitle(R.string.title_error).setMessage(msg)
+        builder.setPositiveButton(R.string.button_text_ok, null)
+                .setTitle(R.string.title_error)
+                .setMessage(msg)
                 .setCancelable(false)
-                .setPositiveButton(R.string.button_text_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
-                    }
-                }).show();
+                .setPositiveButton(R.string.button_text_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                finish();
+                            }
+                        }).show();
     }
 
     private void initSdCardDirectory() {
@@ -362,6 +371,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         mInteractionListener = new InteractionListener();
     }
 
+    ZoomView mZoomView;
+
     private void initActionBarAndScrollLock() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setCustomView(R.layout.action_bar_custom);
@@ -373,79 +384,41 @@ public class MainActivity extends SherlockFragmentActivity implements
 
         mControlToolBoxView = (ControlToolboxView) actionBar.getCustomView()
                 .findViewById(R.id.fragment_control_toolbox);
-        
+
         mControlToolBoxView.setInteractionListener(mInteractionListener);
 
         final ImageButton buttonScroll = (ImageButton) actionBar
                 .getCustomView().findViewById(R.id.button_scroll_toggle);
 
-        final ImageButton buttonZoomInrease = (ImageButton) actionBar
-                .getCustomView().findViewById(R.id.button_zoom_increase);
-
-        final ImageButton buttonZoomDecrease = (ImageButton) actionBar
-                .getCustomView().findViewById(R.id.button_zoom_decrease);
-
         initScrollLock(buttonScroll);
-        ZoomView zoomView = (ZoomView) actionBar.getCustomView()
-                .findViewById(R.id.zoom_view);
-        
-        initZoomView(zoomView);
-        initZoomButtons(buttonZoomInrease, buttonZoomDecrease);
+        mZoomView = (ZoomView) actionBar.getCustomView().findViewById(
+                R.id.zoom_view);
+
+        initZoomView();
     }
 
-    private void initZoomView(ZoomView mZoomView) {
-        final int minCellSide = mColorField.getMinCellSide();
-        final int maxCellSide = mColorField.getMaxCellSide();
-        int width = mColorField.getCellWidth();
-        
-    }
+    private void initZoomView() {
+        // final int minCellSide = mColorField.getMinCellSide();
+        // final int maxCellSide = mColorField.getMaxCellSide();
 
-    private void initZoomButtons(final ImageButton buttonZoomIncrease,
-            final ImageButton buttonZoomDecrease) {
-        final int minCellSide = mColorField.getMinCellSide();
-        final int maxCellSide = mColorField.getMaxCellSide();
-        
-        buttonZoomIncrease.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                int width = mColorField.getCellWidth();
-                int newSide = width + mZoomChangeValue;
-                if (newSide > minCellSide) {
-                    buttonZoomDecrease.setEnabled(true);
-                }
-
-                if (newSide > maxCellSide) {
-                    buttonZoomIncrease.setEnabled(false);
-                    return;
-                }
-
-                mColorField.setCellSide(newSide);
+        mZoomView.setListener(new ZoomView.ZoomListener() {
+            @Override
+            public void onChangeZoom(int count) {
+                // int side = minCellSide + (mZoomChangeValue * count);
+                int side = (mZoomChangeValue * count);
+                mColorField.setCellSide(side);
             }
         });
 
-        buttonZoomDecrease.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                int width = mColorField.getCellWidth();
-                int newSide = width - mZoomChangeValue;
+        updateZoomView();
+    }
 
-                if (newSide < maxCellSide) {
-                    buttonZoomIncrease.setEnabled(true);
-                }
-
-                if (newSide < minCellSide) {
-                    buttonZoomDecrease.setEnabled(false);
-                    return;
-                }
-
-                mColorField.setCellSide(newSide);
-            }
-        });
-
+    private void updateZoomView() {
+        int maxCellSide = mColorField.getMaxCellSide();
         int width = mColorField.getCellWidth();
-        if ((width - mZoomChangeValue) <= minCellSide) {
-            buttonZoomDecrease.setEnabled(false);
-        } else if ((width + mZoomChangeValue) >= maxCellSide) {
-            buttonZoomIncrease.setEnabled(false);
-        }
+        int limit = (int) Math.floor(maxCellSide / mZoomChangeValue);
+        int current = (limit * width) / maxCellSide;
+        mZoomView.set(current, limit);
     }
 
     private void initScrollLock(final ImageButton buttonScroll) {
@@ -1093,13 +1066,18 @@ public class MainActivity extends SherlockFragmentActivity implements
             cellPadding = 0;
             showMessageFromResource(R.string.warning_parsing_cell_padding);
         }
+        
+        mGuiTraceMode = GuiTraceMode.valueOf(preferences.getString(
+                SHARED_PREFERENCES_GUI_TRACE_MODE, "All"));
 
         getPietFile().getView().setCellPadding(cellPadding);
 
         int cellSide = preferences.getInt(SHARED_PREFERENCES_KEY_CELL_SIDE,
                 mColorField.getMinCellSide());
         getPietFile().getView().setCellSide(cellSide);
-
+        if (mZoomView != null) {
+            updateZoomView();
+        }
         boolean infoWidgetVisibility = preferences.getBoolean(
                 SHARED_PREFERENCES_KEY_INFO_WIDGET_VISIBILITY, true);
         updateInfoWidgetVisibility(infoWidgetVisibility);
@@ -1108,7 +1086,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             getRunner().setStepDelay(mSleepBetweenStep);
         }
     }
-    
+
     private int getActiveColor() {
         return mActiveColor;
     }
@@ -1159,15 +1137,15 @@ public class MainActivity extends SherlockFragmentActivity implements
             public void run() {
                 mMessageToast = null;
             }
-        },  2000);
-       
+        }, 2000);
+
     }
-    
+
     private void showMessageFromResource(int id) {
         String msg = getStringFromResource(id);
         showMessage(msg);
     }
-    
+
     private void loadPietFileAsyncWithPath(String path) {
         getPietFile().getLoader().loadAsync(path, new LoadListener(false));
     }

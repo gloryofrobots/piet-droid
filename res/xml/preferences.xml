@@ -16,12 +16,22 @@
         android:inputType="number"/>
     
     <ListPreference
-        android:dialogTitle="@string/prefs_zoom_step"
+        android:dialogTitle="@string/prefs_zoom_step_title"
         android:key="zoom_step"
         android:summary="@string/prefs_zoom_step_summary"
         android:title="@string/prefs_zoom_step_title"
         android:entries="@array/zoom_step_entries"
         android:entryValues="@array/zoom_step_values"
+        android:defaultValue="2"
+       />
+    
+    <ListPreference
+        android:dialogTitle="@string/gui_trace_mode_title"
+        android:key="gui_trace_mode"
+        android:summary="@string/gui_trace_mode_summary"
+        android:title="@string/gui_trace_mode_title"
+        android:entries="@array/gui_trace_mode_entries"
+        android:entryValues="@array/gui_trace_mode_values"
         android:defaultValue="2"
        />
     
