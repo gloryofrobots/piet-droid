@@ -2,4 +2,5 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" 
-    android:textSize="@dimen/info_widget_panel_content_text_size" />
+    android:textSize="@dimen/info_widget_panel_content_text_size"
+    android:textColor="@color/info_widget_panel_content_text_color" />

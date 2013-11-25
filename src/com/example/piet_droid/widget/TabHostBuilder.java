@@ -10,37 +10,36 @@ import android.widget.TabWidget;
 import android.widget.TextView;
 
 public class TabHostBuilder {
-    
-   
+
     int mActiveTabColor;
     int mPassiveTabColor;
     int mTextColor;
     int mTabWidth;
     int mTabHeight;
     float mTextSize;
-    
+
     public final int DEFAULT_DIMENSION = -1;
     ArrayList<TabHost.TabSpec> mTabs;
-    TabHost mTabHost; 
+    TabHost mTabHost;
+
     private TabHostBuilder(TabHost tabs) {
-        // TODO Auto-generated constructor stub
         mTabHost = tabs;
         mTabHost.setup();
         mTabWidth = DEFAULT_DIMENSION;
         mTabHeight = DEFAULT_DIMENSION;
         mTextSize = 12;
     }
-    
-    public static TabHostBuilder  create(TabHost tabs) {
+
+    public static TabHostBuilder create(TabHost tabs) {
         TabHostBuilder helper = new TabHostBuilder(tabs);
         return helper;
     }
- 
+
     public TabHostBuilder setActiveTabColor(int activeTabColor) {
         this.mActiveTabColor = activeTabColor;
         return this;
     }
-    
+
     public TabHostBuilder setTextSize(float size) {
         this.mTextSize = size;
         return this;
@@ -50,24 +49,22 @@ public class TabHostBuilder {
         this.mPassiveTabColor = passiveTabColor;
         return this;
     }
-    
 
     public TabHostBuilder setTabWidth(int width) {
         mTabWidth = width;
         return this;
     }
-    
 
     public TabHostBuilder setTabHeight(int height) {
         mTabHeight = height;
         return this;
     }
-    
+
     public TabHostBuilder setTextColor(int color) {
         mTextColor = color;
         return this;
     }
-    
+
     public TabHostBuilder addTab(int id, String tag, String indicator) {
         TabHost.TabSpec spec = mTabHost.newTabSpec(tag);
         spec.setContent(id);
@@ -75,53 +72,46 @@ public class TabHostBuilder {
         mTabHost.addTab(spec);
         return this;
     }
-    
+
     public void build(int currentTabIndex) {
-        
         mTabHost.setCurrentTab(currentTabIndex);
-       
-       
+
         mTabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-            
             @Override
             public void onTabChanged(String tabId) {
-                // TODO Auto-generated method stub
                 setTabColors(mTabHost);
-             }
+            }
         });
-        
+
         setTabColors(mTabHost);
     }
-    
+
     private void setTabColors(TabHost tabHost) {
         TabWidget tabWidget = tabHost.getTabWidget();
-        for(int i=0; i < tabWidget.getChildCount();i++)
-        {
+        for (int i = 0; i < tabWidget.getChildCount(); i++) {
             View tab = tabWidget.getChildAt(i);
             setTabAttributes(tab, mPassiveTabColor, mTextColor);
         }
-        
+
         View tab = tabWidget.getChildAt(tabHost.getCurrentTab());
         setTabAttributes(tab, mActiveTabColor, mTextColor);
     }
-    
+
     private void setTabAttributes(View tab, int backgroundColor, int textColor) {
-        
-        tab.setBackgroundColor(backgroundColor); //unselected
-        TextView tv = (TextView) tab.findViewById(android.R.id.title); //Unselected Tabs
+
+        tab.setBackgroundColor(backgroundColor); // unselected
+        TextView tv = (TextView) tab.findViewById(android.R.id.title); // Unselected
+                                                                       // Tabs
         tv.setTextColor(textColor);
         tv.setBackgroundColor(backgroundColor);
         tv.setTextSize(mTextSize);
-        
-        if(mTabHeight != DEFAULT_DIMENSION) {
+
+        if (mTabHeight != DEFAULT_DIMENSION) {
             tab.getLayoutParams().height = mTabHeight;
         }
-        if(mTabWidth != DEFAULT_DIMENSION) {
+        if (mTabWidth != DEFAULT_DIMENSION) {
             tab.getLayoutParams().width = mTabWidth;
         }
     }
-    
-   
-    
 
 }

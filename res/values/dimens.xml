@@ -21,8 +21,11 @@
     <dimen name="info_widget_panel_content_text_size">12sp</dimen>
     <dimen name="info_widget_tabhost_tab_height">40dp</dimen>
     <dimen name="info_widget_tabhost_tab_width">40dp</dimen>
-    <dimen name="info_widget_log_height">200dp</dimen>
     
+    <dimen name="info_widget_log_height">200dp</dimen>
+    <dimen name="info_widget_state_height">70dp</dimen>
+     <dimen name="info_widget_out_height">100dp</dimen>
+      <dimen name="info_widget_in_height">100dp</dimen>
     
     <dimen name="codel_board_cell_margin">0dp</dimen>
     <dimen name="button_scroll_toggle_side">30dp</dimen>

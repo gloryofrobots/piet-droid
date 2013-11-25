@@ -35,11 +35,11 @@
         </ScrollView>
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="@dimen/medium_horizontal_margin"
+        android:layout_marginBottom="@dimen/small_horizontal_margin"
         android:layout_marginRight="@dimen/medium_horizontal_margin"
         android:layout_marginTop="@dimen/small_horizontal_margin"
         android:layout_weight="1"
@@ -91,11 +91,13 @@
             </com.example.piet_droid.widget.ScrollViewLockable>
         </LinearLayout>
 
+      
         <com.example.piet_droid.widget.AccordeonTabHost
             android:id="@android:id/tabhost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/info_widget_margin_top" >
+            android:layout_marginTop="@dimen/info_widget_margin_top" 
+            android:layout_alignParentBottom="true" >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -107,12 +109,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" 
                     android:layout_weight="1"
+                    android:background="@color/info_widget_panel_color"
                     >
+					<LinearLayout
+                        android:id="@+id/fakeAccordeonTabHostTab"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:orientation="vertical" >
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/tabInput"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/info_widget_size"
+                        android:layout_height="@dimen/info_widget_in_height"
                         android:orientation="vertical" >
 
                         <EditText
@@ -131,7 +140,7 @@
                     <LinearLayout
                         android:id="@+id/tabOutput"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/info_widget_size"
+                        android:layout_height="@dimen/info_widget_out_height"
                         android:orientation="vertical" >
 
                         <ScrollView
@@ -155,16 +164,15 @@
                     <LinearLayout
                         android:id="@+id/tabState"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/info_widget_size"
+                        android:layout_height="@dimen/info_widget_state_height"
                         android:orientation="vertical" >
 
                         <fragment
                             android:id="@+id/fragment_state_info"
                             android:name="com.example.piet_droid.fragment.FragmentStateInfo"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_marginTop="@dimen/info_widget_margin_top"
-                            android:layout_weight="1" />
+                            android:layout_height="@dimen/info_widget_state_height"
+                            android:layout_marginTop="@dimen/info_widget_margin_top" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -186,12 +194,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/border" 
-                    android:layout_weight="0"
-                    
-                    >
+                    android:layout_weight="0">
                 </TabWidget>
             </LinearLayout>
         </com.example.piet_droid.widget.AccordeonTabHost>
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>
