@@ -1018,8 +1018,13 @@ public class MainActivity extends SherlockFragmentActivity implements
             showMessageFromResource(R.string.warning_parsing_cell_padding);
         }
         
-        mGuiTraceMode = GuiTraceMode.valueOf(preferences.getString(
-                SHARED_PREFERENCES_GUI_TRACE_MODE, "All"));
+        try {
+            mGuiTraceMode = GuiTraceMode.valueOf(preferences.getString(
+                    SHARED_PREFERENCES_GUI_TRACE_MODE, "All"));
+        } catch(IllegalArgumentException e) {
+            mGuiTraceMode = GuiTraceMode.All;
+        }
+        
         mRunListener.setGuiTraceMode(mGuiTraceMode);
         
         getPietFile().getView().setCellPadding(cellPadding);

@@ -1,6 +1,8 @@
 package com.example.piet_droid.widget;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import com.example.piet_droid.IntVector;
@@ -79,71 +81,46 @@ public class ColorFieldView extends View {
             }
         }
 
-        private class CellData {
-            Data mCellDataRoot = new Data(-1,-1);
-
-            private class Data {
-                Data(int x, int y) {
-                    this.x = x;
-                    this.y = y;
+        private class CellDrawables {
+            private ArrayList<Drawable> mDrawables = new ArrayList<Drawable>();
+            private HashMap<Integer, Integer> mFindMap = new HashMap<Integer, Integer>();
+            
+            private Drawable getDrawable(int index) {
+               Integer drawableIndex = mFindMap.get(index);
+               if(drawableIndex == null){
+                   return null;
+               }
+               try{
+                   Drawable drawable = mDrawables.get(drawableIndex);
+                   return drawable;
+               } catch(IndexOutOfBoundsException e) {
+                   return null;
+               }
+            }
+            
+            private boolean hasDrawable(int index) {
+                return mFindMap.containsKey(index);
+            }
+            
+            private void putDrawable(int index, Drawable drawable) {
+                if(mFindMap.containsKey(index)) {
+                    Integer drawableIndex = mFindMap.get(index);
+                    mDrawables.set(drawableIndex, drawable);
+                } else {
+                    mDrawables.add(drawable);
+                    int findIndex = mDrawables.size() - 1;
+                    mFindMap.put(index, findIndex);
                 }
-                
-                private int x;
-                private int y;
-                private Drawable drawable;
-                private Data next;
-            }
-
-            private Data getCellData(int x, int y) {
-                Data data = mCellDataRoot;
-                do {
-                    if (data.x == x && data.y == y) {
-                        return data;
-                    }
-                } while ((data = data.next) != null);
-
-                return null;
-            }
-
-            private Data getCellDataForce(int x, int y) {
-                Data data = getCellData(x, y);
-                if (data != null) {
-                    return data;
-                }
-
-                Data newData = new Data(x, y);
-              
-                newData.next = mCellDataRoot;
-                mCellDataRoot = newData;
-                return mCellDataRoot;
-            }
-
-            public void shrink(int newSize) {
-                // TODO Auto-generated method stub
-
             }
 
             public void clear() {
-                // TODO Auto-generated method stub
-
+                mFindMap.clear();
+                mDrawables.clear();
             }
-
-            public void clearDrawables() {
-                // TODO Auto-generated method stub
-
-            }
-        }
-
-        private class Cell {
-
-            /*
-             * public boolean contains(float x2, float y2) { return
-             * bounds.contains((int) x2, (int) y2); }
-             */
         }
 
         CellColors mCellColors;
-        CellData mCellData;
+        CellDrawables mCellDrawables;
 
         private int mWidth;
         private int mHeight;
@@ -156,7 +133,7 @@ public class ColorFieldView extends View {
             mHeight = height;
             int size = mWidth * mHeight;
             mCellColors = new CellColors(size);
-            mCellData = new CellData();
+            mCellDrawables = new CellDrawables();
             createCells(0, size);
             // makeCellMemorySize();
         }
@@ -173,7 +150,7 @@ public class ColorFieldView extends View {
         public void resize(int width, int height) {
             int newSize = width * height;
             mCellColors.resize(newSize);
-            mCellData.clear();
+            mCellDrawables.clear();
             mWidth = width;
             mHeight = height;
             invalidateCellColors();
@@ -225,8 +202,7 @@ public class ColorFieldView extends View {
         }
 
         public void setCellDrawable(int x, int y, Drawable drawable) {
-            CellData.Data cellData = mCellData.getCellDataForce(x, y);
-            cellData.drawable = drawable;
+            mCellDrawables.putDrawable(getIndex(x, y), drawable);
         }
 
         public void setDrawableForColor(int color, Drawable drawable) {
@@ -240,7 +216,7 @@ public class ColorFieldView extends View {
         }
 
         public void clearDrawables() {
-            mCellData.clearDrawables();
+            mCellDrawables.clear();
         }
 
         public void drawCell(int x, int y, Canvas canvas, Paint cellPaint,
@@ -253,10 +229,10 @@ public class ColorFieldView extends View {
             cellPaint.setColor(color);
             canvas.drawRect(mDrawCellBounds, cellPaint);
             
-            CellData.Data data = mCellData.getCellData(x, y);
-            if (data != null && data.drawable != null) {
-                data.drawable.setBounds(mDrawCellBounds);
-                data.drawable.draw(canvas);
+            Drawable drawable = mCellDrawables.getDrawable(getIndex(x,y));
+            if (drawable != null) {
+               drawable.setBounds(mDrawCellBounds);
+               drawable.draw(canvas);
             }
 
             int strokeWidth = (int) cellBoundsPaint.getStrokeWidth() / 2;
@@ -276,7 +252,7 @@ public class ColorFieldView extends View {
         }
 
         public void clear() {
-            mCellData.clear();
+            mCellDrawables.clear();
             invalidateCellColors();
         }
     }

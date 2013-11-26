@@ -73,7 +73,7 @@ public class FragmentStateInfo extends SherlockFragment {
                 public void onRunCommand(Command command, PietMachineStack stack) {
                     mLastCommandState.delete(0, mLastCommandState.length());
                     mLastCommandState.append(command.toString());
-                    
+                    mLastCommandState.append("\n");
                     String stackRepr =  stack.toString();
                     if(stackRepr.length() > 0) {
                         mLastCommandState.append(stackRepr);
