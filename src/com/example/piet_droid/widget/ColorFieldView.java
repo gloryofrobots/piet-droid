@@ -3,6 +3,7 @@ package com.example.piet_droid.widget;
 import java.io.Serializable;
 import java.util.Iterator;
 
+import com.example.piet_droid.IntVector;
 import com.example.piet_droid.MemoryUtils;
 import com.example.piet_droid.R;
 
@@ -30,199 +31,202 @@ public class ColorFieldView extends View {
         public boolean isProcessClickWanted();
     }
 
-    private class Cell implements Serializable {
+    private class Cells {
+        private class CellColors {
+            private static final long serialVersionUID = 1L;
+            protected int[] mData;
+            protected int mSize;
 
-        private static final long serialVersionUID = 1L;
-        private int color;
-        private Drawable drawable;
-        private Rect bounds;
-        private int x;
-        private int y;
-
-        Cell() {
-            this.bounds = new Rect();
-        }
-
-        // clear all cell state
-        public void init(int x, int y, int color) {
-            this.x = x;
-            this.y = y;
-            this.color = color;
-            this.drawable = null;
-        }
-
-        public Rect createBounds(int width, int height, Rect padding,
-                Rect margin) {
-            bounds.left = x * (width + padding.left) + margin.left;
-            bounds.top = y * (height + padding.top) + margin.top;
-
-            bounds.right = bounds.left + mCellWidth;
-            bounds.bottom = bounds.top + mCellHeight;
-
-            return bounds;
-        }
-
-        public void draw(Canvas canvas, Paint paint, Paint paintBounds) {
-            paint.setColor(color);
-            canvas.drawRect(bounds, paint);
-
-            if (drawable != null) {
-                drawable.setBounds(bounds);
-                drawable.draw(canvas);
+            public CellColors(int size) {
+                mData = new int[size];
+                mSize = size;
             }
 
-            int strokeWidth = (int) paintBounds.getStrokeWidth() / 2;
-
-            canvas.drawRect(bounds.left + strokeWidth,
-                    bounds.top + strokeWidth, bounds.right - strokeWidth,
-                    bounds.bottom - strokeWidth, paintBounds);
-        }
-
-        public boolean contains(float x2, float y2) {
-            return bounds.contains((int) x2, (int) y2);
-        }
-    }
-
-    private class Cells implements Iterable<Cell> {
-        public class CellIterator implements Iterator<Cell> {
-            private int mLastIndex;
-            private int mCurrentIndex;
-
-            CellIterator(int first, int last) {
-                mLastIndex = last;
-                mCurrentIndex = first;
+            public void resize(int newSize) {
+                if (mSize > newSize) {
+                    mSize = newSize;
+                } else {
+                    growTo(newSize);
+                }
             }
 
-            @Override
-            public boolean hasNext() {
-                return mCurrentIndex < mLastIndex;
+            public int size() {
+                return mSize;
             }
 
-            @Override
-            public Cell next() {
-                Cell cell = mCells[mCurrentIndex];
-                mCurrentIndex++;
-                return cell;
+            public int getDataSize() {
+                return mData.length;
             }
 
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
+            public int getColor(int index) {
+                return mData[index];
+            }
+
+            public void setColor(int index, int value) {
+                if (index >= mSize || index < 0) {
+                    throw new IndexOutOfBoundsException();
+                }
+
+                mData[index] = value;
+            }
+
+            private void growTo(int newSize) {
+                int[] newData = new int[newSize];
+                System.arraycopy(mData, 0, newData, 0, mSize);
+                mData = null;
+                mData = newData;
+                mSize = newSize;
             }
         }
 
-        Cell[] mCells;
+        private class CellData {
+            Data mCellDataRoot = new Data(-1,-1);
+
+            private class Data {
+                Data(int x, int y) {
+                    this.x = x;
+                    this.y = y;
+                }
+                
+                private int x;
+                private int y;
+                private Drawable drawable;
+                private Data next;
+            }
+
+            private Data getCellData(int x, int y) {
+                Data data = mCellDataRoot;
+                do {
+                    if (data.x == x && data.y == y) {
+                        return data;
+                    }
+                } while ((data = data.next) != null);
+
+                return null;
+            }
+
+            private Data getCellDataForce(int x, int y) {
+                Data data = getCellData(x, y);
+                if (data != null) {
+                    return data;
+                }
+
+                Data newData = new Data(x, y);
+              
+                newData.next = mCellDataRoot;
+                mCellDataRoot = newData;
+                return mCellDataRoot;
+            }
+
+            public void shrink(int newSize) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void clear() {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void clearDrawables() {
+                // TODO Auto-generated method stub
+
+            }
+        }
+
+        private class Cell {
+
+            /*
+             * public boolean contains(float x2, float y2) { return
+             * bounds.contains((int) x2, (int) y2); }
+             */
+        }
+
+        CellColors mCellColors;
+        CellData mCellData;
+
         private int mWidth;
         private int mHeight;
         private int mCellMemorySize;
-        private int mLastIndex;
+        Rect mDrawCellBounds = new Rect();
 
         Cells(int width, int height) {
 
             mWidth = width;
             mHeight = height;
             int size = mWidth * mHeight;
-            mCells = new Cell[size];
+            mCellColors = new CellColors(size);
+            mCellData = new CellData();
             createCells(0, size);
-            makeCellMemorySize();
-        }
-
-        public Cell getCell(int x, int y) {
-            int index = getIndex(x, y);
-            return mCells[index];
+            // makeCellMemorySize();
         }
 
         private int getIndex(int x, int y) {
             int index = x + y * mWidth;
-
             return index;
         }
 
         private void createCells(int first, int last) {
-            for (int i = first; i < last; i++) {
-                mCells[i] = new Cell();
-            }
-
-            invalidateCellCoords();
+            invalidateCellColors();
         }
 
         public void resize(int width, int height) {
-            int oldSize = mCells.length;
             int newSize = width * height;
-            int delta = newSize - oldSize;
-
-            if (delta <= 0) {
-                mWidth = width;
-                mHeight = height;
-
-                invalidateCellCoords();
-            } else {
-                int first = oldSize - 1;
-                Cell[] newCells = new Cell[newSize];
-                System.arraycopy(mCells, 0, newCells, 0, mCells.length);
-
-                mCells = newCells;
-                mWidth = width;
-                mHeight = height;
-
-                createCells(first, newSize);
-            }
+            mCellColors.resize(newSize);
+            mCellData.clear();
+            mWidth = width;
+            mHeight = height;
+            invalidateCellColors();
         }
 
-        public void invalidateCellCoords() {
-            // create last index for iterator
-            mLastIndex = 0;
+        public void invalidateCellColors() {
             for (int y = 0; y < mHeight; y++) {
                 for (int x = 0; x < mWidth; x++) {
-                    Cell cell = mCells[mLastIndex];
-                    cell.init(x, y, mDefaultCellColor);
-                    mLastIndex++;
+                    setCellColor(x, y, mDefaultCellColor);
                 }
             }
         }
 
         // Brutal way to determine memory for one cell
-        private void makeCellMemorySize() {
-            long freeMemoryBefore = MemoryUtils.getFreeMemory();
-            new Cell();
-            long freeMemoryAfter = MemoryUtils.getFreeMemory();
-            mCellMemorySize = (int) (freeMemoryBefore - freeMemoryAfter);
-        }
+        /*
+         * private void makeCellMemorySize() { long freeMemoryBefore =
+         * MemoryUtils.getFreeMemory(); new Cell(); long freeMemoryAfter =
+         * MemoryUtils.getFreeMemory(); mCellMemorySize = (int)
+         * (freeMemoryBefore - freeMemoryAfter); }
+         */
 
-        public long getAmountOfMemory(int width, int height) {
-            if (mCellMemorySize == 0) {
-                return -1;
-            }
+        /*
+         * public long getAmountOfMemory(int width, int height) { if
+         * (mCellMemorySize == 0) { return -1; }
+         * 
+         * int oldSize = mCells.length; int newSize = width * height; int delta
+         * = newSize - oldSize; if (delta <= 0) { return -1; }
+         * 
+         * return delta * mCellMemorySize; }
+         */
 
-            int oldSize = mCells.length;
-            int newSize = width * height;
-            int delta = newSize - oldSize;
-            if (delta <= 0) {
-                return -1;
-            }
+        public void createBoundsForCell(int x, int y, Rect bounds) {
+            bounds.left = x * (mCellWidth + mCellPadding.left)
+                    + mCellMargin.left;
+            bounds.top = y * (mCellHeight + mCellPadding.top) + mCellMargin.top;
 
-            return delta * mCellMemorySize;
-        }
-
-        @Override
-        public Iterator<Cell> iterator() {
-            return new CellIterator(0, mLastIndex);
-        }
-
-        public Rect createBoundsForCell(int x, int y) {
-            return getCell(x, y).createBounds(mCellWidth, mCellHeight, mCellPadding, mCellMargin);
+            bounds.right = bounds.left + mCellWidth;
+            bounds.bottom = bounds.top + mCellHeight;
         }
 
         public void setCellColor(int x, int y, int color) {
-            getCell(x, y).color = color;
+            int index = getIndex(x, y);
+            mCellColors.setColor(index, color);
         }
 
         public int getCellColor(int x, int y) {
-            return getCell(x, y).color;
+            int index = getIndex(x, y);
+            return mCellColors.getColor(index);
         }
 
         public void setCellDrawable(int x, int y, Drawable drawable) {
-            getCell(x, y).drawable = drawable;
+            CellData.Data cellData = mCellData.getCellDataForce(x, y);
+            cellData.drawable = drawable;
         }
 
         public void setDrawableForColor(int color, Drawable drawable) {
@@ -236,22 +240,51 @@ public class ColorFieldView extends View {
         }
 
         public void clearDrawables() {
-            for (int y = 0; y < mCellCountY; y++) {
-                for (int x = 0; x < mCellCountX; x++) {
-                    getCell(x, y).drawable = null;
-                }
-            }
+            mCellData.clearDrawables();
         }
 
         public void drawCell(int x, int y, Canvas canvas, Paint cellPaint,
                 Paint cellBoundsPaint) {
-            getCell(x,y).draw(canvas, cellPaint, cellBoundsPaint);
+            
+            int color = getCellColor(x, y);
+            
+            createBoundsForCell(x, y, mDrawCellBounds);
+            
+            cellPaint.setColor(color);
+            canvas.drawRect(mDrawCellBounds, cellPaint);
+            
+            CellData.Data data = mCellData.getCellData(x, y);
+            if (data != null && data.drawable != null) {
+                data.drawable.setBounds(mDrawCellBounds);
+                data.drawable.draw(canvas);
+            }
+
+            int strokeWidth = (int) cellBoundsPaint.getStrokeWidth() / 2;
+
+            canvas.drawRect(mDrawCellBounds.left + strokeWidth,
+                    mDrawCellBounds.top + strokeWidth, mDrawCellBounds.right
+                            - strokeWidth,
+                    mDrawCellBounds.bottom - strokeWidth, cellBoundsPaint);
+        }
+
+        public void drawCells(Canvas canvas) {
+            for (int y = 0; y < mCellCountY; y++) {
+                for (int x = 0; x < mCellCountX; x++) {
+                    drawCell(x, y, canvas, mCellPaint, mCellBoundsPaint);
+                }
+            }
+        }
+
+        public void clear() {
+            mCellData.clear();
+            invalidateCellColors();
         }
     }
 
     View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
-        private Cell mPreviousCell;
-
+        private Point mCellCoord = new Point();
+        private Rect  mPreviousCellBounds = new Rect(-1,-1,-1,-1);
+        
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             if (mOnCellClickListener != null
@@ -270,23 +303,21 @@ public class ColorFieldView extends View {
 
             switch (action) {
             case MotionEvent.ACTION_MOVE:
-                if (mPreviousCell != null && mPreviousCell.contains(x, y)) {
+                if (mPreviousCellBounds.contains((int)x, (int)y)) {
                     return;
                 }
 
             case MotionEvent.ACTION_DOWN:
-                Cell cell = findClickedCell(x, y);
-                if (cell == null) {
+                if (findClickedCell(x, y) == false) {
                     return;
                 }
-
-                mPreviousCell = cell;
-                mOnCellClickListener.onCellClick(cell.x, cell.y);
+                mCells.createBoundsForCell(mCellCoord.x, mCellCoord.y, mPreviousCellBounds);
+                mOnCellClickListener.onCellClick(mCellCoord.x, mCellCoord.y);
                 break;
             }
         }
 
-        private Cell findClickedCell(float eventX, float eventY) {
+        private boolean findClickedCell(float eventX, float eventY) {
             int rowY = -1;
             for (int y = 0; y < mCellCountY; y++) {
                 float boundTop = y * (mCellHeight + mCellPadding.top)
@@ -301,7 +332,7 @@ public class ColorFieldView extends View {
             }
 
             if (rowY == -1) {
-                return null;
+                return false;
             }
 
             for (int x = 0; x < mCellCountX; x++) {
@@ -310,11 +341,12 @@ public class ColorFieldView extends View {
                 float boundRight = boundLeft + mCellWidth;
 
                 if (eventX >= boundLeft && eventX < boundRight) {
-                    return mCells.getCell(x, rowY);
+                    mCellCoord.set(x, rowY);
+                    return true;
                 }
             }
 
-            return null;
+            return false;
         }
     };
 
@@ -342,10 +374,10 @@ public class ColorFieldView extends View {
     private CellClickListener mOnCellClickListener;
 
     private boolean mForceDraw;
-    
+
     Point mCellToRedrawCoords = new Point();
     boolean mPartialRedrawFlag;
-    
+
     private int mMinCellSide;
     private int mMaxCellSide;
 
@@ -353,12 +385,10 @@ public class ColorFieldView extends View {
     private final static int DEFAULT_MAX_CELL_SIDE = 100;
 
     Cells mCells;
-    
+
     public void setOnCellClickListener(CellClickListener onCellClickListener) {
         mOnCellClickListener = onCellClickListener;
     }
-
-    
 
     public ColorFieldView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -545,25 +575,25 @@ public class ColorFieldView extends View {
 
     public void setCellColor(int x, int y, int color) {
         mCells.setCellColor(x, y, color);
-        
     }
 
     public int getCellColor(int x, int y) {
         return mCells.getCellColor(x, y);
     }
     
+    private Rect mCellToRedrawBounds = new Rect();
+    
     public void setCellToRedraw(int x, int y) {
         mCellToRedrawCoords.set(x, y);
         mPartialRedrawFlag = true;
-        
-        Rect bounds = mCells.createBoundsForCell(x, y);
+        mCells.createBoundsForCell(x, y, mCellToRedrawBounds);
 
-        invalidate(bounds);
+        invalidate(mCellToRedrawBounds);
         // invalidate();
     }
 
     public void setCellDrawable(int x, int y, Drawable drawable) {
-        mCells.setCellDrawable(x,y,drawable);
+        mCells.setCellDrawable(x, y, drawable);
         setCellToRedraw(x, y);
     }
 
@@ -571,26 +601,20 @@ public class ColorFieldView extends View {
         mCells.setCellDrawable(x, y, null);
         setCellToRedraw(x, y);
     }
-    
+
     public void setDrawableForColor(int color, Drawable drawable) {
         mCells.setDrawableForColor(color, drawable);
-        
+
     }
 
     public void clearDrawables() {
         mCells.clearDrawables();
-       
 
         invalidate();
     }
 
     private void drawFull(Canvas canvas) {
-        for (Cell cell : mCells) {
-            cell.createBounds(mCellWidth, mCellHeight, mCellPadding,
-                    mCellMargin);
-            cell.draw(canvas, mCellPaint, mCellBoundsPaint);
-        }
-
+        mCells.drawCells(canvas);
     }
 
     public void invalidate() {
@@ -599,15 +623,16 @@ public class ColorFieldView extends View {
 
     private void drawDirty(Canvas canvas) {
         Rect boundsToRedraw = canvas.getClipBounds();
-        Rect boundsCell = mCells.createBoundsForCell(mCellToRedrawCoords.x, mCellToRedrawCoords.y);
-              
-        if (boundsCell.contains(boundsToRedraw) == false) {
+        mCells.createBoundsForCell(mCellToRedrawCoords.x,
+                mCellToRedrawCoords.y, mCellToRedrawBounds);
+
+        if (mCellToRedrawBounds.contains(boundsToRedraw) == false) {
             drawFull(canvas);
             return;
         }
-        mCells.drawCell(mCellToRedrawCoords.x, mCellToRedrawCoords.y, 
-                canvas, mCellPaint, mCellBoundsPaint);
-        
+        mCells.drawCell(mCellToRedrawCoords.x, mCellToRedrawCoords.y, canvas,
+                mCellPaint, mCellBoundsPaint);
+
         canvas.save();
     }
 
@@ -641,7 +666,7 @@ public class ColorFieldView extends View {
                         + vlp.bottomMargin + vlp.topMargin + (marginTop * 2));
         return minMeasureHeight;
     }
-    
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (mPartialRedrawFlag == false) {
@@ -681,7 +706,7 @@ public class ColorFieldView extends View {
     }
 
     public void clearAll() {
-        mCells.invalidateCellCoords();
+        mCells.clear();
         invalidate();
     }
 
@@ -694,6 +719,7 @@ public class ColorFieldView extends View {
     }
 
     public long getAmountOfMemory(int width, int height) {
-        return mCells.getAmountOfMemory(width, height);
+        return -1;
+        //return mCells.getAmountOfMemory(width, height);
     }
 }
