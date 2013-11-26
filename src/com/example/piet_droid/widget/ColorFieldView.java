@@ -440,7 +440,6 @@ public class ColorFieldView extends View {
     }
 
     protected void init() {
-        // int x = 1 / 0;
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         mLinePaint.setColor(mLineColor);
@@ -530,6 +529,11 @@ public class ColorFieldView extends View {
         setCellToRedraw(x, y);
     }
 
+    public void clearCellDrawable(int x, int y) {
+        mCells.getCell(x, y).drawable = null;
+        setCellToRedraw(x, y);
+    }
+    
     public void setDrawableForColor(int color, Drawable drawable) {
         for (int y = 0; y < mCellCountY; y++) {
             for (int x = 0; x < mCellCountX; x++) {
@@ -551,12 +555,9 @@ public class ColorFieldView extends View {
     }
 
     private void drawFull(Canvas canvas) {
-        Rect boundsToRedraw = canvas.getClipBounds();
         for (Cell cell : mCells) {
-
             cell.createBounds(mCellWidth, mCellHeight, mCellPadding,
                     mCellMargin);
-            
             cell.draw(canvas, mCellPaint, mCellBoundsPaint);
         }
 

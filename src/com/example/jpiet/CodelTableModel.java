@@ -84,7 +84,7 @@ public class CodelTableModel {
             return result;
         }
         catch(ArrayIndexOutOfBoundsException e) {
-            PolicyStorage.getInstance().getLogger().error(e.toString());
+            Piet.logger().error(e.toString());
         }
         
         return null;

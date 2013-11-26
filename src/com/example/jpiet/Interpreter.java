@@ -12,7 +12,7 @@ public class Interpreter {
     CodelTableModelScanner mModelScanner;
 
     PietMachine mMachine;
-
+    boolean mIsDebug;
     Codel mCurrentCodel;
     Codel mNextCodel;
     Codel mEdgeCodel;
@@ -20,15 +20,15 @@ public class Interpreter {
 
     ExecutionStepListener mExecutionStepListener;
 
-    public Interpreter(PietMachine _machine) {
+    public Interpreter(PietMachine _machine, CodelTableModelScanner scaner, boolean isDebug) {
         mMachine = _machine;
         mStepNumber = 0;
-
+        mIsDebug = isDebug;
         mCurrentCodel = new Codel();
         mNextCodel = new Codel();
         mEdgeCodel = new Codel();
         
-        mModelScanner = PolicyStorage.getInstance().createModelScaner();
+        mModelScanner = scaner;
     }
 
     public void setExecutionStepListener(
@@ -110,9 +110,7 @@ public class Interpreter {
         try {
             mMachine.runCommand(currentColor, nextColor, _input);
         } catch (PietMachineExecutionError exception) {
-            PolicyStorage
-                    .getInstance()
-                    .getLogger()
+            Piet.logger()
                     .error("Step %d %s ERROR : %s",
                             mStepNumber, mMachine.getLastCommand().getTag(),
                             exception.getMessage());
@@ -161,11 +159,10 @@ public class Interpreter {
     }
     
     public void debugTrace(String format, Object ... args) {
-        PolicyStorage policy = PolicyStorage.getInstance();
-        if (policy.isOnDebugMode()) {
-            policy.getLogger().info(format, args);
-            
-        }
+       if(mIsDebug == false) {
+           return;
+       }
+        Piet.logger().info(format, args);
     }
     
     public void init() {
@@ -175,7 +172,7 @@ public class Interpreter {
     }
 
     public void run() {
-        PolicyStorage.getInstance().getLogger().info("Iterpreter run");
+        Piet.logger().info("Iterpreter run");
 
         mStepNumber = 0;
         while (true) {
@@ -193,7 +190,7 @@ public class Interpreter {
         boolean whiteCrossed = (currentColor == CodelColor.WHITE);
 
         if (currentColor == CodelColor.BLACK) {
-            PolicyStorage.getInstance().getLogger()
+            Piet.logger()
                     .error("We are on black hole :)");
             return false;
         }

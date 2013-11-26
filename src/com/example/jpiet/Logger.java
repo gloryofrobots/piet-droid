@@ -19,18 +19,18 @@ public abstract class Logger {
         mListeners.add(listener);
     }
     
-	public void error(String msg, Object... args){
+	public synchronized void error(String msg, Object... args){
 	    String error = prepare(msg, args);
 	    _onError(error);
 	    notifyError(error);
 	}
-	public void info(String msg, Object... args){
+	public synchronized void info(String msg, Object... args){
 	    String error = prepare(msg, args);
 	    _onInfo(error);
 	    notifyInfo(error);
 	}
 	
-	public void warning(String msg, Object... args){
+	public synchronized void warning(String msg, Object... args){
 	    String error = prepare(msg, args);
 	    _onWarning(error);
 	    notifyWarning(error);

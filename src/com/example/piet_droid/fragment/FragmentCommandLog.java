@@ -12,19 +12,13 @@ import com.example.jpiet.Command;
 import com.example.jpiet.CommandRunListener;
 import com.example.jpiet.Piet;
 import com.example.jpiet.PietMachineStack;
-import com.example.jpiet.PolicyStorage;
 import com.example.jpiet.Logger;
 import com.example.piet_droid.PietProvider;
 import com.example.piet_droid.R;
-import com.example.piet_droid.R.id;
-import com.example.piet_droid.R.layout;
 
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Debug;
-import android.support.v4.app.Fragment;
-import android.text.method.ScrollingMovementMethod;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -34,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class FragmentCommandLog extends SherlockFragment {
     List<String> mQueue;
@@ -115,7 +108,7 @@ public class FragmentCommandLog extends SherlockFragment {
                 }
             });
             
-            Logger logger = PolicyStorage.getInstance().getLogger();
+            Logger logger = Piet.logger();
             
             logger.addListener(new Logger.EventListener() {
                 

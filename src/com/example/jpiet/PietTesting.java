@@ -9,7 +9,13 @@
 //import java.util.ArrayList;
 //import java.util.LinkedList;
 //import java.util.List;
+//import java.awt.image.BufferedImage;
+//import java.io.File;
+//import java.io.IOException;
 //
+//import javax.imageio.ImageIO;
+
+
 //public class PietTesting {
 //    
 //    static public class TestInput{
@@ -74,7 +80,7 @@
 //
 //        public boolean makeTest() {
 //            try {
-//                CodelTableModel model = Piet.createModel(mFilename);
+//                CodelTableModel model = createModel(mFilename);
 //                InOutSystemTest inOutTest = new InOutSystemTest(mInput.get(),
 //                        mVerbose);
 //
@@ -149,6 +155,30 @@
 //        return inputChars;
 //    }
 //    
+//  
+//    public static CodelTableModel createModel(String _filename){
+//        try {
+//            BufferedImage img = ImageIO.read(new File(_filename));
+//            CodelTableModel model = new CodelTableModel(img.getWidth(), img.getHeight(), CodelColor.WHITE);
+//
+//            for(int y = 0; y < img.getHeight(); y++){
+//                for(int x = 0; x < img.getWidth(); x++){
+//                    int pixel = img.getRGB(x, y);
+//                    int R = (pixel & 0xFF0000) >> 16;
+//                    int G = (pixel & 0xFF00) >> 8;
+//                    int B = (pixel & 0xFF);
+//
+//                    CodelColor color = CodelColor.findColor(R, G, B);
+//                    model.set(x, y, color);
+//                }
+//            }
+//            return model;
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//      return  null;
+//    }
 //    // CODEL SIZE !!!!!!!!
 //    public static void main(String[] args) {
 //        ArrayList<PietTesting.Test> tests = new ArrayList<PietTesting.Test>();

@@ -38,10 +38,6 @@ public class PietFileActor {
         mView.setCellToRedraw(x, y);
     }
 
-    public void clearViewDrawables() {
-        mView.clearDrawables();
-    }
-
     public void clear() {
         mView.clearAll();
         mPiet.clear();
@@ -55,10 +51,6 @@ public class PietFileActor {
 
     public void finalise() {
         mPietFile = null;
-    }
-
-    public void setCellDrawable(int x, int y, Drawable drawable) {
-        mView.setCellDrawable(x, y, drawable);
     }
 
     public void saveInstanceState(Bundle savedInstanceState) {

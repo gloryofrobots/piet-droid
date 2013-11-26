@@ -1,4 +1,5 @@
 <resources>
+
     <string-array name="unknown_color_interpretation_entries">
         <item>White</item>
         <item>Black</item>
@@ -7,7 +8,6 @@
         <item>#fff</item>
         <item>#000</item>
     </string-array>
-   
     <string-array name="new_field_color_entries">
         <item>White</item>
         <item>Black</item>
@@ -26,7 +26,6 @@
         <item>JPEG</item>
         <item>PNG</item>
     </string-array>
-    
     <string-array name="zoom_step_entries">
         <item>2</item>
         <item>4</item>
@@ -43,16 +42,15 @@
         <item>32</item>
         <item>64</item>
     </string-array>
-    
-     <string-array name="gui_trace_mode_entries">
-        <item>None</item>
-        <item>Current codel</item>
+    <string-array name="gui_trace_mode_entries">
         <item>All codels</item>
-     
+        <item>Current codel</item>
+        <item>None</item>
     </string-array>
     <string-array name="gui_trace_mode_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+        <item>All</item>
+        <item>Current</item>
+        <item>None</item>
     </string-array>
+
 </resources>

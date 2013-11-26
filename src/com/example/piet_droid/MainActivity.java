@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import android.os.Bundle;
@@ -16,42 +14,23 @@ import android.os.Handler;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.app.FragmentActivity;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuInflater;
-
-import android.util.AttributeSet;
 import android.util.Log;
 
-import android.view.Display;
-import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TabHost;
-import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 import ar.com.daidalos.afiledialog.FileChooserDialog;
@@ -59,23 +38,18 @@ import ar.com.daidalos.afiledialog.FileChooserLabels;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.example.jpiet.Codel;
-import com.example.jpiet.CodelColor;
-import com.example.jpiet.CodelTableModel;
-import com.example.jpiet.CodelTableModelSerializedData;
-import com.example.jpiet.Logger;
 
-import com.example.jpiet.InOutSystem;
 
 import com.example.jpiet.Piet;
+import com.example.piet_droid.codel_table_view.CodelTableViewUpdater;
+import com.example.piet_droid.codel_table_view.CodelTableViewUpdaterPool;
 import com.example.piet_droid.fragment.DialogFragmentNewFileSettings;
 import com.example.piet_droid.fragment.DialogFragmentSaveChanges;
 import com.example.piet_droid.fragment.FragmentCommandLog;
 import com.example.piet_droid.fragment.FragmentPaletteSimple;
 import com.example.piet_droid.fragment.FragmentStateInfo;
-import com.example.piet_droid.fragment.PietPreferenceFragment;
 import com.example.piet_droid.widget.ColorFieldView;
 import com.example.piet_droid.widget.ControlToolboxView;
-import com.example.piet_droid.widget.DrawableFilledCircle;
 import com.example.piet_droid.widget.TabHostBuilder;
 import com.example.piet_droid.widget.HorizontalScrollViewLockable;
 import com.example.piet_droid.widget.ScrollViewLockable;
@@ -83,36 +57,28 @@ import com.example.piet_droid.widget.ZoomView;
 
 public class MainActivity extends SherlockFragmentActivity implements
         FragmentPaletteSimple.OnChooseColorListener, PietProvider {
-
+    
     // //////////////////////////////////////////////////////////////////////////
     private class RunListener implements PietFileRunner.RunEventListener {
-        private Codel mPreviousCodel;
-        private DrawableFilledCircle mCurrentCellDrawable;
-        private DrawableFilledCircle mPreviousCellDrawable;
-
-        public void initDebugDrawables(Resources resources) {
-            mCurrentCellDrawable = new DrawableFilledCircle();
-            int currentDrawableColor = resources
-                    .getColor(R.color.debug_cell_highlight);
-            mCurrentCellDrawable.setColor(currentDrawableColor);
-
-            mPreviousCellDrawable = new DrawableFilledCircle();
-            int prevDrawableColor = resources
-                    .getColor(R.color.debug_previous_cell_highlight);
-
-            mPreviousCellDrawable.setColor(prevDrawableColor);
+        CodelTableViewUpdater mUpdater = null;
+        CodelTableViewUpdaterPool mUpdaterPool = null;
+        
+        RunListener(Resources resources) {
+            mUpdaterPool = new CodelTableViewUpdaterPool(mColorField, resources);
+        }
+        
+        public void setGuiTraceMode(GuiTraceMode mode) {
+            mUpdater = mUpdaterPool.getUpdater(mode);
         }
 
         @Override
         public void onRunStart() {
-            
-            mPreviousCodel = new Codel(0, 0);
             getPiet().init();
             mFragmentStateInfo.init();
-            PietFileActor actor = getActor();
-            actor.clearViewDrawables();
-            actor.setCellDrawable(0, 0, mCurrentCellDrawable);
+
             getPiet().getInOutSystem().prepare();
+            
+            mUpdater.start();
         }
 
         private boolean check() {
@@ -127,10 +93,10 @@ public class MainActivity extends SherlockFragmentActivity implements
             if (!check()) {
                 return;
             }
-
-            PietFileActor actor = getPietFile().getActor();
-            actor.clearViewDrawables();
+           
             mControlToolBoxView.setControlsToDefaultState();
+
+            mUpdater.cancel();
             // mFragmentStateInfo.init();
         }
 
@@ -139,13 +105,8 @@ public class MainActivity extends SherlockFragmentActivity implements
             mFragmentStateInfo.update();
             mPiet.getInOutSystem().flush();
             mFragmentCommandLog.update();
-
-            PietFileActor actor = getActor();
-            actor.setCellDrawable(mPreviousCodel.x, mPreviousCodel.y,
-                    mPreviousCellDrawable);
-
-            actor.setCellDrawable(codel.x, codel.y, mCurrentCellDrawable);
-            mPreviousCodel.set(codel);
+            
+            mUpdater.update(codel);
         }
 
         @Override
@@ -153,20 +114,18 @@ public class MainActivity extends SherlockFragmentActivity implements
             if (!check()) {
                 return;
             }
-            PietFileActor actor = getActor();
-            actor.setCellDrawable(mPreviousCodel.x, mPreviousCodel.y,
-                    mPreviousCellDrawable);
+            
             mControlToolBoxView.setControlsToDefaultState();
+            
+            mUpdater.complete();
         }
 
         @Override
         public void onRunError() {
-            PietFileActor actor = getActor();
-            actor.clearViewDrawables();
+            mUpdater.cancel();
+            
             mControlToolBoxView.setControlsToDefaultState();
-            String message = getResources().getString(
-                    R.string.runtime_internal_error);
-            showMessage(message);
+            showMessageFromResource(R.string.runtime_internal_error);
         }
     }
 
@@ -250,10 +209,6 @@ public class MainActivity extends SherlockFragmentActivity implements
     private static final String TEMPORARY_FILENAME = ".pietdroid_tmp.png";
     private static final String SHARED_PREFERENCES_KEY_IS_TEMPORARY = "is_temporary";
     private static final String SHARED_PREFERENCES_ZOOM_STEP = "zoom_step";
-
-    public enum GuiTraceMode {
-        None, Current, All;
-    }
 
     private final String LOG_TAG = "PietDroidMainActivity";
 
@@ -363,8 +318,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void initListeners(Resources resources) {
-        mRunListener = new RunListener();
-        mRunListener.initDebugDrawables(resources);
+        mRunListener = new RunListener(resources);
         getRunner().addExecutionListener(mRunListener);
 
         mSaveListener = new SaveListener();
@@ -487,14 +441,12 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     private void initPiet(Resources resources) {
+        Piet.setLogger(new LoggerDroid());
+        
         final EditText inText = (EditText) findViewById(R.id.text_view_in);
         final TextView outText = (TextView) findViewById(R.id.text_view_out);
-
-        InOutSystem inOutSystem = new InOutSystemEditText(inText, outText);
-
-        LoggerDroid logger = new LoggerDroid();
-
-        mPiet = new Piet(logger, inOutSystem);
+        
+        mPiet =  Piet.createPiet(new InOutSystemEditText(inText, outText), false);
     }
 
     public boolean isOnScrollMode() {
@@ -578,7 +530,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     private void initTabHost() {
         Resources resources = getResources();
-        // final View tabsInclude = findViewById(R.id.tablayout);
         final TabHost tabs = (TabHost) findViewById(android.R.id.tabhost);
 
         TabHostBuilder
@@ -608,7 +559,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 .addTab(R.id.tabState, "state",
                         resources.getString(R.string.tab_state))
                 .addTab(R.id.tabLog, "log",
-                        resources.getString(R.string.tab_log)).build(2);
+                        resources.getString(R.string.tab_log)).build(0);
     }
 
     // Called after onCreate has finished, use to restore UI state
@@ -1069,7 +1020,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         
         mGuiTraceMode = GuiTraceMode.valueOf(preferences.getString(
                 SHARED_PREFERENCES_GUI_TRACE_MODE, "All"));
-
+        mRunListener.setGuiTraceMode(mGuiTraceMode);
+        
         getPietFile().getView().setCellPadding(cellPadding);
 
         int cellSide = preferences.getInt(SHARED_PREFERENCES_KEY_CELL_SIDE,

@@ -12,7 +12,6 @@ public class LoggerDroid extends Logger {
         Log.e(LABEL, msg);
     }
 
-
     @Override
     public void _onInfo(String msg) {
         Log.i(LABEL, msg);
@@ -22,5 +21,4 @@ public class LoggerDroid extends Logger {
     public void _onWarning(String msg) {
         Log.w(LABEL, msg);
     }
-
 }
