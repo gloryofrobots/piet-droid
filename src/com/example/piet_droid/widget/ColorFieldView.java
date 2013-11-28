@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.example.piet_droid.IntVector;
 import com.example.piet_droid.MemoryUtils;
 import com.example.piet_droid.R;
 
@@ -35,7 +34,6 @@ public class ColorFieldView extends View {
 
     private class Cells {
         private class CellColors {
-            private static final long serialVersionUID = 1L;
             protected int[] mData;
             protected int mSize;
 
@@ -84,26 +82,26 @@ public class ColorFieldView extends View {
         private class CellDrawables {
             private ArrayList<Drawable> mDrawables = new ArrayList<Drawable>();
             private HashMap<Integer, Integer> mFindMap = new HashMap<Integer, Integer>();
-            
+
             private Drawable getDrawable(int index) {
-               Integer drawableIndex = mFindMap.get(index);
-               if(drawableIndex == null){
-                   return null;
-               }
-               try{
-                   Drawable drawable = mDrawables.get(drawableIndex);
-                   return drawable;
-               } catch(IndexOutOfBoundsException e) {
-                   return null;
-               }
+                Integer drawableIndex = mFindMap.get(index);
+                if (drawableIndex == null) {
+                    return null;
+                }
+                try {
+                    Drawable drawable = mDrawables.get(drawableIndex);
+                    return drawable;
+                } catch (IndexOutOfBoundsException e) {
+                    return null;
+                }
             }
-            
+
             private boolean hasDrawable(int index) {
                 return mFindMap.containsKey(index);
             }
-            
+
             private void putDrawable(int index, Drawable drawable) {
-                if(mFindMap.containsKey(index)) {
+                if (mFindMap.containsKey(index)) {
                     Integer drawableIndex = mFindMap.get(index);
                     mDrawables.set(drawableIndex, drawable);
                 } else {
@@ -124,7 +122,6 @@ public class ColorFieldView extends View {
 
         private int mWidth;
         private int mHeight;
-        private int mCellMemorySize;
         Rect mDrawCellBounds = new Rect();
 
         Cells(int width, int height) {
@@ -134,17 +131,12 @@ public class ColorFieldView extends View {
             int size = mWidth * mHeight;
             mCellColors = new CellColors(size);
             mCellDrawables = new CellDrawables();
-            createCells(0, size);
-            // makeCellMemorySize();
+            invalidateCellColors();
         }
 
         private int getIndex(int x, int y) {
             int index = x + y * mWidth;
             return index;
-        }
-
-        private void createCells(int first, int last) {
-            invalidateCellColors();
         }
 
         public void resize(int width, int height) {
@@ -164,23 +156,9 @@ public class ColorFieldView extends View {
             }
         }
 
-        // Brutal way to determine memory for one cell
-        /*
-         * private void makeCellMemorySize() { long freeMemoryBefore =
-         * MemoryUtils.getFreeMemory(); new Cell(); long freeMemoryAfter =
-         * MemoryUtils.getFreeMemory(); mCellMemorySize = (int)
-         * (freeMemoryBefore - freeMemoryAfter); }
-         */
-
-        /*
-         * public long getAmountOfMemory(int width, int height) { if
-         * (mCellMemorySize == 0) { return -1; }
-         * 
-         * int oldSize = mCells.length; int newSize = width * height; int delta
-         * = newSize - oldSize; if (delta <= 0) { return -1; }
-         * 
-         * return delta * mCellMemorySize; }
-         */
+        public long getAmountOfMemory(int width, int height) {
+            return width * height * 4;
+        }
 
         public void createBoundsForCell(int x, int y, Rect bounds) {
             bounds.left = x * (mCellWidth + mCellPadding.left)
@@ -221,18 +199,18 @@ public class ColorFieldView extends View {
 
         public void drawCell(int x, int y, Canvas canvas, Paint cellPaint,
                 Paint cellBoundsPaint) {
-            
+
             int color = getCellColor(x, y);
-            
+
             createBoundsForCell(x, y, mDrawCellBounds);
-            
+
             cellPaint.setColor(color);
             canvas.drawRect(mDrawCellBounds, cellPaint);
-            
-            Drawable drawable = mCellDrawables.getDrawable(getIndex(x,y));
+
+            Drawable drawable = mCellDrawables.getDrawable(getIndex(x, y));
             if (drawable != null) {
-               drawable.setBounds(mDrawCellBounds);
-               drawable.draw(canvas);
+                drawable.setBounds(mDrawCellBounds);
+                drawable.draw(canvas);
             }
 
             int strokeWidth = (int) cellBoundsPaint.getStrokeWidth() / 2;
@@ -259,8 +237,8 @@ public class ColorFieldView extends View {
 
     View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
         private Point mCellCoord = new Point();
-        private Rect  mPreviousCellBounds = new Rect(-1,-1,-1,-1);
-        
+        private Rect mPreviousCellBounds = new Rect(-1, -1, -1, -1);
+
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             if (mOnCellClickListener != null
@@ -279,7 +257,7 @@ public class ColorFieldView extends View {
 
             switch (action) {
             case MotionEvent.ACTION_MOVE:
-                if (mPreviousCellBounds.contains((int)x, (int)y)) {
+                if (mPreviousCellBounds.contains((int) x, (int) y)) {
                     return;
                 }
 
@@ -287,7 +265,8 @@ public class ColorFieldView extends View {
                 if (findClickedCell(x, y) == false) {
                     return;
                 }
-                mCells.createBoundsForCell(mCellCoord.x, mCellCoord.y, mPreviousCellBounds);
+                mCells.createBoundsForCell(mCellCoord.x, mCellCoord.y,
+                        mPreviousCellBounds);
                 mOnCellClickListener.onCellClick(mCellCoord.x, mCellCoord.y);
                 break;
             }
@@ -556,9 +535,9 @@ public class ColorFieldView extends View {
     public int getCellColor(int x, int y) {
         return mCells.getCellColor(x, y);
     }
-    
+
     private Rect mCellToRedrawBounds = new Rect();
-    
+
     public void setCellToRedraw(int x, int y) {
         mCellToRedrawCoords.set(x, y);
         mPartialRedrawFlag = true;
@@ -695,7 +674,6 @@ public class ColorFieldView extends View {
     }
 
     public long getAmountOfMemory(int width, int height) {
-        return -1;
-        //return mCells.getAmountOfMemory(width, height);
+         return mCells.getAmountOfMemory(width, height);
     }
 }

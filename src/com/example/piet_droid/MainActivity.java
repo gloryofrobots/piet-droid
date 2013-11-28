@@ -48,6 +48,7 @@ import com.example.piet_droid.fragment.DialogFragmentSaveChanges;
 import com.example.piet_droid.fragment.FragmentCommandLog;
 import com.example.piet_droid.fragment.FragmentPaletteSimple;
 import com.example.piet_droid.fragment.FragmentStateInfo;
+import com.example.piet_droid.widget.AccordionTabHost;
 import com.example.piet_droid.widget.ColorFieldView;
 import com.example.piet_droid.widget.ControlToolboxView;
 import com.example.piet_droid.widget.TabHostBuilder;
@@ -209,14 +210,17 @@ public class MainActivity extends SherlockFragmentActivity implements
     private static final String TEMPORARY_FILENAME = ".pietdroid_tmp.png";
     private static final String SHARED_PREFERENCES_KEY_IS_TEMPORARY = "is_temporary";
     private static final String SHARED_PREFERENCES_ZOOM_STEP = "zoom_step";
-
+    private static final String SHARED_PREFERENCES_LOGGING_ENABLE = "logging_enable";
+    
+    private static final int LOG_TAB_INDEX = 4;
+    
     private final String LOG_TAG = "PietDroidMainActivity";
 
     private PietFile mCurrentFile;
     private Piet mPiet;
     private ColorFieldView mColorField;
     private int mActiveColor;
-
+    
     private long mSleepBetweenStep;
 
     private FragmentStateInfo mFragmentStateInfo;
@@ -259,12 +263,12 @@ public class MainActivity extends SherlockFragmentActivity implements
         } else {
             initStartState(resources);
         }
-
+        
+        initTabHost();
         initListeners(resources);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        updateFromPreferences();
         initActionBarAndScrollLock();
-        initTabHost();
+        updateFromPreferences();
     }
 
     private void abortApplication(String format, Object... args) {
@@ -363,8 +367,6 @@ public class MainActivity extends SherlockFragmentActivity implements
                 mColorField.setCellSide(side);
             }
         });
-
-        updateZoomView();
     }
 
     private void updateZoomView() {
@@ -993,7 +995,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         Context context = getApplicationContext();
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
-
+        //ZOOM STEP
         try {
             mZoomChangeValue = Integer.parseInt(preferences.getString(
                     SHARED_PREFERENCES_ZOOM_STEP, "2"));
@@ -1001,6 +1003,10 @@ public class MainActivity extends SherlockFragmentActivity implements
             mZoomChangeValue = 2;
             showMessageFromResource(R.string.warning_parsing_zoom_step);
         }
+        
+        updateZoomView();
+        
+        //STEP DELAY
         try {
             mSleepBetweenStep = Long.valueOf(preferences.getString(
                     SHARED_PREFERENCES_DELAY_BEFORE_STEP, "0"));
@@ -1008,7 +1014,13 @@ public class MainActivity extends SherlockFragmentActivity implements
             mSleepBetweenStep = 0;
             showMessageFromResource(R.string.warning_parsing_step_delay);
         }
-
+        
+        //TODO DELETE THIS
+//        if (isOnRunMode() == true) {
+//            getRunner().setStepDelay(mSleepBetweenStep);
+//        }
+        
+        // CELL PADDING
         int cellPadding = 0;
         try {
             cellPadding = Integer.valueOf(preferences.getString(
@@ -1018,6 +1030,9 @@ public class MainActivity extends SherlockFragmentActivity implements
             showMessageFromResource(R.string.warning_parsing_cell_padding);
         }
         
+        getPietFile().getView().setCellPadding(cellPadding);
+        
+        //GUI TRACE MODE
         try {
             mGuiTraceMode = GuiTraceMode.valueOf(preferences.getString(
                     SHARED_PREFERENCES_GUI_TRACE_MODE, "All"));
@@ -1027,21 +1042,40 @@ public class MainActivity extends SherlockFragmentActivity implements
         
         mRunListener.setGuiTraceMode(mGuiTraceMode);
         
-        getPietFile().getView().setCellPadding(cellPadding);
+        //LOGGING 
+        boolean logging_enable = preferences.getBoolean(SHARED_PREFERENCES_LOGGING_ENABLE, true);
+        updateLogging(logging_enable);
 
+        //CELL SIDE
         int cellSide = preferences.getInt(SHARED_PREFERENCES_KEY_CELL_SIDE,
                 mColorField.getMinCellSide());
         getPietFile().getView().setCellSide(cellSide);
-        if (mZoomView != null) {
-            updateZoomView();
-        }
+       
+        
+        //INFO WIDGET 
         boolean infoWidgetVisibility = preferences.getBoolean(
                 SHARED_PREFERENCES_KEY_INFO_WIDGET_VISIBILITY, true);
         updateInfoWidgetVisibility(infoWidgetVisibility);
-
-        if (isOnRunMode() == true) {
-            getRunner().setStepDelay(mSleepBetweenStep);
+    }
+    
+    private void updateLogging(boolean logging_enable) {
+        final AccordionTabHost tabs = (AccordionTabHost) findViewById(android.R.id.tabhost);
+        int resultTab = tabs.getCurrentTab();
+        if(resultTab == LOG_TAB_INDEX) {
+            resultTab = 0;
         }
+        
+        int visibility;
+        
+        if(logging_enable == true) {
+            visibility = View.VISIBLE;
+        } else {
+            visibility = View.GONE;
+        }
+        
+        tabs.getTabWidget().getChildTabViewAt(LOG_TAB_INDEX).setVisibility(visibility);
+        mFragmentCommandLog.enableLogging(logging_enable);
+        tabs.setCurrentTabForce(resultTab);
     }
 
     private int getActiveColor() {

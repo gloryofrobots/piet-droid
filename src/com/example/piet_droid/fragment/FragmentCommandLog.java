@@ -34,12 +34,27 @@ public class FragmentCommandLog extends SherlockFragment {
     ArrayList<String> mItems;
     ArrayAdapter<String> mAdapter;
     ListView mListView;
+    boolean mEnabled;
     private final String SAVE_KEY_ITEMS = "SAVE_KEY_ITEMS";
     
     public FragmentCommandLog() {
         mQueue = Collections.synchronizedList(new LinkedList<String>());
+        mEnabled = true;
     }
-
+    
+    public void enableLogging(boolean value) {
+        if(mEnabled == value) {
+            return;
+        }
+        
+        mEnabled = value;
+        mQueue.clear();
+    }
+    
+    public boolean isEnabled() {
+        return mEnabled;
+    }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -122,6 +137,9 @@ public class FragmentCommandLog extends SherlockFragment {
                 
                 @Override
                 public void onError(String error) {
+                    if(!mEnabled) {
+                        return;
+                    }
                     mQueue.add(error);
                 }
             });
@@ -132,7 +150,11 @@ public class FragmentCommandLog extends SherlockFragment {
         }
     }
 
-    public void update() {       
+    public void update() {   
+        if(!mEnabled) {
+            return;
+        }
+        
        synchronized (mQueue) {
            for (String record : mQueue) {
                mItems.add(record);

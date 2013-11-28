@@ -1,8 +1,5 @@
 package com.example.piet_droid;
 
-
-import java.io.IOException;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Resources;
@@ -59,7 +56,14 @@ class AsyncTaskLoadBitmap extends AsyncTask<Bitmap, Integer, Void> {
         
         mProgressDialog.setTitle(title);
         mProgressDialog.setMessage(message);
-        
+//        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface dialog) {
+//                AsyncTaskLoadBitmap.this.cancel(true);
+//            }
+//        });
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.show();
     }

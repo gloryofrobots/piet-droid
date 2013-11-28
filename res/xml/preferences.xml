@@ -4,7 +4,7 @@
         android:key="delay_before_step"
         android:summary="@string/delay_before_step_summary"
         android:title="@string/delay_before_step_title"
-        android:defaultValue="100"
+        android:defaultValue="0"
         android:inputType="number"/>
     
     <EditTextPreference
@@ -32,7 +32,15 @@
         android:title="@string/gui_trace_mode_title"
         android:entries="@array/gui_trace_mode_entries"
         android:entryValues="@array/gui_trace_mode_values"
-        android:defaultValue="2"
+        android:defaultValue="All"
+       />
+    
+    <CheckBoxPreference
+        android:dialogTitle="@string/logging_enable_title"
+        android:key="logging_enable"
+        android:summary="@string/logging_enable_summary"
+        android:title="@string/logging_enable_title"
+        android:defaultValue="true"
        />
     
     <!--  

@@ -1,31 +1,32 @@
 package com.example.piet_droid;
 
-
 import java.io.FileInputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
 
+import com.example.jpiet.CodelTableModel;
 import com.example.jpiet.Piet;
 import com.example.piet_droid.widget.ColorFieldView;
 
 public class PietFileLoader {
     public interface LoadListener {
         public void onComplete();
+
         public void onError(int errorStringId);
     };
-    
+
     PietFile mPietFile;
     Piet mPiet;
     ColorFieldView mView;
-    
+
     public PietFileLoader(PietFile pietFile) {
         mPietFile = pietFile;
         mPiet = mPietFile.getPiet();
         mView = mPietFile.getView();
     }
-    
+
     AsyncTaskLoadBitmap mLoadTask;
     
     private boolean prepareToLoad(Bitmap bitmap, LoadListener listener) {
@@ -44,52 +45,47 @@ public class PietFileLoader {
                 return false;
             }
         }
-
-        mPiet.createModel(width, height);
         
+        mPiet.setNewModel(width, height);
+
         mView.setVisibility(View.INVISIBLE);
         mView.resize(width, height);
         return true;
     }
-    
-    
-    private  BitmapFactory.Options createBitmapOptions() {
+
+    private BitmapFactory.Options createBitmapOptions() {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         return options;
     }
-    
-  
-    
-    
+
     public void loadAsync(String path, LoadListener listener) {
         BitmapFactory.Options options = createBitmapOptions();
         Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-        
+
         if (bitmap == null) {
             listener.onError(R.string.runtime_decoding_error);
             return;
         }
 
-       loadAsync(bitmap, path, listener);
+        loadAsync(bitmap, path, listener);
     }
-    
+
     public void loadAsync(FileInputStream stream, LoadListener listener) {
         BitmapFactory.Options options = createBitmapOptions();
-        Bitmap bitmap = BitmapFactory.decodeStream(stream,null, options);
-        
+        Bitmap bitmap = BitmapFactory.decodeStream(stream, null, options);
+
         if (bitmap == null) {
             listener.onError(R.string.runtime_decoding_error);
             return;
         }
-       
+
         loadAsync(bitmap, null, listener);
     }
-    
-  
-    
-    private void loadAsync(Bitmap bitmap, final String filePath, final LoadListener listener) {
-        if(prepareToLoad(bitmap, listener) == false) {
+
+    private void loadAsync(Bitmap bitmap, final String filePath,
+            final LoadListener listener) {
+        if (prepareToLoad(bitmap, listener) == false) {
             return;
         }
         final PietFileActor actor = mPietFile.getActor();
@@ -123,10 +119,10 @@ public class PietFileLoader {
                 }, mPietFile.getActivity());
         mLoadTask.execute(bitmap);
     }
-    
+
     public void finalise() {
         mPietFile = null;
-        
+
         if (mLoadTask != null) {
             mLoadTask.cancel(true);
             mLoadTask = null;

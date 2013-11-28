@@ -83,9 +83,12 @@ public class Piet {
 	    mMachine.calculateCommandOpportunity(color, visitor);
 	}
 	
-	public void createModel(int width, int height){
-		mModel = CodelTableModel.createEmptyCodelTableModel(width, height, CodelColor.WHITE);
-		mInterpreter.setInput(mModel);
+	public CodelTableModel createModel(int width, int height){
+		return CodelTableModel.createEmptyCodelTableModel(width, height, CodelColor.WHITE);
+	}
+	
+	public void setNewModel(int width, int height) {
+	    setModel(createModel(width, height));
 	}
 	
 	public void setModel(CodelTableModel model){

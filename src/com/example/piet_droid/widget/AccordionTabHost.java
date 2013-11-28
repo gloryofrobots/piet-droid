@@ -8,13 +8,13 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TabHost;
 
-public class AccordeonTabHost extends TabHost {
+public class AccordionTabHost extends TabHost {
 
-    public AccordeonTabHost(Context context) {
+    public AccordionTabHost(Context context) {
         super(context);
     }
 
-    public AccordeonTabHost(Context context, AttributeSet attrs) {
+    public AccordionTabHost(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -22,13 +22,18 @@ public class AccordeonTabHost extends TabHost {
     public void setup() {
         super.setup();
         //Create fake tab to unselect all possibility
-        TabSpec spec = newTabSpec("hiddenTab").setIndicator("").setContent(R.id.fakeAccordeonTabHostTab);
+        TabSpec spec = newTabSpec("hidden_tab").setIndicator("").setContent(R.id.fakeAccordeonTabHostTab);
         this.addTab(spec);
         this.getTabWidget().getChildTabViewAt(0).setVisibility(View.GONE);
     }
 
     @Override
     public void setCurrentTab(int index) {
+        if(index == 0) {
+            super.setCurrentTab(0);
+            return;
+        }
+        
         final FrameLayout contentView = getTabContentView();
         //Toggle view and switch to the fake tab
         if (index == getCurrentTab()) {
@@ -42,5 +47,16 @@ public class AccordeonTabHost extends TabHost {
             contentView.setVisibility(View.VISIBLE);
             super.setCurrentTab(index);
         }
+    }
+
+    public void setCurrentTabForce(int resultTab) {
+        //Skip accordion behaviour by setting tabwidget to fake tab first
+        setCurrentTab(0);
+        
+        if(resultTab == 0) {
+            return;
+        }
+        
+        setCurrentTab(resultTab);
     }
 }

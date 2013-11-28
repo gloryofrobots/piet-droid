@@ -114,8 +114,8 @@ public class PietFileActor {
 
     public void resize(int countX, int countY) {
         mView.resize(countX, countY);
-
-        mPiet.createModel(countX, countY);
+        mPiet.setNewModel(countX, countY);
+        
         //TODO MOVE AWAY
         mPietFile.untouch();
     }
