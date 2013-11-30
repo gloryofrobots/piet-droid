@@ -7,15 +7,15 @@
     <!-- android:background="#b0ae88" -->
 
     
- <ImageView
-        android:id="@+id/ic_launcher_action_bar"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginLeft="@dimen/file_tag_margin"
-        android:layout_marginTop="@dimen/file_tag_margin"
-        android:src="@drawable/ic_launcher"
-        android:contentDescription="@string/content_description_ic_launcher_action_bar"
-        />
+<!--  <ImageView -->
+<!--         android:id="@+id/ic_launcher_action_bar" -->
+<!--         android:layout_width="32dp" -->
+<!--         android:layout_height="32dp" -->
+<!--         android:layout_marginLeft="@dimen/file_tag_margin" -->
+<!--         android:layout_marginTop="@dimen/file_tag_margin" -->
+<!--         android:src="@drawable/ic_launcher" -->
+<!--         android:contentDescription="@string/content_description_ic_launcher_action_bar" -->
+<!--         /> -->
 
     <TextView
         android:id="@+id/text_view_file_tag"
@@ -25,6 +25,7 @@
         android:layout_marginTop="@dimen/file_tag_margin"
         android:textColor="@color/file_tag_text_color"
         android:textSize="@dimen/file_tag_text_size"
+        android:maxLines="1"
         android:textStyle="bold"
        />
    

@@ -174,8 +174,7 @@ public class ColorFieldView extends View {
         }
 
         public void createBoundsForCell(int x, int y, Rect bounds) {
-            ViewGroup.MarginLayoutParams vlp = (ViewGroup.MarginLayoutParams) getLayoutParams();
-            createBoundsForCell(x, y, bounds, vlp.leftMargin, vlp.topMargin);
+            createBoundsForCell(x, y, bounds, 0, 0);
         }
 
         public void setCellColor(int x, int y, int color) {
@@ -320,7 +319,7 @@ public class ColorFieldView extends View {
     private Paint mLinePaint;
     private Paint mCellPaint;
     private Paint mCellBoundsPaint;
-
+    //TODO REMOVE THIS
     private Rect mCellPadding;
     private Rect mCellMargin;
 
@@ -612,26 +611,23 @@ public class ColorFieldView extends View {
     }
 
     protected int makeMinimalCanvasWidth() {
-        ViewGroup.MarginLayoutParams vlp = (ViewGroup.MarginLayoutParams) getLayoutParams();
-
         int marginLeft = getCellMarginLeft();
 
         int minMeasureWidth = getCellCountX()
                 * mCellWidth
                 + (getTotalPaddingLeft() + (getCellStrokeWidth() * 2)
-                        + vlp.leftMargin + vlp.rightMargin + (marginLeft * 2));
+                         + (marginLeft * 2));
 
         return minMeasureWidth;
     }
 
     protected int makeMinimalCanvasHeight() {
-        ViewGroup.MarginLayoutParams vlp = (ViewGroup.MarginLayoutParams) getLayoutParams();
         int marginTop = getCellMarginTop();
 
         int minMeasureHeight = getCellCountY()
                 * mCellHeight
                 + (getTotalPaddingTop() + (getCellStrokeWidth() * 2)
-                        + vlp.bottomMargin + vlp.topMargin + (marginTop * 2));
+                        + (marginTop * 2));
         return minMeasureHeight;
     }
 

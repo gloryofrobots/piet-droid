@@ -368,8 +368,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     private void initActionBarAndScrollLock() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setCustomView(R.layout.action_bar_custom);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        // actionBar.setDisplayShowTitleEnabled(true);
+        //actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
         // FORCE SET COLOR BACKGROUND
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
