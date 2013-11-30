@@ -30,6 +30,8 @@ public class ColorFieldView extends View {
         public void onCellClick(int x, int y);
 
         public boolean isProcessClickWanted();
+
+        public boolean isNeedToHandleMoveAsClick();
     }
 
     private class Cells {
@@ -160,13 +162,20 @@ public class ColorFieldView extends View {
             return width * height * 4;
         }
 
-        public void createBoundsForCell(int x, int y, Rect bounds) {
+        public void createBoundsForCell(int x, int y, Rect bounds,
+                int layoutLeftMargin, int layoutRightMargin) {
+
             bounds.left = x * (mCellWidth + mCellPadding.left)
-                    + mCellMargin.left;
-            bounds.top = y * (mCellHeight + mCellPadding.top) + mCellMargin.top;
+                    + mCellMargin.left + layoutLeftMargin;
+            bounds.top = y * (mCellHeight + mCellPadding.top) + mCellMargin.top + layoutRightMargin;
 
             bounds.right = bounds.left + mCellWidth;
             bounds.bottom = bounds.top + mCellHeight;
+        }
+
+        public void createBoundsForCell(int x, int y, Rect bounds) {
+            ViewGroup.MarginLayoutParams vlp = (ViewGroup.MarginLayoutParams) getLayoutParams();
+            createBoundsForCell(x, y, bounds, vlp.leftMargin, vlp.topMargin);
         }
 
         public void setCellColor(int x, int y, int color) {
@@ -201,7 +210,7 @@ public class ColorFieldView extends View {
                 Paint cellBoundsPaint) {
 
             int color = getCellColor(x, y);
-
+            
             createBoundsForCell(x, y, mDrawCellBounds);
 
             cellPaint.setColor(color);
@@ -261,7 +270,10 @@ public class ColorFieldView extends View {
                     return;
                 }
 
-            case MotionEvent.ACTION_DOWN:
+                if (mOnCellClickListener.isNeedToHandleMoveAsClick() == false) {
+                    return;
+                }
+            case MotionEvent.ACTION_UP:
                 if (findClickedCell(x, y) == false) {
                     return;
                 }
@@ -341,10 +353,6 @@ public class ColorFieldView extends View {
 
     Cells mCells;
 
-    public void setOnCellClickListener(CellClickListener onCellClickListener) {
-        mOnCellClickListener = onCellClickListener;
-    }
-
     public ColorFieldView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
@@ -403,6 +411,10 @@ public class ColorFieldView extends View {
         this.setOnTouchListener(mOnTouchListener);
 
         init();
+    }
+
+    public void setOnCellClickListener(CellClickListener onCellClickListener) {
+        mOnCellClickListener = onCellClickListener;
     }
 
     protected void resetNewCellMargin() {
@@ -601,6 +613,7 @@ public class ColorFieldView extends View {
 
     protected int makeMinimalCanvasWidth() {
         ViewGroup.MarginLayoutParams vlp = (ViewGroup.MarginLayoutParams) getLayoutParams();
+
         int marginLeft = getCellMarginLeft();
 
         int minMeasureWidth = getCellCountX()
@@ -674,6 +687,6 @@ public class ColorFieldView extends View {
     }
 
     public long getAmountOfMemory(int width, int height) {
-         return mCells.getAmountOfMemory(width, height);
+        return mCells.getAmountOfMemory(width, height);
     }
 }

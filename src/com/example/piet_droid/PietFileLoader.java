@@ -1,5 +1,6 @@
 package com.example.piet_droid;
 
+import java.io.File;
 import java.io.FileInputStream;
 
 import android.graphics.Bitmap;
@@ -107,6 +108,7 @@ public class PietFileLoader {
                         mPietFile.setPath(filePath);
                         mPietFile.untouch();
                         mLoadTask = null;
+                       
                         listener.onComplete();
                     }
 

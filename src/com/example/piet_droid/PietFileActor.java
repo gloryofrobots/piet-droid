@@ -1,6 +1,8 @@
 package com.example.piet_droid;
 
 
+import java.io.File;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -26,6 +28,7 @@ public class PietFileActor {
 
     private final String SAVE_KEY_MODEL_INSTANCE_STATE = "PietCodelTableModelInstanceState";
     private final String SAVE_KEY_CURRENT_FILENAME_INSTANCE_STATE = "PietCurrentFileNameInstanceState";
+    private final String SAVE_KEY_IS_TEMPORARY_FILE = "PietCurrentFileIsTemporary";
     
     public PietFileActor(PietFile pietFile) {
         mPietFile = pietFile;
@@ -57,11 +60,8 @@ public class PietFileActor {
         CodelTableModel model = mPiet.getModel();
         CodelTableModelSerializedData data = model.getSerializeData();
         savedInstanceState.putSerializable(SAVE_KEY_MODEL_INSTANCE_STATE, data);
-
-        if (mPietFile.hasPath() == false) {
-            return;
-        }
-
+        savedInstanceState.putBoolean(SAVE_KEY_IS_TEMPORARY_FILE, mPietFile.isTemporary());
+        
         savedInstanceState.putString(SAVE_KEY_CURRENT_FILENAME_INSTANCE_STATE,
                 mPietFile.getPath());
     }
@@ -75,14 +75,13 @@ public class PietFileActor {
 
         attachModel(model);
         invalidateView();
-
+        
+        boolean isTemporary = savedInstanceState.getBoolean(SAVE_KEY_IS_TEMPORARY_FILE);
+        mPietFile.setTemporary(isTemporary);
+        
         String fileName = savedInstanceState
                 .getString(SAVE_KEY_CURRENT_FILENAME_INSTANCE_STATE);
-
-        if (fileName == null) {
-            return;
-        }
-
+        
         mPietFile.setPath(fileName);
     }
 

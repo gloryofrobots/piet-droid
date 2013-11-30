@@ -5,85 +5,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_background"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     tools:context=".MainActivity" >
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/tool_box_height"
-        android:gravity="center"
-        android:orientation="horizontal" >
-
-        <com.example.piet_droid.widget.ControlToolboxView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/fragment_control_toolbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:padding="0dp" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="0dp"
-            android:orientation="horizontal" >
-
-            <com.example.piet_droid.widget.ZoomView
-                android:id="@+id/zoom_view_tools"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:contentDescription="@string/content_description_button_scroll_toggle" />
-
-            <ImageButton
-                android:id="@+id/button_scroll_toggle_tools"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:contentDescription="@string/content_description_button_scroll_toggle"
-                android:src="@drawable/button_scroll_toggle" />
-        </LinearLayout>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-         >
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
 
-        <HorizontalScrollView
+        <ScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:scrollbars="horizontal"
-            android:layout_centerInParent="true" >
+            android:layout_marginTop="@dimen/small_horizontal_margin"
+            android:scrollbars="vertical" >
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="@dimen/palette_slide_panel_width"
                 android:layout_height="wrap_content"
-                android:gravity="top"
-                android:orientation="horizontal" >
+                android:gravity="center_horizontal"
+                android:orientation="vertical" >
 
                 <fragment
                     android:id="@+id/fragment_palette_simple"
                     android:name="com.example.piet_droid.fragment.FragmentPaletteSimple"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
-            </RelativeLayout>
-        </HorizontalScrollView>
-    </RelativeLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginBottom="@dimen/small_horizontal_margin"
+        android:layout_marginRight="@dimen/medium_horizontal_margin"
+        android:layout_marginTop="@dimen/small_horizontal_margin"
         android:layout_weight="1"
-        android:background="@color/white"
+        android:background="@drawable/border"
         android:orientation="vertical" >
 
         <LinearLayout
@@ -91,7 +51,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="0dp" >
+            android:padding="2dp" >
 
             <com.example.piet_droid.widget.ScrollViewLockable
                 android:id="@+id/scrollview_codelField_vertical"
@@ -117,11 +77,6 @@
                             android:layout_width="1dp"
                             android:layout_height="1dp"
                             android:layout_gravity="center"
-                            android:layout_marginBottom="@dimen/codel_board_margin_bottom"
-                            android:layout_marginLeft="@dimen/codel_board_margin_top_left_right"
-                            android:layout_marginRight="@dimen/codel_board_margin_top_left_right"
-                            android:layout_marginTop="@dimen/codel_board_margin_top_left_right"
-                            
                             colorField:cellHeight="30dp"
                             colorField:cellMargin="@dimen/codel_board_cell_margin"
                             colorField:cellWidth="30dp"
@@ -136,12 +91,13 @@
             </com.example.piet_droid.widget.ScrollViewLockable>
         </LinearLayout>
 
+      
         <com.example.piet_droid.widget.AccordionTabHost
             android:id="@android:id/tabhost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="@dimen/info_widget_margin_top" >
+            android:layout_marginTop="@dimen/info_widget_margin_top" 
+            android:layout_alignParentBottom="true" >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -151,11 +107,11 @@
                 <FrameLayout
                     android:id="@android:id/tabcontent"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="match_parent" 
                     android:layout_weight="1"
-                    android:background="@color/info_widget_panel_color" >
-
-                    <LinearLayout
+                    android:background="@color/info_widget_panel_color"
+                    >
+					<LinearLayout
                         android:id="@+id/fakeAccordeonTabHostTab"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
@@ -233,13 +189,12 @@
                             android:layout_marginTop="@dimen/info_widget_margin_top" />
                     </LinearLayout>
                 </FrameLayout>
-
-                <TabWidget
+                 <TabWidget
                     android:id="@android:id/tabs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:background="@drawable/border" >
+                    android:background="@drawable/border" 
+                    android:layout_weight="0">
                 </TabWidget>
             </LinearLayout>
         </com.example.piet_droid.widget.AccordionTabHost>

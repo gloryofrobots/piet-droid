@@ -94,10 +94,6 @@ public class ZoomView extends LinearLayout {
         if(mCurrentStep < mLimit && mButtonZoomIncrease.isEnabled() == false) {
             mButtonZoomIncrease.setEnabled(true);
         }
-        
-        if(mListener == null) {
-            return;
-        }
     }
     
     private void updateIncrease() {
@@ -112,12 +108,13 @@ public class ZoomView extends LinearLayout {
             mButtonZoomDecrease.setEnabled(true);
         }
         
-        if(mListener == null) {
-            return;
-        }
     }
     
     private void notifyListener() {
+        if(mListener == null) {
+            return;
+        }
+        
         mListener.onChangeZoom(mCurrentStep);
     }
     

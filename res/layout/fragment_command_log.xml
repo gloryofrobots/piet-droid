@@ -12,6 +12,7 @@
         android:transcriptMode="normal"
         android:padding="@dimen/info_widget_panel_content_padding"
         android:textColor="@color/info_widget_panel_content_text_color"
-        android:textSize="@dimen/info_widget_panel_content_text_size" />
+        android:textSize="@dimen/info_widget_panel_content_text_size"
+        android:cacheColorHint="@color/info_widget_panel_color" />
 
 </LinearLayout>

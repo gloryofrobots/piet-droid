@@ -1,42 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-     >
-<!-- android:background="#b0ae88" -->
-    <com.example.piet_droid.widget.ControlToolboxView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/fragment_control_toolbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/control_toolbox_padding"
-        android:layout_alignParentLeft="true" />
-   
-    
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true" 
-        android:orientation="horizontal"
-        android:paddingTop="@dimen/control_toolbox_padding">
-         
-    <com.example.piet_droid.widget.ZoomView
-            android:id="@+id/zoom_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/small_horizontal_margin"
-            android:background="@null"
-            android:contentDescription="@string/content_description_button_scroll_toggle"
-       />
-    
-        <ImageButton
-            android:id="@+id/button_scroll_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/small_horizontal_margin"
-            android:background="@null"
-            android:contentDescription="@string/content_description_button_scroll_toggle"
-            android:src="@drawable/button_scroll_toggle" />
-    </LinearLayout>
+    android:orientation="horizontal" >
 
-</RelativeLayout>
+    <!-- android:background="#b0ae88" -->
+
+    
+ <ImageView
+        android:id="@+id/ic_launcher_action_bar"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="@dimen/file_tag_margin"
+        android:layout_marginTop="@dimen/file_tag_margin"
+        android:src="@drawable/ic_launcher"
+        android:contentDescription="@string/content_description_ic_launcher_action_bar"
+        />
+
+    <TextView
+        android:id="@+id/text_view_file_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/file_tag_margin"
+        android:layout_marginTop="@dimen/file_tag_margin"
+        android:textColor="@color/file_tag_text_color"
+        android:textSize="@dimen/file_tag_text_size"
+        android:textStyle="bold"
+       />
+   
+</LinearLayout>

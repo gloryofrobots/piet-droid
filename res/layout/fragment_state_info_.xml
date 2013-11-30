@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/big_vertical_margin"
         android:gravity="bottom"
-        android:padding="@dimen/info_widget_panel_content_padding"
+        android:paddingLeft="@dimen/info_widget_panel_content_padding"
         android:textColor="@color/info_widget_panel_content_text_color"
         android:textSize="@dimen/info_widget_panel_content_text_size" />
 

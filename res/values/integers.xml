@@ -2,8 +2,8 @@
     <integer name="field_count_codels_x">10</integer>
     <integer name="field_count_codels_y">10</integer>
     
-    <integer name="palette_count_codels_x">1</integer>
-    <integer name="palette_count_codels_y">20</integer>
+    <integer name="palette_count_codels_x">20</integer>
+    <integer name="palette_count_codels_y">1</integer>
     
     <integer name="codel_field_cell_padding">2</integer>
     <integer name="codel_field_stroke_width">1</integer>

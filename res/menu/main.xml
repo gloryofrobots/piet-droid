@@ -4,7 +4,7 @@
         android:id="@+id/action_bitmap"
         android:icon="@drawable/rw_action_bitmap"
         android:orderInCategory="100"
-        android:showAsAction="never"
+        android:showAsAction="always"
         android:title="@string/action_bitmap">
         <menu xmlns:android="http://schemas.android.com/apk/res/android" >
             <item

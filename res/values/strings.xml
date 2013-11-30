@@ -15,6 +15,7 @@
     <string name="content_description_button_scroll_toggle">Toggle scroll button</string>
     <string name="content_description_button_zoom_decrease">Zoom decrease</string>
     <string name="content_description_button_zoom_increase">Zoom increase</string>
+    <string name="content_description_ic_launcher_action_bar">Application icon</string>
     
     <!-- ACTIONS -->
     <string name="action_bitmap">Bitmap</string>
@@ -89,11 +90,11 @@
     <string name="runtime_save_bitmap_error">Error writing image!</string>
     <string name="runtime_bitmap_saved">Bitmap saved!</string>
     <string name="runtime_edit_mode_lock_warning">Edit mode disabled until program executed.</string>
-    <string name="runtime_large_bitmap_error"> Error! Image is too large to create piet program. We will fix it in the next update</string>
+    <string name="runtime_large_bitmap_error"> Error! Image is too large to create piet program.</string>
     <string name="runtime_error_title">Error!</string>
     <string name="runtime_decoding_error">Decoding error!</string>
     
-    
+    <string name="abort_application_image_initialise_error">Can`t initialize piet image</string>
     <string name="abort_application_not_mounted">External Storage (SDCard) not mounted  %s</string>
     <string name="abort_application_cant_create_dir">Can`t create application directory %s</string>
     <string name="abort_application_is_not_dir">Application folder is not directory %s</string>

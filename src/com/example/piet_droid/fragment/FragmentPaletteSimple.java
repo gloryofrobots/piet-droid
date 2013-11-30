@@ -171,7 +171,8 @@ public class FragmentPaletteSimple extends SherlockFragment {
         mDrawable = new GradientDrawable();
 
         mPalette = (ColorFieldView) view.findViewById(R.id.colorPalette);
-
+        
+        
         mPalette.setOnCellClickListener(new ColorFieldView.CellClickListener() {
             @Override
             public void onCellClick(int x, int y) {
@@ -184,6 +185,11 @@ public class FragmentPaletteSimple extends SherlockFragment {
             @Override
             public boolean isProcessClickWanted() {
                 return true;
+            }
+
+            @Override
+            public boolean isNeedToHandleMoveAsClick() {
+                return false;
             }
         });
 
