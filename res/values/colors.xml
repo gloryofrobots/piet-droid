@@ -33,7 +33,7 @@
     <color name="info_widget_tabhost_tab_text_color">#000</color>
     <color name="info_widget_panel_content_text_color">#000</color>
 <!--     <color name="info_widget_panel_color">#7f879f38</color> -->
-    <color name="info_widget_panel_color">#fff</color>
+    <color name="info_widget_panel_color">#b0ae88</color>
     
     <color name="file_tag_text_color">#fff</color>
 </resources>

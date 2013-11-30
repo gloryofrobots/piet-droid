@@ -49,6 +49,7 @@ import com.example.piet_droid.fragment.FragmentPaletteSimple;
 import com.example.piet_droid.fragment.FragmentStateInfo;
 import com.example.piet_droid.widget.AccordionTabHost;
 import com.example.piet_droid.widget.ColorFieldView;
+import com.example.piet_droid.widget.ColorIndicatorView;
 import com.example.piet_droid.widget.ControlToolboxView;
 import com.example.piet_droid.widget.TabHostBuilder;
 import com.example.piet_droid.widget.HorizontalScrollViewLockable;
@@ -153,9 +154,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     // //////////////////////////////////////////////////////////////////////////
     public class SaveListener implements PietFileSaver.SaveListener {
-
-        SaveListener() {
-        }
 
         @Override
         public void onComplete() {
@@ -272,12 +270,25 @@ public class MainActivity extends SherlockFragmentActivity implements
             return;
         }
 
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
         initTabHost();
         initListeners(resources);
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        initActionBarAndScrollLock();
+        initActionBar();
+        initControlToolbox();
+        initScrollLock();
+        initZoomView();
+
+        updateCurrentColorIndicator();
         updateFromPreferences();
         updateFileTagView();
+    }
+
+    private void updateCurrentColorIndicator() {
+        ActionBar actionBar = getSupportActionBar();
+        ColorIndicatorView indicator = (ColorIndicatorView) actionBar
+                .getCustomView().findViewById(R.id.current_color_indicator);
+        indicator.setColor(mActiveColor);
     }
 
     private void updateFileTagView() {
@@ -365,30 +376,27 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     ZoomView mZoomView;
 
-    private void initActionBarAndScrollLock() {
+    private void initActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setCustomView(R.layout.action_bar_custom);
-        //actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        // actionBar.setDisplayShowTitleEnabled(true);
+        // actionBar.setDisplayShowCustomEnabled(true);
         // FORCE SET COLOR BACKGROUND
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources()
                 .getColor(R.color.action_bar_background)));
 
+    }
+
+    private void initControlToolbox() {
         mControlToolBoxView = (ControlToolboxView) findViewById(R.id.fragment_control_toolbox);
 
         mControlToolBoxView.setInteractionListener(mInteractionListener);
-
-        final ImageButton buttonScroll = (ImageButton) findViewById(R.id.button_scroll_toggle_tools);
-
-        initScrollLock(buttonScroll);
-        mZoomView = (ZoomView) findViewById(R.id.zoom_view_tools);
-
-        initZoomView();
-
     }
 
     private void initZoomView() {
+        mZoomView = (ZoomView) findViewById(R.id.zoom_view_tools);
+
         mZoomView.setListener(new ZoomView.ZoomListener() {
             @Override
             public void onChangeZoom(int count) {
@@ -408,7 +416,9 @@ public class MainActivity extends SherlockFragmentActivity implements
         mZoomView.set(current, limit);
     }
 
-    private void initScrollLock(final ImageButton buttonScroll) {
+    private void initScrollLock() {
+        final ImageButton buttonScroll = (ImageButton) findViewById(R.id.button_scroll_toggle_tools);
+
         mOnScrollMode = false;
         updateScrollViews();
         buttonScroll.setSelected(!mOnScrollMode);
@@ -739,6 +749,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public void onChooseColor(int color) {
         mActiveColor = color;
+        updateCurrentColorIndicator();
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

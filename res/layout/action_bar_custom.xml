@@ -7,6 +7,13 @@
     <!-- android:background="#b0ae88" -->
 
     
+        <com.example.piet_droid.widget.ColorIndicatorView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/current_color_indicator"
+            android:layout_margin="@dimen/small_horizontal_margin"
+            android:layout_width="@dimen/current_color_indicator_size"
+            android:layout_height="@dimen/current_color_indicator_size"
+             />
 <!--  <ImageView -->
 <!--         android:id="@+id/ic_launcher_action_bar" -->
 <!--         android:layout_width="32dp" -->
